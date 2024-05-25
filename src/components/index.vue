@@ -1,10 +1,10 @@
 <template>
   <div class="nav">
-    <h1 class="title">IYUWB-NAV</h1>
+    <h1 class="title"></h1>
     <div class="search">
       <div class="seach-engine" :style="{ top: styleTop() }">
         <div
-          :style="{ visibility: item.active ? 'visible' : 'hidden' }"
+          :style="{ visibility: item.active ? 'visible' : '' }"
           v-for="item in searchEngineList"
           :key="item.name"
           @click="selectSearchEngine(item)"
@@ -12,10 +12,22 @@
           {{ item.name }}
         </div>
       </div>
-      <input type="text" v-model="searchKey"/>
+      <input type="text" v-model="searchKey" @keyup.enter="clickSearch"/>
       <button @click="clickSearch">Search</button>
     </div>
-    <div class="content"></div>
+    <!-- <div class="content">
+      <div class="left-content">
+        
+      </div>
+      <div class="right-content"></div>
+    </div> -->
+    <div class="right">
+      <div class="link-list">
+        <button v-for="item in linlList" :key="item.name" @click="go(item)">
+          {{ item.name }}
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -35,6 +47,16 @@ export default {
         { name: "Douyin", active: false },
         { name: "Bili", active: false },
       ],
+      linlList: [
+        { name: "文心一言", link: "https://yiyan.baidu.com/" },
+        { name: "GITHUB", link: "https://github.com/" },
+        { name: "MDN", link: "https://developer.mozilla.org/" },
+        { name: "微信读书", link: "https://weread.qq.com/" },
+        { name: "Bilibili", link: "https://bilibili.com/" },
+        { name: "抖音", link: "https://douyin.com/" },
+        { name: "怡然博客", link: "http://r.yuwb.cn/" },
+        { name: "耶温博客", link: "http://yuwb.cn/" },
+      ],
     };
   },
   methods: {
@@ -53,6 +75,7 @@ export default {
           `https://search.bilibili.com/all?keyword=${this.searchKey}`
         );
       }
+      this.searchKey = "";
     },
     selectSearchEngine(item) {
       this.searchEngineList.map((it) => (it.active = false));
@@ -62,6 +85,9 @@ export default {
       let index = this.searchEngineList.findIndex((it) => it.active);
       return `-${index * 52}px`;
     },
+    go(item) {
+      window.open(item.link);
+    },
   },
 };
 </script>
@@ -70,13 +96,18 @@ export default {
 .nav {
   width: 100%;
   height: 100%;
-  background-color: #ccc;
-  background: #ebbd92;
-  background: linear-gradient(90deg, #ebbd9288 0, #a96aa288 58%);
+  background-image: url("bg.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  position: relative;
+  overflow-x: hidden;
+  /* background: linear-gradient(90deg, #ebbd9288 0, #a96aa288 58%);
   -webkit-backdrop-filter: blur(5px);
-  backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px); */
 }
 h1.title {
+  visibility: hidden;
   padding: 0;
   margin: 0 auto;
   padding-top: 1%;
@@ -87,9 +118,8 @@ h1.title {
   width: 38vw;
   margin: 20vh auto 0;
   height: 52px;
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.4);
   border-radius: 12px;
-  backdrop-filter: blur(5px);
   box-shadow: 5px 5px 5px rgba(255, 255, 255, 0.2);
   position: relative;
 }
@@ -134,7 +164,6 @@ h1.title {
 .nav .search .seach-engine div {
   cursor: pointer;
   width: 80px;
-
   visibility: hidden;
   line-height: 52px;
   color: transparent;
@@ -149,10 +178,76 @@ h1.title {
   width: 68vw;
   height: 50vh;
   background-color: #fff;
-  margin: 5vh auto;
+  margin: 10vh auto;
   background: rgba(255, 255, 255, 0.4);
   border-radius: 6px;
-  backdrop-filter: blur(5px);
   box-shadow: 5px 5px 5px rgba(255, 255, 255, 0.2);
+  display: flex;
+}
+.nav .content .left-content {
+  padding: 16px;
+  width: 50%;
+  height: 100%;
+  /* background-color: pink; */
+  flex: 1;
+  border-right: 2px solid rgba(255, 255, 255, 0.3);
+  box-sizing: border-box;
+}
+.nav .content .right-content {
+  padding: 16px;
+  width: 50%;
+  height: 100%;
+  /* background-color: red; */
+  flex: 1;
+  border-left: 2px solid rgba(255, 255, 255, 0.3);
+  box-sizing: border-box;
+}
+
+.nav .right {
+  position: absolute;
+  width: 200px;
+  height: 70%;
+  top: 20vh;
+  background-color: transparent;
+  transition: 0.3s;
+  right: -160px;
+  cursor: pointer;
+  padding-left: 50px;
+  box-sizing: border-box;
+}
+.nav .right:hover {
+  right: 0px;
+}
+.nav .right .link-list {
+  border-radius: 12px;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.4);
+  box-shadow: -5px 5px 5px rgba(255, 255, 255, 0.2);
+  overflow: auto;
+  padding-top: 12px;
+}
+.nav .right .link-list::-webkit-scrollbar {
+  display: none;
+}
+.nav .right .link-list button {
+  min-width: 100px;
+  text-align: center;
+  outline: none;
+  border: none;
+  background: linear-gradient(90deg, #ebbd92 0, #a96aa2 58%);
+  border-radius: 4px;
+  color: #fff;
+  padding: 8px 12px;
+  backdrop-filter: blur(5px);
+  cursor: pointer;
+  letter-spacing: 2px;
+  margin: 6px;
+}
+.nav .right .link-list button:hover {
+  background: linear-gradient(90deg, #ebbd92aa 0, #a96aa2bb 58%);
+}
+.nav .right .link-list button:active {
+  background: linear-gradient(90deg, #ebbd92 0, #a96aa2 58%);
 }
 </style>
