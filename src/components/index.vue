@@ -3,16 +3,11 @@
     <h1 class="title"></h1>
     <div class="search">
       <div class="seach-engine" :style="{ top: styleTop() }">
-        <div
-          :style="{ visibility: item.active ? 'visible' : '' }"
-          v-for="item in searchEngineList"
-          :key="item.name"
-          @click="selectSearchEngine(item)"
-        >
+        <div :style="{ visibility: item.active ? 'visible' : '' }" v-for="item in searchEngineList" :key="item.name" @click="selectSearchEngine(item)">
           {{ item.name }}
         </div>
       </div>
-      <input type="text" v-model="searchKey" @keyup.enter="clickSearch"/>
+      <input type="search" v-model="searchKey" @keyup.enter="clickSearch" />
       <button @click="clickSearch">Search</button>
     </div>
     <!-- <div class="content">
@@ -113,6 +108,8 @@ h1.title {
   padding-top: 1%;
   color: rgba(255, 255, 255, 0.6);
 }
+
+
 .nav .search {
   z-index: 99;
   width: 38vw;
@@ -125,15 +122,15 @@ h1.title {
 }
 
 .nav .search input {
-  padding-left: 60px;
-  padding-right: 60px;
+  padding-left: 80px;
+  padding-right: 100px;
   box-sizing: border-box;
   outline: none;
   border: none;
   color: #a96aa2;
   line-height: 52px;
   height: 52px;
-  width: 80%;
+  width: 100%;
   background-color: transparent;
   font-size: 22px;
 }
@@ -204,6 +201,7 @@ h1.title {
 }
 
 .nav .right {
+  -webkit-tap-highlight-color: transparent;
   position: absolute;
   width: 200px;
   height: 70%;
@@ -227,6 +225,7 @@ h1.title {
   overflow: auto;
   padding-top: 12px;
 }
+
 .nav .right .link-list::-webkit-scrollbar {
   display: none;
 }
@@ -249,5 +248,19 @@ h1.title {
 }
 .nav .right .link-list button:active {
   background: linear-gradient(90deg, #ebbd92 0, #a96aa2 58%);
+}
+
+
+@media (max-width:800px) {
+  .nav .search {
+    z-index: 99;
+    width: 80vw;
+  }
+  .nav .search input{
+    padding-right: 20px;
+  }
+  .nav .search button{
+    display: none;
+  }
 }
 </style>
