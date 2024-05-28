@@ -201,6 +201,7 @@ h1.title {
 }
 
 .nav .right {
+  z-index: 99;
   -webkit-tap-highlight-color: transparent;
   position: absolute;
   width: 200px;
