@@ -10,12 +10,26 @@
       <input type="search" v-model="searchKey" @keyup.enter="clickSearch" />
       <button @click="clickSearch">Search</button>
     </div>
-    <!-- <div class="content">
-      <div class="left-content">
-        
+    <div class="content">
+      <div class="tab-btn">
+        <button>待办列表</button>
+        <button>备忘录</button>
       </div>
-      <div class="right-content"></div>
-    </div> -->
+      <div class="left-content">
+        <div class="title">Todo</div>
+        <div class="centont-todo-list">
+          <div class="left-list">1</div>
+          <div class="right-main">2</div>
+        </div>
+      </div>
+      <div class="right-content">
+        <div class="title">Memo</div>
+        <div class="centont-memo">
+          <div class="left-list">1</div>
+          <div class="right-main">2</div>
+        </div>
+      </div>
+    </div>
     <div class="right">
       <div class="link-list">
         <button v-for="item in linlList" :key="item.name" @click="go(item)">
@@ -78,7 +92,7 @@ export default {
     },
     styleTop() {
       let index = this.searchEngineList.findIndex((it) => it.active);
-      return `-${index * 52}px`;
+      return index? `-${(index * 32) - 10}px`:'10px';
     },
     go(item) {
       window.open(item.link);
@@ -162,7 +176,7 @@ h1.title {
   cursor: pointer;
   width: 80px;
   visibility: hidden;
-  line-height: 52px;
+  line-height: 32px;
   color: transparent;
   background-image: linear-gradient(90deg, #ebbd92 0, #a96aa2 58%);
   background-clip: text;
@@ -179,6 +193,42 @@ h1.title {
   background: rgba(255, 255, 255, 0.4);
   border-radius: 6px;
   box-shadow: 5px 5px 5px rgba(255, 255, 255, 0.2);
+  display: flex;
+  position: relative;
+}
+.nav .content .tab-btn{
+  position: absolute;
+  left: -30px;
+  top: 0px;
+  display: none;
+}
+.nav .content .tab-btn button{
+  display: block;
+  width: 25px;
+  height: 80px;
+  background: linear-gradient(90deg, #ebbd9286 0, #a96aa284 58%);
+}
+.nav .content .title{
+  margin: 0 auto;
+  width: 80px;
+  background-color: #fff;
+  background: linear-gradient(90deg, #ebbd9286 0, #a96aa284 58%);
+  border-radius: 4px;
+  color: #fff;
+  padding: 6px;
+  backdrop-filter: blur(5px);
+  letter-spacing: 2px;
+}
+.nav .content .left-list{
+  background-color: pink;
+  width: 200px;
+}
+.nav .content .right-main{
+  background-color: #fff;
+  flex: 1;
+}
+.nav .content .centont-todo-list,
+.nav .content .centont-memo{
   display: flex;
 }
 .nav .content .left-content {
@@ -252,15 +302,31 @@ h1.title {
 }
 
 
-@media (max-width:800px) {
+@media (max-width:1000px) {
   .nav .search {
     z-index: 99;
+    width: 80vw;
+  }
+  .nav .content {
     width: 80vw;
   }
   .nav .search input{
     padding-right: 20px;
   }
   .nav .search button{
+    display: none;
+  }
+}
+@media (max-width:1200px) {
+  .nav .content .tab-btn{
+    display: block;
+  }
+  .nav .content .left-content{
+    width: 100%;
+    display: block;
+  }
+  .nav .content .right-content{
+    width: 100%;
     display: none;
   }
 }
