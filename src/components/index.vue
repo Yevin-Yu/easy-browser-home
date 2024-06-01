@@ -11,10 +11,6 @@
       <button @click="clickSearch">Search</button>
     </div>
     <div class="content">
-      <div class="tab-btn">
-        <button>待办列表</button>
-        <button>备忘录</button>
-      </div>
       <div class="left-content">
         <div class="title">Todo</div>
         <div class="centont-todo-list">
@@ -66,6 +62,7 @@ export default {
         { name: "怡然博客", link: "http://r.yuwb.cn/" },
         { name: "耶温博客", link: "http://yuwb.cn/" },
       ],
+      tabActive:0,
     };
   },
   methods: {
@@ -96,6 +93,9 @@ export default {
     },
     go(item) {
       window.open(item.link);
+    },
+    tabBtn(active){
+      this.active = active
     },
   },
 };
@@ -195,29 +195,31 @@ h1.title {
   box-shadow: 5px 5px 5px rgba(255, 255, 255, 0.2);
   display: flex;
   position: relative;
+  overflow: auto;
 }
-.nav .content .tab-btn{
-  position: absolute;
-  left: -30px;
-  top: 0px;
-  display: none;
+.nav .content::-webkit-scrollbar{
+  width: 5px;
+  height: 5px;
+  background-color: transparent;
 }
-.nav .content .tab-btn button{
-  display: block;
-  width: 25px;
-  height: 80px;
-  background: linear-gradient(90deg, #ebbd9286 0, #a96aa284 58%);
+.nav .content::-webkit-scrollbar-thumb{
+  width: 5px;
+  height: 5px;
+  border-radius: 2px;
+  background: linear-gradient(0deg, #ebbd92 0, #a96aa2 58%);
 }
+
 .nav .content .title{
   margin: 0 auto;
-  width: 80px;
+  width: 70px;
   background-color: #fff;
   background: linear-gradient(90deg, #ebbd9286 0, #a96aa284 58%);
   border-radius: 4px;
   color: #fff;
-  padding: 6px;
+  padding: 4px;
   backdrop-filter: blur(5px);
   letter-spacing: 2px;
+  font-size: 18px;
 }
 .nav .content .left-list{
   background-color: pink;
@@ -232,7 +234,7 @@ h1.title {
   display: flex;
 }
 .nav .content .left-content {
-  padding: 16px;
+  padding: 12px;
   width: 50%;
   height: 100%;
   /* background-color: pink; */
@@ -241,7 +243,7 @@ h1.title {
   box-sizing: border-box;
 }
 .nav .content .right-content {
-  padding: 16px;
+  padding: 12px;
   width: 50%;
   height: 100%;
   /* background-color: red; */
@@ -318,16 +320,22 @@ h1.title {
   }
 }
 @media (max-width:1200px) {
-  .nav .content .tab-btn{
+  .nav .content {
     display: block;
   }
   .nav .content .left-content{
     width: 100%;
-    display: block;
+    border-right: 2px solid transparent;
+
   }
   .nav .content .right-content{
     width: 100%;
-    display: none;
+    border-left: 2px solid transparent;
+  }
+}
+@media (max-width:600px) {
+  .nav .content .left-list{
+    width: 120px;
   }
 }
 </style>
