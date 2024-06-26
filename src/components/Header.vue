@@ -2,7 +2,7 @@
     <div class="header">
         <div class="title">耶温导航</div>
         <div class="setting">
-            <img src="@/assets/set.svg" height="24px" alt="set">
+            <img src="@/assets/set.svg" height="18px" alt="set">
         </div>
     </div>
 </template>

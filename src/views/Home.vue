@@ -18,7 +18,7 @@ import Header from '@/components/Header.vue'
   height: 100%;
   min-width: 100vw;
   min-height: 100vh;
-  background-image: url("bg.png");
+  background-image: url("@/assets/bg.png");
   background-color: #000000;
   background-repeat: no-repeat;
   background-position: center;
