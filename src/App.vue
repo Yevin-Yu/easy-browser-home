@@ -6,6 +6,9 @@ import { RouterView } from 'vue-router'
   <RouterView />
 </template>
 
-<style scoped>
-
+<style>
+#app {
+  min-width: 100vw;
+  min-height: 100vh;
+}
 </style>
