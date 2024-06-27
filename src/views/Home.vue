@@ -10,6 +10,13 @@
 <script setup>
 import Search from '@/components/Search.vue'
 import Header from '@/components/Header.vue'
+import axios from 'axios';
+import { onMounted } from 'vue';
+// onMounted(() => {
+//   axios.post('/api/login', { username: '17343058952', password: '17343058952' }).then(res => {
+//     console.log(res)
+//   })
+// })
 </script>
 
 <style scoped>

@@ -9,6 +9,16 @@ import { VitePWA } from 'vite-plugin-pwa'
 // https://vitejs.dev/config/
 export default defineConfig({
   base: '/nav/',
+  // 配置代理
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000', // 你希望代理到的目标服务器地址
+        changeOrigin: true, // 是否开启代理服务器的跨域
+        rewrite: (path) => path.replace(/^\/api/, ''), // 重写路径，可选
+      },
+    },
+  },
   plugins: [
     vue(),
     vueJsx(),
