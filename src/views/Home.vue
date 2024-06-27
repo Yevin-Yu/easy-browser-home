@@ -1,22 +1,27 @@
 <template>
-  <div class="nav">
+  <div id="yuwbNav" class="nav">
     <!-- header -->
     <Header></Header>
     <!-- 搜索 -->
     <Search></Search>
+    <!-- 侧边栏 -->
   </div>
 </template>
 
 <script setup>
 import Search from '@/components/Search.vue'
 import Header from '@/components/Header.vue'
-import axios from 'axios';
 import { onMounted } from 'vue';
-// onMounted(() => {
-//   axios.post('/api/login', { username: '17343058952', password: '17343058952' }).then(res => {
-//     console.log(res)
-//   })
-// })
+import axios from 'axios';
+onMounted(() => {
+  axios.get('https://api.yuwb.cn/user/bg',).then(res => {
+    if (res.status === 200) {
+      console.log(res)
+      const base64ImageData = `data:image/png;base64,${res.data.bg_base64}`
+      document.getElementById('yuwbNav').style.backgroundImage = `url(${base64ImageData})`;
+    }
+  })
+})
 </script>
 
 <style scoped>
@@ -25,7 +30,6 @@ import { onMounted } from 'vue';
   height: 100%;
   min-width: 100vw;
   min-height: 100vh;
-  background-image: url("@/assets/bg.png");
   background-color: #000000;
   background-repeat: no-repeat;
   background-position: center;

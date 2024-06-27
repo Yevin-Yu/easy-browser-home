@@ -6,12 +6,12 @@
                 {{ item.name }}
             </div>
         </div>
-        <input type="search" v-model="searchKey" @keyup.enter="clickSearch" />
+        <input ref="searchRef" type="search" v-model="searchKey" @keyup.enter="clickSearch" />
         <button @click="clickSearch">Search</button>
     </div>
 </template>
 <script setup>
-import { ref, watchEffect } from 'vue'
+import { onMounted, ref, watchEffect } from 'vue'
 let searchKey = ref('')
 const searchEngineList = ref([
     { name: "百度", active: true },
@@ -20,6 +20,15 @@ const searchEngineList = ref([
     { name: "Bing", active: false },
 ])
 
+let searchRef = ref(null)   
+onMounted(() => {
+    searchRef.value.focus();
+    window.addEventListener('focus', function () {
+        console.log('页面获得焦点');
+        // 执行页面获得焦点时的操作   
+        searchRef.value.focus();
+    });
+})
 function styleTop() {
     let index = searchEngineList.value.findIndex((it) => it.active);
     return index ? `-${(index * 32) - 10}px` : '10px';
@@ -52,6 +61,10 @@ function clickSearch() {
     border-radius: 12px;
     box-shadow: 5px 5px 5px rgba(255, 255, 255, 0.2);
     position: relative;
+}
+
+.search:focus-within {
+    box-shadow: 5px 5px 15px #a96aa2da;
 }
 
 .search input {

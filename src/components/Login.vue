@@ -38,7 +38,7 @@ let isLoading = ref(false)
 let isShowLogin = defineProps(['isShowLogin'])
 function login() {
     isLoading.value = true
-    axios.post('/api/login', {
+    axios.post('https://api.yuwb.cn/login', {
         username: username.value,
         password: password.value
     }).then(res => {
