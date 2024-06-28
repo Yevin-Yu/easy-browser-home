@@ -9,19 +9,25 @@
 </template>
 
 <script setup>
-import Search from '@/components/Search.vue'
-import Header from '@/components/Header.vue'
-import { onMounted } from 'vue';
-import axios from 'axios';
+import Search from "@/components/Search.vue";
+import Header from "@/components/Header.vue";
+import axiosInstance from "@/axios";
+import { onMounted } from "vue";
+import { useCookieAuth } from "@/hook/useAuth.js";
+
+const { token } = useCookieAuth();
 onMounted(() => {
-  axios.get('https://api.yuwb.cn/user/bg',).then(res => {
-    if (res.status === 200) {
-      console.log(res)
-      const base64ImageData = `data:image/png;base64,${res.data.bg_base64}`
-      document.getElementById('yuwbNav').style.backgroundImage = `url(${base64ImageData})`;
-    }
-  })
-})
+  // 加载用户自己上传背景
+  if (token.value) {
+    axiosInstance.get("/user/bg").then(res => {
+      if (res.status === 200) {
+        console.log(res);
+        const base64ImageData = `data:image/png;base64,${res.data.bg_base64}`;
+        document.getElementById("yuwbNav").style.backgroundImage = `url(${base64ImageData})`;
+      }
+    });
+  }
+});
 </script>
 
 <style scoped>
@@ -38,7 +44,7 @@ onMounted(() => {
   overflow-x: hidden;
 }
 
-@media (max-width:1000px) {
+@media (max-width: 1000px) {
   .nav .search {
     z-index: 99;
     width: 80vw;
@@ -57,7 +63,7 @@ onMounted(() => {
   }
 }
 
-@media (max-width:1200px) {
+@media (max-width: 1200px) {
   .nav .content {
     display: block;
   }
@@ -74,7 +80,7 @@ onMounted(() => {
   }
 }
 
-@media (max-width:600px) {
+@media (max-width: 600px) {
   .nav .content .left-list {
     width: 120px;
   }
