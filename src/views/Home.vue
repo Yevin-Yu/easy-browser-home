@@ -5,12 +5,14 @@
     <!-- 搜索 -->
     <Search></Search>
     <!-- 侧边栏 -->
+    <Right></Right>
   </div>
 </template>
 
 <script setup>
 import Search from "@/components/Search.vue";
 import Header from "@/components/Header.vue";
+import Right from "@/components/Right.vue"
 import axiosInstance from "@/axios";
 import { onMounted } from "vue";
 import { useCookieAuth } from "@/hook/useAuth.js";

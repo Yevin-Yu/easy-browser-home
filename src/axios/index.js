@@ -3,7 +3,8 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 
 const axiosInstance = axios.create({
-  baseURL: 'https://api.yuwb.cn',
+  // baseURL: 'https://api.yuwb.cn',
+  baseURL: 'http://localhost:3000',
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',

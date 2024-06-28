@@ -12,9 +12,9 @@
           <label for="imageUpload" class="custom-file-upload">
             <input v-show="false" type="file" id="imageUpload" ref="fileInput" @change="onFileChange"
                    accept="image/*">
-            <span class="upload-button">选择图片</span>
+            <span class="upload-button">{{ btn_text }}</span>
           </label>
-          <span class="upload-button">删除背景</span>
+          <span @click="delBgImage" class="upload-button">删除背景</span>
           <div class="upload-tip" style="color:#ccc;">
             当前背景:{{ bg_name }}
           </div>
@@ -26,7 +26,14 @@
       <div class="item">
         <div class="title">侧边导航</div>
         <div class="card">
-
+          <el-radio-group v-model="is_nav">
+            <el-radio value="1">开启导航</el-radio>
+            <el-radio value="2">关闭导航</el-radio>
+          </el-radio-group>
+          <el-radio-group :disabled="is_nav==='2'" v-model="nav_type">
+            <el-radio value="1">默认导航</el-radio>
+            <el-radio value="2">右侧导航</el-radio>
+          </el-radio-group>
         </div>
       </div>
       <!-- <div class="item">
@@ -53,10 +60,12 @@ import { useRouter } from "vue-router";
 
 const router = useRouter();
 const { token, setToken, removeToken } = useCookieAuth();
-// 获取背景信息
+// 获取设置信息
 const username = ref("");
 const bg_name = ref("获取中...");
 const btn_text = ref("选择图片");
+const is_nav = ref("1");
+const nav_type = ref("1");
 onMounted(() => {
   axiosInstance.get("/user/info").then(res => {
     if (res.status === 200) {
@@ -69,6 +78,19 @@ onMounted(() => {
     }
   });
 });
+
+// 删除图片
+function delBgImage() {
+  axiosInstance.post("/delete/bg").then(res => {
+    if (res.status === 200) {
+      bg_name.value = "暂无背景图";
+      ElMessage({
+        message: "delete success",
+        type: "success",
+      });
+    }
+  });
+}
 
 // 上传图片
 const fileInput = ref(null);
@@ -222,5 +244,8 @@ function loginOut() {
   right: 12px;
   background-color: rgba(255, 255, 255, 0.4);
   color: #fff;
+}
+:deep(.el-radio__label) {
+  color:#eee;
 }
 </style>
