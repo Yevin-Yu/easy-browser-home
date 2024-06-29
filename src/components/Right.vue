@@ -1,11 +1,14 @@
 <template>
   <div class="right">
     <div class="link-list">
+      <h3>导航列表</h3>
       <button v-for="item in linkList" :key="item.name" @click="go(item)">
-        <div class="img">
-          <img  height="32px"  src="https://img.alicdn.com/imgextra/i3/O1CN01sffRIx1nb3dXCKdFC_!!6000000005107-2-tps-1024-1024.png" alt="">
-        </div>
-        <br/>{{ item.name }}
+        <span class="img">
+          <img  height="26px"  src="https://img.alicdn.com/imgextra/i3/O1CN01sffRIx1nb3dXCKdFC_!!6000000005107-2-tps-1024-1024.png" alt="">
+        </span>
+        <span class="text">
+          {{ item.name }}
+        </span>
       </button>
     </div>
   </div>
@@ -46,15 +49,28 @@ function go(item) {
 .right:hover {
   right: 0px;
 }
-
+.right .link-list h3{
+  margin-top: 10px;
+  font-size: 16px;
+  color: #ccc;
+  padding-left: 16px;
+}
 .right .link-list {
-  border-radius: 12px;
+  border-radius: 24px 0 0 24px;
   width: 100%;
   height: 100%;
   background: rgba(255, 255, 255, 0.4);
   box-shadow: -5px 5px 5px rgba(255, 255, 255, 0.2);
   overflow: auto;
   padding-top: 12px;
+  font-size: 12px;
+}
+.right .link-list .text{
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-bottom: 6px;
 }
 
 .right .link-list::-webkit-scrollbar {
@@ -62,31 +78,31 @@ function go(item) {
 }
 
 .right .link-list button {
-  width: 100px;
+  width: calc(50% - 24px);
   text-align: center;
   outline: none;
   border: none;
-  background: linear-gradient(90deg, rgb(235, 189, 146) 0, rgb(169, 106, 162) 58%);
+  background: linear-gradient(90deg, rgba(235, 189, 146, 0.76) 0, rgba(165, 106, 169, 0.29) 58%);
   border-radius: 4px;
   color: #fff;
-  padding: 8px 12px;
   backdrop-filter: blur(5px);
   cursor: pointer;
   letter-spacing: 2px;
-  margin: 6px;
+  margin: 12px;
+  box-sizing: border-box;
 }
 .right .link-list button .img{
-  margin-bottom: 12px;
+  margin:6px;
   display: inline-block;
-  height: 50px;
-  width: 50px;
+  height: 42px;
+  width: 42px;
   border-radius: 50%;
   background-color: rgba(255, 255, 255, 0.33);
   backdrop-filter: blur(5px);
 }
 .right .link-list button .img img{
   position: relative;
-  top: 9px;
+  top: 8px;
 }
 .right .link-list button:hover {
   background: linear-gradient(90deg, #ebbd92aa 0, #a96aa2bb 58%);

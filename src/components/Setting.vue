@@ -1,8 +1,10 @@
 <template>
   <div class="setting">
-    <el-button class="close" @click="closeSetting" circle>关</el-button>
+    <el-button class="close" @click="closeSetting" circle>
+      <img src="@/assets/close.svg" alt="close">
+    </el-button>
     <div class="user-info">
-      欢迎！<span>{{ username }}</span>
+      欢迎！<span>{{ mainStore.username }}</span>
       <el-button @click="loginOut" type="primary" link> 退出</el-button>
     </div>
     <div class="content">
@@ -19,18 +21,23 @@
             当前背景:{{ bg_name }}
           </div>
           <div class="upload-tip" style="color:#ccc;">
-            上传后刷新页面，重新加载背景
+            背景图片限制大小为2.5M
           </div>
         </div>
       </div>
       <div class="item">
-        <div class="title">侧边导航</div>
+        <div class="title">
+          侧边导航
+          <el-button class="close" @click="openEditNav" circle>
+            <img src="@/assets/setting.svg" alt="close">
+          </el-button>
+        </div>
         <div class="card">
-          <el-radio-group v-model="is_nav">
+          <el-radio-group v-model="mainStore.is_nav">
             <el-radio value="1">开启导航</el-radio>
             <el-radio value="2">关闭导航</el-radio>
           </el-radio-group>
-          <el-radio-group :disabled="is_nav==='2'" v-model="nav_type">
+          <el-radio-group :disabled="mainStore.is_nav==='2'" v-model="mainStore.nav_type">
             <el-radio value="1">默认导航</el-radio>
             <el-radio value="2">右侧导航</el-radio>
           </el-radio-group>
@@ -54,22 +61,23 @@
 <script setup>
 import { ElMessage } from "element-plus";
 import { useCookieAuth } from "@/hook/useAuth";
-import { ref, onMounted, defineEmits } from "vue";
+import { ref, onMounted, defineEmits, watchEffect, watch } from "vue";
 import axiosInstance from "@/axios"; // 导入你的axios实例
 import { useRouter } from "vue-router";
+import { useMainStore } from "@/stores/useMainStore";
 
+const mainStore = useMainStore();
 const router = useRouter();
 const { token, setToken, removeToken } = useCookieAuth();
 // 获取设置信息
-const username = ref("");
 const bg_name = ref("获取中...");
 const btn_text = ref("选择图片");
-const is_nav = ref("1");
-const nav_type = ref("1");
 onMounted(() => {
   axiosInstance.get("/user/info").then(res => {
     if (res.status === 200) {
-      username.value = res.data.username;
+      mainStore.username = res.data.username;
+      mainStore.is_nav = res.data.is_nav;
+      mainStore.nav_type = res.data.nav_type;
     }
   });
   axiosInstance.get("/user/bg/name").then(res => {
@@ -78,6 +86,23 @@ onMounted(() => {
     }
   });
 });
+watch([() => mainStore.is_nav, () => mainStore.nav_type], (newVal, oldVal) => {
+  if (oldVal[0] && oldVal[1]) {
+    axiosInstance.post("/user/update", {
+      is_nav: mainStore.is_nav,
+      nav_type: mainStore.nav_type,
+    }).then(res => {
+      console.log(res);
+    });
+  }
+});
+
+
+// 编辑导航列表
+function openEditNav() {
+  mainStore.isEditNav = true;
+  emit("closeSetting");
+}
 
 // 删除图片
 function delBgImage() {
@@ -88,6 +113,8 @@ function delBgImage() {
         message: "delete success",
         type: "success",
       });
+      localStorage.setItem("bg_base64", "");
+      document.getElementById("yuwbNav").style.backgroundImage = "";
     }
   });
 }
@@ -118,6 +145,17 @@ function onFileChange() {
           message: "Upload success",
           type: "success",
         });
+        // 上传成功，同时更新
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const base64String = e.target.result;
+          localStorage.setItem("bg_base64", base64String);
+          document.getElementById("yuwbNav").style.backgroundImage = `url(${base64String})`;
+        };
+        reader.onerror = function(error) {
+          console.error("Error reading file:", error);
+        };
+        reader.readAsDataURL(file);
       } else {
         ElMessage.error("Upload error");
       }
@@ -197,8 +235,13 @@ function loginOut() {
 }
 
 .item .title {
+  position: relative;
   padding: 6px 16px;
   color: #eee;
+}
+
+.item .title .close {
+  top: 12px;
 }
 
 .item .card {
@@ -245,7 +288,8 @@ function loginOut() {
   background-color: rgba(255, 255, 255, 0.4);
   color: #fff;
 }
+
 :deep(.el-radio__label) {
-  color:#eee;
+  color: #eee;
 }
 </style>

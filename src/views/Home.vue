@@ -6,26 +6,34 @@
     <Search></Search>
     <!-- 侧边栏 -->
     <Right></Right>
+    <!-- 中间 -->
+    <Center></Center>
   </div>
 </template>
 
 <script setup>
 import Search from "@/components/Search.vue";
 import Header from "@/components/Header.vue";
-import Right from "@/components/Right.vue"
+import Right from "@/components/Right.vue";
+import Center from "@/components/Center.vue";
 import axiosInstance from "@/axios";
-import { onMounted } from "vue";
+import { onMounted,ref } from "vue";
 import { useCookieAuth } from "@/hook/useAuth.js";
 
 const { token } = useCookieAuth();
 onMounted(() => {
   // 加载用户自己上传背景
+  const bg_base64 = localStorage.getItem("bg_base64");
+  if (bg_base64) {
+    document.getElementById("yuwbNav").style.backgroundImage = `url(${bg_base64})`;
+  }
   if (token.value) {
     axiosInstance.get("/user/bg").then(res => {
       if (res.status === 200) {
-        console.log(res);
         const base64ImageData = `data:image/png;base64,${res.data.bg_base64}`;
         document.getElementById("yuwbNav").style.backgroundImage = `url(${base64ImageData})`;
+        // 储存图片优化加载问题
+        localStorage.setItem("bg_base64", base64ImageData);
       }
     });
   }
@@ -88,7 +96,7 @@ onMounted(() => {
   }
 
   .nav .content {
-    height: 60vh;
+    height: 50vh;
   }
 }
 </style>
