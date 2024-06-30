@@ -5,9 +5,9 @@
     <!-- 搜索 -->
     <Search></Search>
     <!-- 侧边栏 -->
-    <Right></Right>
+    <Right v-if="mainStore.is_nav==='1'&&mainStore.nav_type==='2'"></Right>
     <!-- 中间 -->
-    <Center></Center>
+    <Center v-if="mainStore.is_nav==='1'&&mainStore.nav_type==='1'"></Center>
   </div>
 </template>
 
@@ -17,11 +17,32 @@ import Header from "@/components/Header.vue";
 import Right from "@/components/Right.vue";
 import Center from "@/components/Center.vue";
 import axiosInstance from "@/axios";
-import { onMounted,ref } from "vue";
+import { onMounted, ref } from "vue";
 import { useCookieAuth } from "@/hook/useAuth.js";
+
+import { useMainStore } from "@/stores/useMainStore";
+
+const mainStore = useMainStore();
+
 
 const { token } = useCookieAuth();
 onMounted(() => {
+  // 加载个人信息
+  axiosInstance.get("/user/info").then(res => {
+    if (res.status === 200) {
+      mainStore.username = res.data.username;
+      mainStore.is_nav = res.data.is_nav;
+      mainStore.nav_type = res.data.nav_type;
+      // 获取导航栏
+      if (mainStore.is_nav === "1") {
+        axiosInstance.get("/nav/list").then(res => {
+          if (res.status === 200)mainStore.nav_list = res.data
+        })
+      }
+    }
+  });
+  // 加载导航栏
+
   // 加载用户自己上传背景
   const bg_base64 = localStorage.getItem("bg_base64");
   if (bg_base64) {
@@ -53,7 +74,9 @@ onMounted(() => {
   position: relative;
   overflow-x: hidden;
 }
-
+.nav .content {
+  width: 45vw;
+}
 @media (max-width: 1000px) {
   .nav .search {
     z-index: 99;

@@ -1,59 +1,65 @@
 <script setup>
+import AddNav from "@/components/addNav.vue";
 import { ref } from "vue";
 import { useMainStore } from "@/stores/useMainStore";
+import axiosInstance from "@/axios/index.js";
+import { ElMessage } from "element-plus";
 
 const mainStore = useMainStore();
-const linkList = ref([
-  { name: "文心一言", link: "https://yiyan.baidu.com/" },
-  { name: "GITHUB", link: "https://github.com/" },
-  { name: "MDN", link: "https://developer.mozilla.org/" },
-  { name: "微哈哈哈哈哈哈啊哈信读书", link: "https://weread.qq.com/" },
-  { name: "Bilibili", link: "https://bilibili.com/" },
-  { name: "抖音", link: "https://douyin.com/" },
-  { name: "怡然博客", link: "http://r.yuwb.cn/" },
-  { name: "耶温博客", link: "http://yuwb.cn/" },
-]);
 
 function go(item) {
-  window.open(item.link);
+  window.open(item.link_path);
 }
 
-function delNavItem() {
-  console.log(123);
+function delNavItem(item) {
+  axiosInstance.post("/nav/del", { nav_id:item.nav_id }).then(res => {
+    if (res.status === 200) {
+      ElMessage({
+        message: "Delete success",
+        type: "success",
+      });
+      mainStore.isShowAddNav = false;
+      axiosInstance.get("/nav/list").then( res => {
+        if (res.status === 200)mainStore.nav_list = res.data
+      })
+    }
+  });
 }
 
 function isAddNav() {
-
+  mainStore.isShowAddNav =  true;
 }
 </script>
 
 <template>
   <div>
     <h3 class="title">导航列表 </h3>
+    <el-button @click.stop="mainStore.isEditNav = false" v-if="mainStore.isEditNav" class="close" circle>
+      <img height="18px" src="@/assets/right.svg" alt="close">
+    </el-button>
     <div class="nav-center">
-      <button class="button" v-for="item in linkList" :key="item.name" @click="go(item)">
-        <el-button @click.stop="delNavItem" v-if="mainStore.isEditNav" class="close" circle>
+      <button class="button" v-for="item in mainStore.nav_list" :key="item.nav_id" @click="go(item)">
+        <el-button @click.stop="delNavItem(item)" v-if="mainStore.isEditNav" class="close" circle>
           <img height="12px" src="@/assets/close.svg" alt="close">
         </el-button>
         <span class="img">
-          <img height="26px"
-               src="https://img.alicdn.com/imgextra/i3/O1CN01sffRIx1nb3dXCKdFC_!!6000000005107-2-tps-1024-1024.png"
-               alt="icon">
+          <img height="26px" :src="item.icon_path" alt="icon">
         </span>
         <span class="text">
             {{ item.name }}
-         </span>
+        </span>
       </button>
       <button v-if="mainStore.isEditNav" class="button add-nav" @click="isAddNav()">
         <span class="img">
           <img height="26px" src="@/assets/add.svg" alt="icon">
         </span>
         <span class="text">
-            添加新导航
+            添加导航
          </span>
       </button>
     </div>
   </div>
+  <AddNav v-if="mainStore.isShowAddNav"></AddNav>
 </template>
 
 <style scoped>

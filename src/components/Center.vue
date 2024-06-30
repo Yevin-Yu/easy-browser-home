@@ -8,7 +8,7 @@ import NavCenter from "@/components/NavCenter.vue";
 </script>
 
 <style scoped>
-.nav .content {
+ .content {
   width: 68vw;
   height: 50vh;
   background-color: #fff;
@@ -21,13 +21,13 @@ import NavCenter from "@/components/NavCenter.vue";
   overflow: auto;
 }
 
-.nav .content::-webkit-scrollbar {
+ .content::-webkit-scrollbar {
   width: 5px;
   height: 5px;
   background-color: transparent;
 }
 
-.nav .content::-webkit-scrollbar-thumb {
+ .content::-webkit-scrollbar-thumb {
   width: 5px;
   height: 5px;
   border-radius: 2px;

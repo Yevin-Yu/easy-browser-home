@@ -17,10 +17,10 @@
             <span class="upload-button">{{ btn_text }}</span>
           </label>
           <span @click="delBgImage" class="upload-button">删除背景</span>
-          <div class="upload-tip" style="color:#ccc;">
+          <div class="upload-tip">
             当前背景:{{ bg_name }}
           </div>
-          <div class="upload-tip" style="color:#ccc;">
+          <div class="upload-tip">
             背景图片限制大小为2.5M
           </div>
         </div>
@@ -43,18 +43,6 @@
           </el-radio-group>
         </div>
       </div>
-      <!-- <div class="item">
-          <div class="title">待办列表</div>
-          <div class="card">
-
-          </div>
-      </div>
-      <div class="item">
-          <div class="title">备忘录</div>
-          <div class="card">
-
-          </div>
-      </div> -->
     </div>
   </div>
 </template>
@@ -73,13 +61,6 @@ const { token, setToken, removeToken } = useCookieAuth();
 const bg_name = ref("获取中...");
 const btn_text = ref("选择图片");
 onMounted(() => {
-  axiosInstance.get("/user/info").then(res => {
-    if (res.status === 200) {
-      mainStore.username = res.data.username;
-      mainStore.is_nav = res.data.is_nav;
-      mainStore.nav_type = res.data.nav_type;
-    }
-  });
   axiosInstance.get("/user/bg/name").then(res => {
     if (res.status === 200) {
       bg_name.value = res.data.bg_name || "暂无背景图";
@@ -92,7 +73,11 @@ watch([() => mainStore.is_nav, () => mainStore.nav_type], (newVal, oldVal) => {
       is_nav: mainStore.is_nav,
       nav_type: mainStore.nav_type,
     }).then(res => {
-      console.log(res);
+      if(mainStore.is_nav === '1'){
+        axiosInstance.get("/nav/list").then(res => {
+          if (res.status === 200)mainStore.nav_list = res.data
+        })
+      }
     });
   }
 });
@@ -273,11 +258,11 @@ function loginOut() {
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: 12px;
+  margin: 8px 0;
+  color:#fff;
 }
 
-.upload-tip {
-  margin: 8px 0;
-}
+
 
 .close {
   outline: none;
