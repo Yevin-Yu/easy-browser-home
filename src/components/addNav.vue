@@ -37,19 +37,18 @@ function addNav() {
 <template>
   <div class="add-nav">
     <el-button class="close" circle @click="closeAddNav">
-      <img height="12px" src="@/assets/close.svg" alt="close">
+      <img height="12px" src="../assets/images/close.svg" alt="close">
     </el-button>
     <el-form label-position="top" label-width="auto" :model="params">
       <el-form-item label="Name">
         <el-input v-model="params.name" />
       </el-form-item>
-      <el-form-item label="Activity zone">
+      <el-form-item label="Icon Path">
         <el-input v-model="params.icon_path" />
       </el-form-item>
-      <el-form-item label="Activity form">
+      <el-form-item label="Link Path">
         <el-input v-model="params.link_path" />
       </el-form-item>
-
     </el-form>
     <button @click="addNav" class="sub_button">添加导航</button>
   </div>
@@ -101,6 +100,6 @@ function addNav() {
 }
 
 :deep(.el-form-item__label) {
-  color: #fff;
+  color: #666;
 }
 </style>

@@ -3,11 +3,11 @@
     <div class="link-list">
       <h3>导航列表</h3>
       <el-button @click.stop="mainStore.isEditNav = false" v-if="mainStore.isEditNav" class="close close2" circle>
-        <img height="18px" src="@/assets/right.svg" alt="close">
+        <img height="18px" src="../assets/images/right.svg" alt="close">
       </el-button>
       <button class="button" v-for="item in mainStore.nav_list" :key="item.nav_id" @click="go(item)">
         <el-button @click.stop="delNavItem(item)" v-if="mainStore.isEditNav" class="close" circle>
-          <img height="12px" src="@/assets/close.svg" alt="close">
+          <img height="12px" src="../assets/images/close.svg" alt="close">
         </el-button>
         <span class="img">
           <img height="26px" :src="item.icon_path" alt="icon">
@@ -18,7 +18,7 @@
       </button>
       <button v-if="mainStore.isEditNav" class="button add-nav" @click="isAddNav()">
         <span class="img">
-          <img height="26px" src="@/assets/add.svg" alt="icon">
+          <img height="26px" src="../assets/images/add.svg" alt="icon">
         </span>
         <span class="text">
             添加导航

@@ -1,7 +1,7 @@
 <template>
   <div class="setting">
     <el-button class="close" @click="closeSetting" circle>
-      <img src="@/assets/close.svg" alt="close">
+      <img src="../assets/images/close.svg" alt="close">
     </el-button>
     <div class="user-info">
       欢迎！<span>{{ mainStore.username }}</span>
@@ -29,7 +29,7 @@
         <div class="title">
           侧边导航
           <el-button class="close" @click="openEditNav" circle>
-            <img src="@/assets/setting.svg" alt="close">
+            <img src="../assets/images/setting.svg" alt="close">
           </el-button>
         </div>
         <div class="card">
@@ -56,7 +56,7 @@ import { useMainStore } from "@/stores/useMainStore";
 
 const mainStore = useMainStore();
 const router = useRouter();
-const { token, setToken, removeToken } = useCookieAuth();
+const { removeToken } = useCookieAuth();
 // 获取设置信息
 const bg_name = ref("获取中...");
 const btn_text = ref("选择图片");
@@ -73,10 +73,10 @@ watch([() => mainStore.is_nav, () => mainStore.nav_type], (newVal, oldVal) => {
       is_nav: mainStore.is_nav,
       nav_type: mainStore.nav_type,
     }).then(res => {
-      if(mainStore.is_nav === '1'){
+      if (mainStore.is_nav === "1") {
         axiosInstance.get("/nav/list").then(res => {
-          if (res.status === 200)mainStore.nav_list = res.data
-        })
+          if (res.status === 200) mainStore.nav_list = res.data;
+        });
       }
     });
   }
@@ -180,10 +180,10 @@ function loginOut() {
   -webkit-backdrop-filter: blur(5px);
   backdrop-filter: blur(5px);
   padding: 2rem;
-  background-color: rgba(255, 255, 255, 0.4);
+  background-color: rgba(255, 255, 255, 0.6);
   border-radius: 8px;
   box-shadow: 5px 5px 5px rgba(255, 255, 255, 0.2);
-  color: #eee;
+  color: #666;
 }
 
 .setting::-webkit-scrollbar {
@@ -222,7 +222,7 @@ function loginOut() {
 .item .title {
   position: relative;
   padding: 6px 16px;
-  color: #eee;
+  color: #666;
 }
 
 .item .title .close {
@@ -259,9 +259,8 @@ function loginOut() {
   white-space: nowrap;
   font-size: 12px;
   margin: 8px 0;
-  color:#fff;
+  color: #666;
 }
-
 
 
 .close {
@@ -275,6 +274,6 @@ function loginOut() {
 }
 
 :deep(.el-radio__label) {
-  color: #eee;
+  color: #666;
 }
 </style>

@@ -2,7 +2,7 @@
   <div class="header">
     <div class="title">耶温导航</div>
     <el-button class="close setting" @click="openSetting" circle>
-      <img height="20px" src="@/assets/setting.svg" alt="close">
+      <img height="20px" src="../assets/images/setting.svg" alt="close">
     </el-button>
   </div>
   <!-- 登录组件 -->
