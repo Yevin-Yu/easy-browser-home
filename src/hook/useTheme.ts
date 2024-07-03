@@ -4,7 +4,7 @@ type Theme = "light" | "dark";
 
 export function useTheme() {
     const currentTheme = ref<Theme>("light");
-    
+
     const setTheme = (theme: Theme) => {
         const rootElement = document.documentElement;
         if (theme === "dark") {
@@ -26,6 +26,7 @@ export function useTheme() {
 
     const toggleTheme = () => {
         currentTheme.value = currentTheme.value === "light" ? "dark" : "light";
+        localStorage.setItem("theme", currentTheme.value);
     };
 
     return {

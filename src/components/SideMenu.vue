@@ -1,18 +1,29 @@
 <template>
     <div class="side-menu">
         <ul>
-            <li class="active">首页</li>
-            <li>导航</li>
-            <li>待办</li>
-            <li>笔记</li>
-            <li>设置</li>
+            <li @click.stop="onSideMenu(item)" :class="{'active':item.value === store.activeMenuId}" v-for="item in sideMenuList" :key="item.value">
+                {{item.label}}
+            </li>
         </ul>
     </div>
 </template>
 <script setup>
-// 主题切换
-import { useTheme } from "@/hook/useTheme";
-const { toggleTheme } = useTheme();
+// 引入Stores
+import { useMyStoreHook } from "@/stores/useStore";
+let store = useMyStoreHook();
+
+// SideMenu
+import { reactive } from "vue";
+const sideMenuList = reactive([
+    { value: 1, label: "首页" },
+    { value: 2, label: "导航" },
+    { value: 3, label: "新闻" },
+    { value: 4, label: "笔记" },
+    { value: 5, label: "设置" },
+]);
+function onSideMenu(item) {
+    store.activeMenuIdChange(item.value);
+}
 </script>
 <style lang="less" scoped>
 .side-menu {
@@ -24,6 +35,7 @@ const { toggleTheme } = useTheme();
         list-style: none;
         padding: 0;
         li {
+            transition: 0.5s;
             box-sizing: border-box;
             color: var(--sideFontColor);
             cursor: pointer;
@@ -36,22 +48,14 @@ const { toggleTheme } = useTheme();
             border: var(--sideBoder);
             background: var(--sideBg);
             box-shadow: var(--sideShadow);
+            transition: box-shadow 0.5s ease;
         }
         li.active {
             box-shadow: var(--sideShadowActive);
         }
-    }
-}
-.dark-theme {
-    .side-menu {
-        li {
-            backdrop-filter: var(--sideFilter);
-            border: var(--sideBoder);
-            background: var(--sideBg);
-            box-shadow: var(--sideShadow);
-        }
-        li.active {
-            background: var(--sideBgActive);    
+        li:hover,
+        li:active {
+            box-shadow: var(--sideShadowActive);
         }
     }
 }

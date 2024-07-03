@@ -2,7 +2,7 @@
 
 
     /* main */
-    --bgColor: #aaa;
+    --bgColor: #f3f4fb;
     --shadow: -3px -3px 9px rgba(255, 255, 255, 0.4), 3px 4px 9px rgba(0, 0, 0, 0.2);
     --activeShadow: inset -3px -3px 9px rgba(255, 255, 255, 0.9), inset 3px 4px 9px rgba(0, 0, 0, 0.5);
     --bgColorDefaut: rgba(243, 244, 251, 1);
@@ -11,7 +11,7 @@
 
     /* SideMenu */
     --sideFontColor: rgba(51, 51, 51, 1);
-    --sideBoder: 1px solid transparent;
+    --sideBoder: var(--border);
     --sideFilter: none;
     --sideBg: rgba(243, 244, 251, 1);
     --sideShadow: var(--shadow);
@@ -23,6 +23,7 @@
 
     /* SearchMain */
     --searchShadow: var(--shadow);
+    --searchShadowActive:var(--activeShadow);
     --searchFontColor: #333;
     --searchInputBg: rgba(243, 244, 251, 1);
     --searchBtnBg: rgba(243, 244, 251, 1);
@@ -31,26 +32,27 @@
 
 :root.dark-theme {
     /* main */
-    --bgColor: rgba(0, 0, 0, 1);
-    --shadow: none;
+    --bgColor: #000;
+    --shadow: -3px -3px 9px rgba(0, 0, 0, 0.5), 3px 4px 9px rgba(255, 255, 255, 0.5);
+    --activeShadow: inset -3px -3px 9px rgba(255, 255, 255, 0.5), inset 3px 4px 9px rgba(0, 0, 0, 0.5);
     --bgColorDefaut: rgba(243, 244, 251, 0.3);
-    --border: 1px solid rgba(255, 255, 255, 1);
     --fontColor: rgba(255, 255, 255, 1);
 
     /* SideMenu */
     --sideFontColor: rgba(255, 255, 255, 1);
-    --sideBoder: 1px solid rgba(255, 255, 255, 1);
+    --sideBoder: var(--border);
     --sideFilter: blur(6px);
     --sideBg: rgba(243, 244, 251, 0.2);
-    --sideShadow: none;
-    --sideBgActive: rgba(243, 244, 251, 0.5);
+    --sideShadow: var(--shadow);
+    --sideShadowActive: var(--activeShadow);
 
     /* TopTime */
     --timeColor: rgba(255, 255, 255, 1);
     --timeShadow: none;
 
     /* SearchMain */
-    --searchShadow: none;
+    --searchShadow: var(--shadow);
+    --searchShadowActive:var(--activeShadow);
     --searchFontColor: #333;
     --searchBtnBg: rgba(24, 19, 14, 1);
     --searchBtColor: #eee;

@@ -67,6 +67,9 @@
                     background-color: #fff;
                 }
             }
+            div:hover,div:active{
+                box-shadow: var(--sideShadowActive);
+            }
             span {
                 width: 80px;
                 display: inline-block;
@@ -78,6 +81,7 @@
                 color: var(--fontColor);
             }
         }
+       
     }
 }
 </style>

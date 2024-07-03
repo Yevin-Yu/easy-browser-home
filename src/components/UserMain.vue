@@ -1,7 +1,7 @@
 <template>
     <div class="user-main">
         <img src="@/assets/images/user.jpg" alt="user">
-        <span>于文博</span>
+        <span>耶温导航</span>
     </div>
 </template>
   
@@ -9,6 +9,9 @@
 </script>
   
 <style lang="less" scoped>
+.user-main:hover,.user-main:active{
+    box-shadow: var(--sideShadowActive);
+}
 .user-main {
     cursor: pointer;
     width: 130px;
