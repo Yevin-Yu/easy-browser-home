@@ -1,2 +1,46 @@
 @import "base.css";
 @import "root.css";
+
+/* Element组件样式覆盖 */
+#app .el-dialog {
+    background: var(--dialogBgColor);
+    box-shadow: var(--shadow);
+    border: var(--border);
+    color: var(--fontColor);
+    border-radius: 20px;
+    backdrop-filter: blur(5px);
+}
+
+.el-dialog .el-dialog__title {
+    color: var(--fontColor);
+}
+
+.el-dialog .el-dialog__title .el-dialog__headerbtn {
+    color: var(--fontColor);
+}
+
+#app .el-button {
+    font-size: 13px;
+    text-align: center;
+    display: inline-block;
+    margin: 12px;
+    cursor: pointer;
+    width: 130px;
+    height: 40px;
+    line-height: 40px;
+    border-radius: 55px;
+    padding: 0;
+    background: var(--bgColorDefaut);
+    box-shadow: var(--shadow);
+    border: var(--border);
+    color: var(--fontColor);
+}
+
+.el-dialog .el-dialog__body {
+    text-align: center;
+}
+
+#app .el-button:hover,
+#app .el-button:active {
+    box-shadow: var(--sideShadowActive);
+}

@@ -1,10 +1,10 @@
 <template>
     <div class="news-main">
-        <div class="item-card" v-for="it in TYPE" :key="it">
-            <div v-if="data[it]">
-                <div class="title">{{data[it].title}}</div>
+        <div class="item-card" v-for="it in store.newsMenu" :key="it">
+            <div v-if="data[it.value]">
+                <div class="title">{{data[it.value].title}}</div>
                 <ul>
-                    <li v-for="(item,index) in data[it].data.slice(0,10) " :key="item.id">
+                    <li v-for="(item,index) in data[it.value].data.slice(0,10) " :key="item.id">
                         <span :style="{'background-color':colors[index]}">{{index+1}}</span>
                         <a :href="item.url" target="_blank"> {{item.title}}</a>
                     </li>
@@ -15,14 +15,21 @@
 </template>
   
 <script setup>
-import { reactive } from "vue";
+import { onMounted, reactive } from "vue";
 const colors = ["#ea444d", "#ed702d", "#eead3f"];
-const TYPE = ["juejin", "weibo", "douyin", "zhihu", "bilibili", "36kr", "baidu", "sspai", "ithome", "toutiao", "thepaper", "tieba"];
+// 引入Stores
+import { useMyStoreHook } from "@/stores/useStore";
+let store = useMyStoreHook();
+
 const data = reactive({});
-TYPE.forEach((item) => {
-    fetch(`https://api-hot.efefee.cn/${item}?cache=true`)
-        .then((res) => res.json())
-        .then((res) => (data[item] = res));
+onMounted(() => {
+    const newsMenu = JSON.parse(localStorage.getItem("newsMenu"));
+    if (newsMenu) store.newsMenuChange(newsMenu);
+    store.newsMenu.forEach((item) => {
+        fetch(`https://api-hot.efefee.cn/${item.value}?cache=true`)
+            .then((res) => res.json())
+            .then((res) => (data[item.value] = res));
+    });
 });
 </script>
   
@@ -38,7 +45,6 @@ TYPE.forEach((item) => {
     height: 5px;
     border-radius: 2px;
     background-color: #ccc;
-    box-shadow: var(--shadow);
 }
 .news-main {
     width: 85vw;

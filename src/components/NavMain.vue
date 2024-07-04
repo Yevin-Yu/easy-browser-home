@@ -1,22 +1,29 @@
 <template>
     <div class="nav-main">
         <ul>
-            <li v-for="item in 10" :key="item">
+            <li v-for="item in store.navMenu" @click="go(item)" :key="item.name">
                 <div>
-                    <img src="@/assets/images/user.jpg" alt="icon" />
+                    <img :src="item.iconPath" alt="icon" />
                 </div>
-                <span>啊哈哈哈</span>
-            </li>
-            <li>
-                <div>
-                    <img src="@/assets/icon/add.svg" alt="icon" />
-                </div>
+                <span>{{item.name}}</span>
             </li>
         </ul>
     </div>
 </template>
   
 <script setup>
+import { onMounted } from "vue";
+// 引入Stores
+import { useMyStoreHook } from "@/stores/useStore";
+let store = useMyStoreHook();
+
+onMounted(() => {
+    const navMenu = JSON.parse(localStorage.getItem("navMenu"));
+    if (navMenu) store.navMenuChange(navMenu);
+});
+function go(item) {
+    window.open(item.linkPath);
+}
 </script>
   
 <style lang="less" scoped>
@@ -31,26 +38,25 @@
     height: 5px;
     border-radius: 2px;
     background-color: #ccc;
-    box-shadow: var(--shadow);
 }
 .nav-main {
-    width: 70vw;
+    width: 65vw;
     height: 50vh;
-    // background-color: #fff;
     margin: 7.5vh auto;
     overflow: auto;
+    text-align: center;
 
     ul {
         list-style: none;
         display: flex;
         flex-wrap: wrap;
-        justify-content: space-around;
-
+        display: inline-block;
+        padding-left: 0;
         li {
             display: inline-block;
             margin: 12px 25px;
             text-align: center;
-            flex: 1;
+            width: 80px;
             div {
                 cursor: pointer;
                 border-radius: 17px;
@@ -60,15 +66,21 @@
                 background-color: var(--bgColorDefaut);
                 box-shadow: var(--shadow);
                 img {
+                    padding: 12px;
+                    background-color: #fff;
                     width: 50px;
                     height: 50px;
-                    margin: 13px;
+                    margin: 14px;
                     border-radius: 15px;
-                    background-color: #fff;
+                    background-color: rgba(255, 255, 255, 0.5);
                 }
             }
-            div:hover,div:active{
+            div:hover,
+            div:active {
                 box-shadow: var(--sideShadowActive);
+                img {
+                    box-shadow: var(--shadow);
+                }
             }
             span {
                 width: 80px;
@@ -81,7 +93,6 @@
                 color: var(--fontColor);
             }
         }
-       
     }
 }
 </style>

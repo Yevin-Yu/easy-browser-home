@@ -18,18 +18,57 @@
             </button>
         </div>
         <div class="item-card">
+            <h3>导航设置</h3>
+            <div class="nav-list">
+                <ul ref="navsList">
+                    <li v-for="(item,index) in store.navMenu" @click="go(item)" :key="item.name">
+                        <div>
+                            <img :src="item.iconPath" alt="icon" />
+                        </div>
+                        <span>{{item.name}}</span>
+                        <img @click="delNav(index)" class="del-icon" src="@/assets/icon/close.svg" alt="" />
+                    </li>
+                </ul>
+                <ul>
+                    <li @click="dialogVisible=true">
+                        <div>
+                            <img src="@/assets/icon/add.svg" alt="icon" />
+                        </div>
+                        <span>添加</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="item-card">
             <h3>新闻排序</h3>
-            <div ref="draggableList">
-                <button v-for="item in TYPE" :key="item">
-                    {{item}}
+            <div ref="newsList">
+                <button v-for="item in store.newsMenu" :key="item">
+                    {{item.label}}
                 </button>
             </div>
         </div>
     </div>
+    <!-- 添加导航 -->
+    <el-dialog v-model="dialogVisible" :show-close="false" title="添加导航" width="500">
+        <div class="add-nav">
+            <h3>名字</h3>
+            <input type="text" v-model="navParams.name" />
+            <h3>图标链接</h3>
+            <input type="text" v-model="navParams.iconPath" />
+            <h3>网站链接</h3>
+            <input type="text" v-model="navParams.linkPath" />
+        </div>
+        <template #footer>
+            <div class="dialog-footer">
+                <el-button @click="dialogVisible = false">取消</el-button>
+                <el-button type="primary" @click="addNav"> 添加 </el-button>
+            </div>
+        </template>
+    </el-dialog>
 </template>
   
 <script setup>
-import Sortable from 'sortablejs';
+import Sortable from "sortablejs";
 // 主题切换
 import { useTheme } from "@/hook/useTheme";
 import { onMounted, reactive, ref } from "vue";
@@ -47,18 +86,30 @@ onMounted(() => {
     // 默认引擎
     const searchEngine = localStorage.getItem("searchEngine");
     if (searchEngine) store.searchEngineChange(parseInt(searchEngine));
+    // 默认导航
+    const navMenu = JSON.parse(localStorage.getItem("navMenu"));
+    if (navMenu) store.navMenuChange(navMenu);
     // 调整顺序初始化
-   
-        const sortable = Sortable.create(draggableList.value, {
-            group: "shared",
-            animation: 150,
-            ghostClass: "ghost",
-            onEnd: ({ newIndex, oldIndex }) => {
-                const item = TYPE.splice(oldIndex, 1)[0];
-                TYPE.splice(newIndex, 0, item);
-            },
-        });
-    
+    const sortable = Sortable.create(newsList.value, {
+        group: "shared",
+        animation: 150,
+        ghostClass: "ghost",
+        onEnd: ({ newIndex, oldIndex }) => {
+            const item = store.newsMenu.splice(oldIndex, 1)[0];
+            store.newsMenu.splice(newIndex, 0, item);
+            localStorage.setItem("newsMenu", JSON.stringify(store.newsMenu));
+        },
+    });
+    const navsSortable = Sortable.create(navsList.value, {
+        group: "shared",
+        animation: 150,
+        ghostClass: "ghost",
+        onEnd: ({ newIndex, oldIndex }) => {
+            const item = store.navMenu.splice(oldIndex, 1)[0];
+            store.navMenu.splice(newIndex, 0, item);
+            localStorage.setItem("navMenu", JSON.stringify(store.navMenu));
+        },
+    });
 });
 // 搜索引擎列表
 const list = reactive([
@@ -96,8 +147,30 @@ function delFile() {
     document.getElementById("app").style.backgroundImage = "";
 }
 // 新闻排序
-const TYPE = ["juejin", "weibo", "douyin", "zhihu", "bilibili", "36kr", "baidu", "sspai", "ithome", "toutiao", "thepaper", "tieba"];
-const draggableList = ref(null);
+const newsList = ref(null);
+// 导航
+const navsList = ref(null);
+// 添加导航
+const navParams = reactive({
+    name: "",
+    iconPath: "",
+    linkPath: "",
+});
+function addNav() {
+    if (navParams.name && navParams.iconPath && navParams.linkPath) {
+        store.navMenu.push(navParams);
+        localStorage.setItem("navMenu", JSON.stringify(store.navMenu));
+        dialogVisible = false;
+        navParams.name = "";
+        navParams.iconPath = "";
+        navParams.linkPath = "";
+    }
+}
+function delNav(index) {
+    store.navMenu.splice(index, 1);
+    localStorage.setItem("navMenu", JSON.stringify(store.navMenu));
+}
+let dialogVisible = ref(false);
 </script>
   
 <style lang="less" scoped>
@@ -112,7 +185,6 @@ const draggableList = ref(null);
     height: 5px;
     border-radius: 2px;
     background-color: #ccc;
-    box-shadow: var(--shadow);
 }
 .setting-main {
     width: 60vw;
@@ -156,6 +228,84 @@ const draggableList = ref(null);
         .button:active {
             box-shadow: var(--sideShadowActive);
         }
+    }
+    .nav-list {
+        ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            display: inline-block;
+            padding-left: 0;
+            li {
+                display: inline-block;
+                margin: 12px 25px;
+                text-align: center;
+                width: 80px;
+                position: relative;
+                div {
+                    cursor: pointer;
+                    border-radius: 17px;
+                    min-width: 80px;
+                    height: 80px;
+                    border: var(--border);
+                    background-color: var(--bgColorDefaut);
+                    box-shadow: var(--shadow);
+                    img {
+                        padding: 12px;
+                        background-color: #fff;
+                        width: 50px;
+                        height: 50px;
+                        margin: 14px;
+                        border-radius: 15px;
+                        background-color: rgba(255, 255, 255, 0.5);
+                    }
+                }
+                div:hover,
+                div:active {
+                    box-shadow: var(--sideShadowActive);
+                    img {
+                        box-shadow: var(--shadow);
+                    }
+                }
+                span {
+                    width: 80px;
+                    display: inline-block;
+                    margin-top: 12px;
+                    font-size: 12px;
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                    color: var(--fontColor);
+                }
+                .del-icon {
+                    position: absolute;
+                    right: -10px;
+                    top: -10px;
+                    color: var(--fontColor);
+                    cursor: pointer;
+                }
+            }
+        }
+    }
+}
+.dialog-footer {
+    text-align: center;
+}
+
+.el-dialog .add-nav {
+    h3 {
+        color: var(--fontColor);
+        padding: 12px;
+    }
+    input {
+        outline: none;
+        border: none;
+        color: #333;
+        background-color: #fff;
+        height: 38px;
+        width: 320px;
+        border-radius: 16px;
+        padding: 0 24px;
     }
 }
 </style>

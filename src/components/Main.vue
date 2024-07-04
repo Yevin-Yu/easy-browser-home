@@ -19,7 +19,6 @@
     height: 5px;
     border-radius: 2px;
     background-color: #ccc;
-    box-shadow: var(--shadow);
 }
 .main {
     width: 70vw;

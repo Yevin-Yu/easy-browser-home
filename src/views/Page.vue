@@ -9,6 +9,8 @@
     <NavMain v-if="store.activeMenuId === 2"></NavMain>
     <!-- 新闻 -->
     <NewsMain v-if="store.activeMenuId === 3"></NewsMain>
+    <!-- 笔记 -->
+    <NotesMain v-if="store.activeMenuId === 4"></NotesMain>
     <!-- 设置 -->
     <SettingMain v-if="store.activeMenuId === 5"></SettingMain>
     <!-- 侧边菜单 -->
@@ -21,6 +23,7 @@ import TopTime from "@/components/TopTime.vue";
 import SearchMain from "@/components/SearchMain.vue";
 import NavMain from "@/components/NavMain.vue";
 import NewsMain from "@/components/NewsMain.vue";
+import NotesMain from "@/components/NotesMain.vue";
 import SettingMain from "@/components/SettingMain.vue";
 import SideMenu from "@/components/SideMenu.vue";
 // 引入Stores
