@@ -7,6 +7,7 @@ interface MyState {
     navMenu: object;
     notesList: object;
     activeNotes: any;
+    todosList:object;
 }
 // 创建 store
 export const useMyStoreHook = defineStore({
@@ -55,6 +56,8 @@ export const useMyStoreHook = defineStore({
         // 笔记
         notesList: [],
         activeNotes: null,
+        // todo
+        todosList:[],
     }),
     getters: {},
     actions: {
@@ -81,6 +84,10 @@ export const useMyStoreHook = defineStore({
         activeNotesChange(data: any): void {
             this.activeNotes = data;
             localStorage.setItem("activeNotes", data);
+        },
+        todosListChange(data: any): void {
+            this.todosList = data;
+            localStorage.setItem("todosList", JSON.stringify(data));
         },
     },
 });
