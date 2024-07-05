@@ -2,7 +2,7 @@
     <div class="notes-main">
         <div class="left">
             <div class="title">
-                <span class="edit">
+                <span class="edit" @click="isDel=!isDel">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
                         <path
                             fill="currentColor"
@@ -12,19 +12,29 @@
                 笔记列表
                 <span @click="noteAdd" class="add">+</span>
             </div>
-            <ul>
-                <li @click="selectNote(item)" v-for="item in store.notesList" :class="{'active':item.id == store.activeNotes}" :key="item">{{item.title}}</li>
+            <ul ref="notesListRef">
+                <li @click="selectNote(item)" v-for="(item,index) in store.notesList" :class="{'active':item.id == store.activeNotes}" :key="item">
+                    <span>{{item.title}}</span>
+                    <span v-if="isDel" @click.stop="delNote(index)" class="del-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+                            <path
+                                fill="currentColor"
+                                d="M764.288 214.592 512 466.88 259.712 214.592a31.936 31.936 0 0 0-45.12 45.12L466.752 512 214.528 764.224a31.936 31.936 0 1 0 45.12 45.184L512 557.184l252.288 252.288a31.936 31.936 0 0 0 45.12-45.12L557.12 512.064l252.288-252.352a31.936 31.936 0 1 0-45.12-45.184z"></path>
+                        </svg>
+                    </span>
+                </li>
             </ul>
         </div>
         <div class="right">
-            <input maxlength="30" v-model="noteDetails.title" class="title" type="text" placeholder="标题" /><br />
-            <textarea v-model="noteDetails.data" class="content" placeholder="笔记"></textarea>
+            <input @input="onInput" maxlength="30" v-model="noteDetails.title" class="title" type="text" placeholder="标题" /><br />
+            <textarea @input="onInput" v-model="noteDetails.data" class="content" placeholder="笔记"></textarea>
         </div>
     </div>
 </template>
   
 <script setup>
-import { onMounted, onBeforeUnmount, reactive } from "vue";
+import Sortable from "sortablejs";
+import { onMounted, onBeforeUnmount, reactive, ref } from "vue";
 // 引入Stores
 import { useMyStoreHook } from "@/stores/useStore";
 let store = useMyStoreHook();
@@ -36,7 +46,22 @@ onMounted(() => {
     if (activeNotes) store.activeNotesChange(activeNotes);
     if (notesList && activeNotes) {
         noteDetails = notesList.find((it) => it.id == activeNotes);
+        if (!noteDetails) {
+            noteDetails = store.notesList[0];
+            store.activeNotesChange(noteDetails.id)
+        }
     }
+    // 排序
+    const notesSortable = Sortable.create(notesListRef.value, {
+        group: "shared",
+        animation: 150,
+        ghostClass: "ghost",
+        onEnd: ({ newIndex, oldIndex }) => {
+            const item = store.notesList.splice(oldIndex, 1)[0];
+            store.notesList.splice(newIndex, 0, item);
+            localStorage.setItem("notesList", JSON.stringify(store.notesList));
+        },
+    });
 });
 function noteAdd() {
     const data = {
@@ -55,6 +80,27 @@ function selectNote(data) {
 onBeforeUnmount(() => {
     localStorage.setItem("notesList", JSON.stringify(store.notesList));
 });
+// 保存优化 2秒内没输入自动保存
+let timer;
+function onInput() {
+    clearTimeout(timer);
+    timer = setTimeout(function () {
+        localStorage.setItem("notesList", JSON.stringify(store.notesList));
+    }, 2000);
+}
+// 删除
+let isDel = ref(false);
+function delNote(index) {
+    store.notesList.splice(index, 1);
+    localStorage.setItem("notesList", JSON.stringify(store.notesList));
+    if (store.notesList && store.activeNotes) {
+        noteDetails = store.notesList.find((it) => it.id == store.activeNotes);
+        if (!noteDetails) noteDetails = store.notesList[0];
+        store.activeNotesChange(noteDetails.id)
+    }
+}
+// 排序
+const notesListRef = ref(null);
 </script>
   
 <style lang="less" scoped>
@@ -103,25 +149,48 @@ onBeforeUnmount(() => {
             height: 32px;
             font-size: 24px;
         }
-        .edit {
-            cursor: pointer;
-            display: block;
-            position: absolute;
-            left: 6px;
-            top: 0;
-            border-radius: 50%;
-            width: 32px;
-            height: 32px;
-            background: var(--notesBg);
-            box-shadow: var(--notesShadowActive);
-            text-align: center;
-            svg {
-                width: 16px;
-                height: 16px;
-                position: relative;
-                top: 2px;
-            }
+    }
+    .edit {
+        cursor: pointer;
+        display: block;
+        position: absolute;
+        left: 6px;
+        top: 0;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        background: var(--notesBg);
+        box-shadow: var(--notesShadowActive);
+        text-align: center;
+        svg {
+            width: 16px;
+            height: 16px;
+            position: relative;
+            top: 2px;
         }
+    }
+    .del-btn {
+        cursor: pointer;
+        display: block;
+        position: absolute;
+        right: 8px;
+        top: 16px;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        background: var(--notesBg);
+        box-shadow: var(--shadow);
+        text-align: center;
+        svg {
+            width: 16px;
+            height: 16px;
+            position: relative;
+            top: -13px;
+        }
+    }
+    .del-btn:hover,
+    .del-btn:active {
+        box-shadow: var(--notesShadowActive);
     }
     .left {
         width: 320px;
@@ -133,6 +202,8 @@ onBeforeUnmount(() => {
             padding-left: 0;
             list-style: none;
             li {
+                cursor: pointer;
+                position: relative;
                 width: 285px;
                 height: 56px;
                 line-height: 56px;
@@ -146,6 +217,7 @@ onBeforeUnmount(() => {
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
+                padding-right: 30px;
             }
             li.active {
                 box-shadow: var(--notesShadowActive);

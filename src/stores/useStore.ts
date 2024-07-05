@@ -80,7 +80,7 @@ export const useMyStoreHook = defineStore({
         },
         activeNotesChange(data: any): void {
             this.activeNotes = data;
-            localStorage.setItem("activeNotes", JSON.stringify(data));
+            localStorage.setItem("activeNotes", data);
         },
     },
 });
