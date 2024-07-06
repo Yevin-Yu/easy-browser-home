@@ -14,7 +14,8 @@
             </div>
             <ul ref="todosListRef">
                 <li v-for="(item, index) in store.todosList" :key="item.id">
-                    <span class="checkbox" @click.stop="item.checked = !item.checked">
+                    <span class="checkbox" :class="{ 'checked': item.checked }"
+                        @click.stop="item.checked = !item.checked">
                         <svg v-if="item.checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
                             <path fill="currentColor"
                                 d="M329.956 257.138a254.862 254.862 0 0 0 0 509.724h364.088a254.862 254.862 0 0 0 0-509.724zm0-72.818h364.088a327.68 327.68 0 1 1 0 655.36H329.956a327.68 327.68 0 1 1 0-655.36z">
@@ -45,14 +46,15 @@
             </ul>
         </div>
         <div class="right">
-
+            <div class="big-nav"></div>
+            <div class="nav-list"></div>
         </div>
     </div>
 </template>
 
 <script setup>
 import Sortable from "sortablejs";
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watchEffect } from 'vue'
 import { useMyStoreHook } from "@/stores/useStore";
 let store = useMyStoreHook();
 // 初始加载
@@ -67,7 +69,6 @@ onMounted(() => {
         onEnd: ({ newIndex, oldIndex }) => {
             const item = store.todosList.splice(oldIndex, 1)[0];
             store.todosList.splice(newIndex, 0, item);
-            localStorage.setItem("todosList", JSON.stringify(store.todosList));
         },
     });
 });
@@ -80,7 +81,6 @@ function addTodo() {
         checked: false,
     };
     store.todosList.push(data);
-    localStorage.setItem("todosList", JSON.stringify(store.todosList));
 }
 // 删除
 function delTodo(index) {
@@ -89,8 +89,13 @@ function delTodo(index) {
 }
 // 排序
 const todosListRef = ref(null);
+// 实时更新
+watchEffect(() => {
+    if (store.todosList && store.todosList.length) {
+        localStorage.setItem("todosList", JSON.stringify(store.todosList));
+    }
+})
 </script>
-
 <style lang="less" scoped>
 .main::-webkit-scrollbar,
 .left-todo::-webkit-scrollbar {
@@ -108,9 +113,9 @@ const todosListRef = ref(null);
 }
 
 .main {
-    width: 70vw;
-    height: 60vh;
-    margin: 8vh auto;
+    width: 60vw;
+    height: 50vh;
+    margin: 10vh auto;
     overflow: hidden;
     display: flex;
     padding: 20px;
@@ -244,8 +249,11 @@ const todosListRef = ref(null);
                     top: 1px;
                     left: 6px;
                     width: 24px;
-                    color: var(--fontColor);
                 }
+            }
+
+            .checkbox.checked {
+                color: #999;
             }
 
             .todo-input {
@@ -258,8 +266,11 @@ const todosListRef = ref(null);
                 padding: 0;
                 font-size: 14px;
             }
-            .todo-text{
+
+            .todo-text {
                 font-size: 14px;
+                text-decoration: line-through;
+                color: #999;
             }
 
             .checkbox:hover,
@@ -271,7 +282,7 @@ const todosListRef = ref(null);
 
     .right {
         flex: 1;
-        
+
     }
 }
 </style>
