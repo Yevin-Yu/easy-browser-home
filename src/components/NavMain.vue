@@ -5,12 +5,12 @@
                 <div>
                     <img :src="item.iconPath" alt="icon" />
                 </div>
-                <span>{{item.name}}</span>
+                <span>{{ item.name }}</span>
             </li>
         </ul>
     </div>
 </template>
-  
+
 <script setup>
 import { onMounted } from "vue";
 // 引入Stores
@@ -25,7 +25,7 @@ function go(item) {
     window.open(item.linkPath);
 }
 </script>
-  
+
 <style lang="less" scoped>
 .nav-main::-webkit-scrollbar {
     width: 5px;
@@ -39,10 +39,11 @@ function go(item) {
     border-radius: 2px;
     background-color: #ccc;
 }
+
 .nav-main {
     width: 65vw;
     height: 50vh;
-    margin: 7.5vh auto;
+    margin: 10vh auto;
     overflow: auto;
     text-align: center;
 
@@ -52,11 +53,13 @@ function go(item) {
         flex-wrap: wrap;
         display: inline-block;
         padding-left: 0;
+
         li {
             display: inline-block;
             margin: 12px 25px;
             text-align: center;
             width: 80px;
+
             div {
                 cursor: pointer;
                 border-radius: 17px;
@@ -65,6 +68,7 @@ function go(item) {
                 border: var(--border);
                 background-color: var(--bgColorDefaut);
                 box-shadow: var(--shadow);
+
                 img {
                     padding: 12px;
                     background-color: #fff;
@@ -75,13 +79,16 @@ function go(item) {
                     background-color: rgba(255, 255, 255, 0.5);
                 }
             }
+
             div:hover,
             div:active {
                 box-shadow: var(--sideShadowActive);
+
                 img {
                     box-shadow: var(--shadow);
                 }
             }
+
             span {
                 width: 80px;
                 display: inline-block;

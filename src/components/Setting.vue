@@ -9,11 +9,16 @@
     </div>
     <div class="content">
       <div class="item">
+        <div class="title">同步设置</div>
+        <div class="card">
+          <span @click="downloadLocalStorage" class="upload-button">导出数据</span>
+        </div>
+      </div>
+      <div class="item">
         <div class="title">背景设置</div>
         <div class="card">
           <label for="imageUpload" class="custom-file-upload">
-            <input v-show="false" type="file" id="imageUpload" ref="fileInput" @change="onFileChange"
-                   accept="image/*">
+            <input v-show="false" type="file" id="imageUpload" ref="fileInput" @change="onFileChange" accept="image/*">
             <span class="upload-button">{{ btn_text }}</span>
           </label>
           <span @click="delBgImage" class="upload-button">删除背景</span>
@@ -37,7 +42,7 @@
             <el-radio value="1">开启导航</el-radio>
             <el-radio value="2">关闭导航</el-radio>
           </el-radio-group>
-          <el-radio-group :disabled="mainStore.is_nav==='2'" v-model="mainStore.nav_type">
+          <el-radio-group :disabled="mainStore.is_nav === '2'" v-model="mainStore.nav_type">
             <el-radio value="1">默认导航</el-radio>
             <el-radio value="2">右侧导航</el-radio>
           </el-radio-group>
@@ -49,6 +54,7 @@
 <script setup>
 import { ElMessage } from "element-plus";
 import { useCookieAuth } from "@/hook/useAuth";
+import { useLocalStorage } from "@/hook/useLocalStorage";
 import { ref, onMounted, defineEmits, watchEffect, watch } from "vue";
 import axiosInstance from "@/axios"; // 导入你的axios实例
 import { useRouter } from "vue-router";
@@ -57,6 +63,7 @@ import { useMainStore } from "@/stores/useMainStore";
 const mainStore = useMainStore();
 const router = useRouter();
 const { removeToken } = useCookieAuth();
+const { downloadLocalStorage } = useLocalStorage();
 // 获取设置信息
 const bg_name = ref("获取中...");
 const btn_text = ref("选择图片");
@@ -132,12 +139,12 @@ function onFileChange() {
         });
         // 上传成功，同时更新
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = function (e) {
           const base64String = e.target.result;
           localStorage.setItem("bg_base64", base64String);
           document.getElementById("yuwbNav").style.backgroundImage = `url(${base64String})`;
         };
-        reader.onerror = function(error) {
+        reader.onerror = function (error) {
           console.error("Error reading file:", error);
         };
         reader.readAsDataURL(file);

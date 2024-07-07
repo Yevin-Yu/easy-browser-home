@@ -46,8 +46,20 @@
             </ul>
         </div>
         <div class="right">
-            <div class="big-nav"></div>
-            <div class="nav-list"></div>
+            <div class="big-nav">
+                <img src="@/assets/images/banner.jpg" alt="">
+                <p>——  认真生活，简单做人，用心做事。</p>
+            </div>
+            <div class="nav-main">
+                <ul>
+                    <li v-for="item in store.navMenu" @click="go(item)" :key="item.name">
+                        <div>
+                            <img :src="item.iconPath" alt="icon" />
+                        </div>
+                        <span>{{ item.name }}</span>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 </template>
@@ -59,6 +71,8 @@ import { useMyStoreHook } from "@/stores/useStore";
 let store = useMyStoreHook();
 // 初始加载
 onMounted(() => {
+    const navMenu = JSON.parse(localStorage.getItem("navMenu"));
+    if (navMenu) store.navMenuChange(navMenu);
     const todosList = JSON.parse(localStorage.getItem("todosList"));
     if (todosList) store.todosListChange(todosList);
     // 排序
@@ -95,6 +109,11 @@ watchEffect(() => {
         localStorage.setItem("todosList", JSON.stringify(store.todosList));
     }
 })
+// 导航跳转
+
+function go(item) {
+    window.open(item.linkPath);
+}
 </script>
 <style lang="less" scoped>
 .main::-webkit-scrollbar,
@@ -113,9 +132,9 @@ watchEffect(() => {
 }
 
 .main {
-    width: 60vw;
-    height: 50vh;
-    margin: 10vh auto;
+    width: 70vw;
+    height: 60vh;
+    margin: 7.5vh auto 0;
     overflow: hidden;
     display: flex;
     padding: 20px;
@@ -282,6 +301,109 @@ watchEffect(() => {
 
     .right {
         flex: 1;
+        overflow: auto;
+
+        .nav-main::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+            background-color: transparent;
+        }
+
+        .nav-main::-webkit-scrollbar-thumb {
+            width: 5px;
+            height: 5px;
+            border-radius: 2px;
+            background-color: #ccc;
+        }
+
+        ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            display: inline-block;
+            padding-left: 0;
+
+            li {
+                display: inline-block;
+                margin: 12px 25px;
+                text-align: center;
+                width: 80px;
+
+                div {
+                    cursor: pointer;
+                    border-radius: 17px;
+                    min-width: 80px;
+                    height: 80px;
+                    border: var(--border);
+                    background-color: var(--bgColorDefaut);
+                    box-shadow: var(--shadow);
+
+                    img {
+                        padding: 12px;
+                        background-color: #fff;
+                        width: 50px;
+                        height: 50px;
+                        margin: 14px;
+                        border-radius: 15px;
+                        background-color: rgba(255, 255, 255, 0.5);
+                    }
+                }
+
+                div:hover,
+                div:active {
+                    box-shadow: var(--sideShadowActive);
+
+                    img {
+                        box-shadow: var(--shadow);
+                    }
+                }
+
+                span {
+                    width: 80px;
+                    display: inline-block;
+                    margin-top: 12px;
+                    font-size: 12px;
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                    color: var(--fontColor);
+                }
+            }
+        }
+
+        .big-nav {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            padding: 0 25px;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 40px;
+
+            img {
+                height: 200px;
+                width: 100%;
+                border-radius: 15px;
+                overflow: hidden;
+                object-fit: cover;
+            }
+
+            p {
+                color: rgba(255, 255, 245, .86);
+                position: absolute;
+                right: 40px;
+                bottom: 12px;
+
+            }
+        }
+
+        .nav-main {
+            max-height: 280px;
+            min-height: 280px;
+            margin: 0 auto;
+            overflow: hidden;
+            text-align: center;
+        }
 
     }
 }

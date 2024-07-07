@@ -1,11 +1,14 @@
 <template>
-    <div class="user-main">
+    <div class="user-main" @click="go">
         <img src="@/assets/images/user.jpg" alt="user">
         <span>耶温导航</span>
     </div>
 </template>
   
 <script setup>
+function go(){
+ window.open('https://github.com/iyuwb/browser-nav-front')
+}
 </script>
   
 <style lang="less" scoped>

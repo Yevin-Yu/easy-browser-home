@@ -1,11 +1,22 @@
 <template>
     <div class="setting-main">
+
+        <div class="item-card">
+            <h3>同步数据</h3>
+            <button @click="downloadLocalStorage">导出数据</button>
+            <label for="jsonUpload" class="custom-file-upload">
+                <input v-show="false" type="file" id="jsonUpload" ref="fileInputRef" @change="onFileChange"
+                    accept=".json" />
+                <span class="button">导入数据</span>
+            </label>
+        </div>
         <div class="item-card">
             <h3>主题设置</h3>
             <button @click="theme.toggleTheme">切换主题</button>
             <span>[ 可以根据需要，调整主题色，适应亮色背景或者暗色背景 ]</span> <br />
             <label for="imageUpload" class="custom-file-upload">
-                <input v-show="false" type="file" id="imageUpload" ref="fileInput" @change="onFileChange" accept="image/*" />
+                <input v-show="false" type="file" id="imageUpload" ref="fileInput" @change="onFileChange"
+                    accept="image/*" />
                 <span class="button">设置背景图片</span>
             </label>
             <button @click="delFile">删除背景</button>
@@ -13,24 +24,25 @@
         </div>
         <div class="item-card">
             <h3>搜索引擎</h3>
-            <button @click="store.searchEngineChange(item.value)" :class="{'active':store.searchEngine === item.value}" v-for="item in list" :key="item.value">
-                {{item.label}}
+            <button @click="store.searchEngineChange(item.value)"
+                :class="{ 'active': store.searchEngine === item.value }" v-for="item in list" :key="item.value">
+                {{ item.label }}
             </button>
         </div>
         <div class="item-card">
             <h3>导航设置</h3>
             <div class="nav-list">
                 <ul ref="navsList">
-                    <li v-for="(item,index) in store.navMenu" @click="go(item)" :key="item.name">
+                    <li v-for="(item, index) in store.navMenu" @click="go(item)" :key="item.name">
                         <div>
                             <img :src="item.iconPath" alt="icon" />
                         </div>
-                        <span>{{item.name}}</span>
+                        <span>{{ item.name }}</span>
                         <img @click="delNav(index)" class="del-icon" src="@/assets/icon/close.svg" alt="" />
                     </li>
                 </ul>
                 <ul>
-                    <li @click="dialogVisible=true">
+                    <li @click="dialogVisible = true">
                         <div>
                             <img src="@/assets/icon/add.svg" alt="icon" />
                         </div>
@@ -43,7 +55,7 @@
             <h3>新闻排序</h3>
             <div ref="newsList">
                 <button v-for="item in store.newsMenu" :key="item">
-                    {{item.label}}
+                    {{ item.label }}
                 </button>
             </div>
         </div>
@@ -66,7 +78,7 @@
         </template>
     </el-dialog>
 </template>
-  
+
 <script setup>
 import Sortable from "sortablejs";
 // 主题切换
@@ -79,6 +91,9 @@ let store = useMyStoreHook();
 
 // 初始化主题
 let theme = useTheme();
+// 下载数据
+import { useLocalStorageIO } from '@/hook/useLocalStorage'
+const { downloadLocalStorage, fileInputRef } = useLocalStorageIO();
 onMounted(() => {
     // 默认主题
     const currentTheme = localStorage.getItem("theme");
@@ -172,7 +187,7 @@ function delNav(index) {
 }
 let dialogVisible = ref(false);
 </script>
-  
+
 <style lang="less" scoped>
 .setting-main::-webkit-scrollbar {
     width: 5px;
@@ -186,12 +201,14 @@ let dialogVisible = ref(false);
     border-radius: 2px;
     background-color: #ccc;
 }
+
 .setting-main {
     width: 60vw;
     height: 55vh;
     margin: 7.5vh auto;
     overflow: auto;
     padding: 24px;
+
     .item-card {
         margin-bottom: 20px;
         border-radius: 15px;
@@ -200,9 +217,11 @@ let dialogVisible = ref(false);
         border: var(--border);
         color: var(--fontColor);
         padding: 12px;
+
         h3 {
             padding: 12px 0;
         }
+
         button,
         .button {
             font-size: 13px;
@@ -219,9 +238,11 @@ let dialogVisible = ref(false);
             border: var(--border);
             color: var(--fontColor);
         }
+
         button.active {
             box-shadow: var(--sideShadowActive);
         }
+
         button:hover,
         button:active,
         .button:hover,
@@ -229,6 +250,7 @@ let dialogVisible = ref(false);
             box-shadow: var(--sideShadowActive);
         }
     }
+
     .nav-list {
         ul {
             list-style: none;
@@ -236,12 +258,14 @@ let dialogVisible = ref(false);
             flex-wrap: wrap;
             display: inline-block;
             padding-left: 0;
+
             li {
                 display: inline-block;
                 margin: 12px 25px;
                 text-align: center;
                 width: 80px;
                 position: relative;
+
                 div {
                     cursor: pointer;
                     border-radius: 17px;
@@ -250,6 +274,7 @@ let dialogVisible = ref(false);
                     border: var(--border);
                     background-color: var(--bgColorDefaut);
                     box-shadow: var(--shadow);
+
                     img {
                         padding: 12px;
                         background-color: #fff;
@@ -260,13 +285,16 @@ let dialogVisible = ref(false);
                         background-color: rgba(255, 255, 255, 0.5);
                     }
                 }
+
                 div:hover,
                 div:active {
                     box-shadow: var(--sideShadowActive);
+
                     img {
                         box-shadow: var(--shadow);
                     }
                 }
+
                 span {
                     width: 80px;
                     display: inline-block;
@@ -277,6 +305,7 @@ let dialogVisible = ref(false);
                     text-overflow: ellipsis;
                     color: var(--fontColor);
                 }
+
                 .del-icon {
                     position: absolute;
                     right: -10px;
@@ -288,6 +317,7 @@ let dialogVisible = ref(false);
         }
     }
 }
+
 .dialog-footer {
     text-align: center;
 }
@@ -297,6 +327,7 @@ let dialogVisible = ref(false);
         color: var(--fontColor);
         padding: 12px;
     }
+
     input {
         outline: none;
         border: none;
