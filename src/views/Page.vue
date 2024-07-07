@@ -34,7 +34,7 @@ import { useMyStoreHook } from "@/stores/useStore";
 
 let store = useMyStoreHook();
 // 主题设置
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import { useTheme } from "@/hook/useTheme";
 
 const theme = useTheme();
