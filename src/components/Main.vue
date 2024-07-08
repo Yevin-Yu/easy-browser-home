@@ -14,26 +14,25 @@
             </div>
             <ul ref="todosListRef">
                 <li v-for="(item, index) in store.todosList" :key="item.id">
-                    <span class="checkbox" :class="{ 'checked': item.checked }"
-                        @click.stop="item.checked = !item.checked">
+                    <span class="checkbox" :class="{ 'checked': item.checked }" @click.stop="item.checked = !item.checked">
                         <svg v-if="item.checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
-                            <path fill="currentColor"
-                                d="M329.956 257.138a254.862 254.862 0 0 0 0 509.724h364.088a254.862 254.862 0 0 0 0-509.724zm0-72.818h364.088a327.68 327.68 0 1 1 0 655.36H329.956a327.68 327.68 0 1 1 0-655.36z">
-                            </path>
-                            <path fill="currentColor"
-                                d="M694.044 621.227a109.227 109.227 0 1 0 0-218.454 109.227 109.227 0 0 0 0 218.454m0 72.817a182.044 182.044 0 1 1 0-364.088 182.044 182.044 0 0 1 0 364.088">
-                            </path>
+                            <path
+                                fill="currentColor"
+                                d="M329.956 257.138a254.862 254.862 0 0 0 0 509.724h364.088a254.862 254.862 0 0 0 0-509.724zm0-72.818h364.088a327.68 327.68 0 1 1 0 655.36H329.956a327.68 327.68 0 1 1 0-655.36z"></path>
+                            <path
+                                fill="currentColor"
+                                d="M694.044 621.227a109.227 109.227 0 1 0 0-218.454 109.227 109.227 0 0 0 0 218.454m0 72.817a182.044 182.044 0 1 1 0-364.088 182.044 182.044 0 0 1 0 364.088"></path>
                         </svg>
                         <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
-                            <path fill="currentColor"
-                                d="M329.956 257.138a254.862 254.862 0 0 0 0 509.724h364.088a254.862 254.862 0 0 0 0-509.724zm0-72.818h364.088a327.68 327.68 0 1 1 0 655.36H329.956a327.68 327.68 0 1 1 0-655.36z">
-                            </path>
-                            <path fill="currentColor"
-                                d="M329.956 621.227a109.227 109.227 0 1 0 0-218.454 109.227 109.227 0 0 0 0 218.454m0 72.817a182.044 182.044 0 1 1 0-364.088 182.044 182.044 0 0 1 0 364.088">
-                            </path>
+                            <path
+                                fill="currentColor"
+                                d="M329.956 257.138a254.862 254.862 0 0 0 0 509.724h364.088a254.862 254.862 0 0 0 0-509.724zm0-72.818h364.088a327.68 327.68 0 1 1 0 655.36H329.956a327.68 327.68 0 1 1 0-655.36z"></path>
+                            <path
+                                fill="currentColor"
+                                d="M329.956 621.227a109.227 109.227 0 1 0 0-218.454 109.227 109.227 0 0 0 0 218.454m0 72.817a182.044 182.044 0 1 1 0-364.088 182.044 182.044 0 0 1 0 364.088"></path>
                         </svg>
                     </span>
-                    <input class="todo-input" v-if="!item.checked" v-model="item.title" type="text">
+                    <input class="todo-input" v-if="!item.checked" v-model="item.title" type="text" />
                     <span v-else class="todo-text">{{ item.title }}</span>
                     <span class="del-btn" v-if="isEdit" @click="delTodo(index)">
                         <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
@@ -47,8 +46,8 @@
         </div>
         <div class="right">
             <div class="big-nav">
-                <img src="@/assets/images/banner.jpg" alt="">
-                <p>——  认真生活，简单做人，用心做事。</p>
+                <img src="@/assets/images/banner.jpg" alt="" />
+                <p>—— 认真生活，简单做人，用心做事。</p>
             </div>
             <div class="nav-main">
                 <ul>
@@ -66,7 +65,7 @@
 
 <script setup>
 import Sortable from "sortablejs";
-import { ref, onMounted, watchEffect } from 'vue'
+import { ref, onMounted, watchEffect } from "vue";
 import { useMyStoreHook } from "@/stores/useStore";
 let store = useMyStoreHook();
 // 初始加载
@@ -94,7 +93,7 @@ function addTodo() {
         title: "新建Todo",
         checked: false,
     };
-    store.todosList.push(data);
+    store.todosList.unshift(data);
 }
 // 删除
 function delTodo(index) {
@@ -108,7 +107,7 @@ watchEffect(() => {
     if (store.todosList && store.todosList.length) {
         localStorage.setItem("todosList", JSON.stringify(store.todosList));
     }
-})
+});
 // 导航跳转
 
 function go(item) {
@@ -117,14 +116,18 @@ function go(item) {
 </script>
 <style lang="less" scoped>
 .main::-webkit-scrollbar,
-.left-todo::-webkit-scrollbar {
+.left-todo::-webkit-scrollbar,
+.right::-webkit-scrollbar,
+ul::-webkit-scrollbar {
     width: 5px;
     height: 5px;
     background-color: transparent;
 }
 
 .main::-webkit-scrollbar-thumb,
-.left-todo::-webkit-scrollbar-thumb {
+.left-todo::-webkit-scrollbar-thumb,
+.right::-webkit-scrollbar-thumb,
+ul::-webkit-scrollbar-thumb {
     width: 5px;
     height: 5px;
     border-radius: 2px;
@@ -143,8 +146,6 @@ function go(item) {
         border-radius: 15px;
         width: 320px;
         height: 100%;
-        background-color: #aaa;
-        overflow: auto;
         background: var(--bgColorDefaut);
         box-shadow: var(--shadow);
         border: var(--border);
@@ -161,7 +162,7 @@ function go(item) {
         .add {
             display: block;
             position: absolute;
-            right: -10px;
+            right: 6px;
             cursor: pointer;
             top: -1px;
             width: 32px;
@@ -218,10 +219,14 @@ function go(item) {
     }
 
     .left-todo {
+        overflow: hidden;
+        padding-right: 0;
         ul {
             padding-left: 0;
             list-style: none;
-
+            overflow: auto;
+            height: calc(100% - 35px);
+            margin: 6px 0 12px 0;
             li {
                 cursor: pointer;
                 position: relative;
@@ -229,7 +234,7 @@ function go(item) {
                 height: 56px;
                 line-height: 56px;
                 border-radius: 12px;
-                padding: 0 12px;
+                padding: 0 20px 0 12px;
                 background: var(--notesBg);
                 box-shadow: var(--notesShadow);
                 border: var(--border);
@@ -389,11 +394,10 @@ function go(item) {
             }
 
             p {
-                color: rgba(255, 255, 245, .86);
+                color: rgba(255, 255, 245, 0.86);
                 position: absolute;
                 right: 40px;
                 bottom: 12px;
-
             }
         }
 
@@ -404,7 +408,6 @@ function go(item) {
             overflow: hidden;
             text-align: center;
         }
-
     }
 }
 </style>

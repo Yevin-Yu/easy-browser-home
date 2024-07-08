@@ -4,31 +4,29 @@
             <div class="title">
                 <span class="edit" @click="isDel = !isDel">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
-                        <path fill="currentColor"
-                            d="m199.04 672.64 193.984 112 224-387.968-193.92-112-224 388.032zm-23.872 60.16 32.896 148.288 144.896-45.696zM455.04 229.248l193.92 112 56.704-98.112-193.984-112-56.64 98.112zM104.32 708.8l384-665.024 304.768 175.936L409.152 884.8h.064l-248.448 78.336zm384 254.272v-64h448v64h-448z">
-                        </path>
+                        <path
+                            fill="currentColor"
+                            d="m199.04 672.64 193.984 112 224-387.968-193.92-112-224 388.032zm-23.872 60.16 32.896 148.288 144.896-45.696zM455.04 229.248l193.92 112 56.704-98.112-193.984-112-56.64 98.112zM104.32 708.8l384-665.024 304.768 175.936L409.152 884.8h.064l-248.448 78.336zm384 254.272v-64h448v64h-448z"></path>
                     </svg>
                 </span>
                 笔记列表
                 <span @click="noteAdd" class="add">+</span>
             </div>
             <ul ref="notesListRef">
-                <li @click="selectNote(item)" v-for="(item, index) in store.notesList"
-                    :class="{ 'active': item.id == store.activeNotes }" :key="item">
+                <li @click="selectNote(item)" v-for="(item, index) in store.notesList" :class="{ 'active': item.id == store.activeNotes }" :key="item">
                     <span>{{ item.title }}</span>
                     <span v-if="isDel" @click.stop="delNote(index)" class="del-btn">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
-                            <path fill="currentColor"
-                                d="M764.288 214.592 512 466.88 259.712 214.592a31.936 31.936 0 0 0-45.12 45.12L466.752 512 214.528 764.224a31.936 31.936 0 1 0 45.12 45.184L512 557.184l252.288 252.288a31.936 31.936 0 0 0 45.12-45.12L557.12 512.064l252.288-252.352a31.936 31.936 0 1 0-45.12-45.184z">
-                            </path>
+                            <path
+                                fill="currentColor"
+                                d="M764.288 214.592 512 466.88 259.712 214.592a31.936 31.936 0 0 0-45.12 45.12L466.752 512 214.528 764.224a31.936 31.936 0 1 0 45.12 45.184L512 557.184l252.288 252.288a31.936 31.936 0 0 0 45.12-45.12L557.12 512.064l252.288-252.352a31.936 31.936 0 1 0-45.12-45.184z"></path>
                         </svg>
                     </span>
                 </li>
             </ul>
         </div>
-        <div class="right">
-            <input @input="onInput" maxlength="30" v-model="noteDetails.title" class="title" type="text"
-                placeholder="标题" /><br />
+        <div class="right" v-if="noteDetails&&noteDetails.title">
+            <input @input="onInput" maxlength="30" v-model="noteDetails.title" class="title" type="text" placeholder="标题" /><br />
             <textarea @input="onInput" v-model="noteDetails.data" class="content" placeholder="笔记"></textarea>
         </div>
     </div>
@@ -48,9 +46,9 @@ onMounted(() => {
     if (activeNotes) store.activeNotesChange(activeNotes);
     if (notesList && activeNotes) {
         noteDetails = notesList.find((it) => it.id == activeNotes);
-        if (!noteDetails) {
+        if (!noteDetails && store.notesList.length) {
             noteDetails = store.notesList[0];
-            store.activeNotesChange(noteDetails.id)
+            store.activeNotesChange(noteDetails.id);
         }
     }
     // 排序
@@ -71,7 +69,8 @@ function noteAdd() {
         title: "新建笔记",
         data: "",
     };
-    store.notesList.push(data);
+    store.notesList.unshift(data);
+    selectNote(data);
     localStorage.setItem("notesList", JSON.stringify(store.notesList));
 }
 function selectNote(data) {
@@ -97,8 +96,10 @@ function delNote(index) {
     localStorage.setItem("notesList", JSON.stringify(store.notesList));
     if (store.notesList && store.activeNotes) {
         noteDetails = store.notesList.find((it) => it.id == store.activeNotes);
-        if (!noteDetails) noteDetails = store.notesList[0];
-        store.activeNotesChange(noteDetails.id)
+        if (!noteDetails && store.notesList.length) {
+            noteDetails = store.notesList[0];
+            store.activeNotesChange(noteDetails.id);
+        }
     }
 }
 // 排序
@@ -109,7 +110,8 @@ const notesListRef = ref(null);
 .notes-main::-webkit-scrollbar,
 .right::-webkit-scrollbar,
 .left::-webkit-scrollbar,
-.content::-webkit-scrollbar {
+.content::-webkit-scrollbar,
+ul::-webkit-scrollbar {
     width: 5px;
     height: 5px;
     background-color: transparent;
@@ -118,7 +120,8 @@ const notesListRef = ref(null);
 .notes-main::-webkit-scrollbar-thumb,
 .left::-webkit-scrollbar-thumb,
 .right::-webkit-scrollbar-thumb,
-.content::-webkit-scrollbar-thumb {
+.content::-webkit-scrollbar-thumb,
+ul::-webkit-scrollbar-thumb {
     width: 5px;
     height: 5px;
     border-radius: 2px;
@@ -209,13 +212,15 @@ const notesListRef = ref(null);
         width: 320px;
         border-radius: 6px;
         margin-right: 12px;
-        overflow: auto;
+        overflow: hidden;
         height: calc(55vh - 32px);
 
         ul {
             padding-left: 0;
             list-style: none;
-
+            height: calc(100% - 30px);
+            overflow: auto;
+            margin-top: 6px;
             li {
                 cursor: pointer;
                 position: relative;
