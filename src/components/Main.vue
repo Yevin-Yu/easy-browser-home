@@ -137,7 +137,7 @@ ul::-webkit-scrollbar-thumb {
 .main {
     width: 70vw;
     height: 60vh;
-    margin: 7.5vh auto 0;
+    margin: 5vh auto 0;
     overflow: hidden;
     display: flex;
     padding: 20px;
@@ -262,6 +262,9 @@ ul::-webkit-scrollbar-thumb {
                 width: 38px;
                 line-height: 28px;
                 border-radius: 10px;
+                position: absolute;
+                left: 10px;
+                top: 14px;
                 background: var(--notesBg);
                 box-shadow: var(--notesShadow);
                 border: var(--border);
@@ -281,6 +284,7 @@ ul::-webkit-scrollbar-thumb {
             }
 
             .todo-input {
+                margin-left: 50px;
                 outline: none;
                 border: none;
                 height: 28px;
@@ -289,9 +293,11 @@ ul::-webkit-scrollbar-thumb {
                 color: var(--fontColor);
                 padding: 0;
                 font-size: 14px;
+                width: 190px;
             }
 
             .todo-text {
+                margin-left: 50px;
                 font-size: 14px;
                 text-decoration: line-through;
                 color: #999;
