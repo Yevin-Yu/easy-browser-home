@@ -25,7 +25,7 @@
                 </li>
             </ul>
         </div>
-        <div class="right" v-if="noteDetails&&noteDetails.title">
+        <div class="right" v-if="store.activeNotes">
             <input @input="onInput" maxlength="30" v-model="noteDetails.title" class="title" type="text" placeholder="标题" /><br />
             <textarea @input="onInput" v-model="noteDetails.data" class="content" placeholder="笔记"></textarea>
         </div>
@@ -99,6 +99,9 @@ function delNote(index) {
         if (!noteDetails && store.notesList.length) {
             noteDetails = store.notesList[0];
             store.activeNotesChange(noteDetails.id);
+        }else{
+            noteDetails = {};
+            store.activeNotesChange(null);
         }
     }
 }
