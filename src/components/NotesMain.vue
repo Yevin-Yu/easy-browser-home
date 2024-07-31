@@ -34,12 +34,17 @@
                         d="M768.96 575.072c-22.144-34.112-54.816-56.8-97.984-68.032v-2.176c22.88-10.88 42.112-23.04 57.696-36.48 15.616-12.704 27.584-26.144 35.936-40.288 16.32-29.76 24.128-60.96 23.392-93.632 0-63.872-19.776-115.232-59.328-154.08-39.2-38.464-97.824-58.048-175.84-58.784H215.232v793.728H579.52c62.432 0 114.496-20.864 156.256-62.624 42.112-39.936 63.52-94.176 64.224-162.752 0-41.376-10.336-79.68-31.04-114.88zM344.32 228.832h194.912c43.904 0.736 76.224 11.424 96.896 32.128 21.056 22.144 31.584 49.184 31.584 81.12s-10.528 58.432-31.584 79.488c-20.672 22.848-52.992 34.304-96.896 34.304H344.32V228.832z m304.352 536.256c-20.672 23.584-53.344 35.744-97.984 36.48H344.32v-238.432h206.336c44.64 0.704 77.312 12.512 97.984 35.392 20.672 23.232 31.04 51.168 31.04 83.84 0 31.904-10.336 59.488-31.008 82.72z"
                         p-id="4639"></path>
                 </svg>
-                <svg @click="fontLager" t="1722237109755" fill="#6CB9B4" class="icon" viewBox="0 0 1024 1024"
+                <svg t="1722237109755" fill="#6CB9B4" class="icon" viewBox="0 0 1024 1024"
                     version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4800" width="20" height="32">
                     <path
                         d="M792.864 922.112l103.584-2.176L572.576 110.24h-89.184L161.696 919.936H264l66.944-167.936h394.112l67.808 170.112zM369.216 656L528 257.632 686.784 656h-317.568z"
                         p-id="4801"></path>
                 </svg>
+                <div class="font-size-list">
+                    <ul> 
+                        <li @click="editFontSize(item)" v-for="item in  fonstStore.size" :key="item">{{item}}</li>
+                    </ul>
+                </div>
             </div>
             <input @input="onInput" maxlength="30" v-model="noteDetails.title" class="title" type="text"
                 placeholder="标题" /><br />
@@ -148,6 +153,9 @@ const fontLager = () => {
             fonstStore.fontSize = fonstStore.size[0]
         }
     }
+}
+const editFontSize = (data) => {
+    fonstStore.fontSize = data
 }
 </script>
 
@@ -351,6 +359,43 @@ ul::-webkit-scrollbar-thumb {
                 cursor: pointer;
                 margin: 0 4px;
                 color: var(--fontColor);
+            }
+            .font-size-list{
+                position: absolute;
+                right: -6px;
+                top: 32px;
+                display: none;
+                background: var(--notesBg);
+                box-shadow: var(--notesShadow);
+                box-shadow: 3px 3px 3px #6cb9b480;
+                border: var(--border);
+                color: var(--fontColor);
+                border-radius: 6px;
+                ul{
+                    list-style: none;
+                    padding-left: 0;
+                    display: flex;
+                    flex-wrap: wrap;
+                    width: 60px;
+                    border-radius: 6px;
+                    li{
+                        text-align: center;
+                        width: 30px;
+                        padding:2px 8px;
+                        font-size: 14px;
+                        line-height: 20px;
+                        cursor: pointer;
+                        &:hover{
+                            color: #6cb9b4;
+                        }
+                    }
+                }
+            }
+            svg:nth-of-type(2):hover + .font-size-list {
+                display: block;
+            }
+            .font-size-list:hover {
+                display: block;
             }
         }
     }

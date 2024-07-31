@@ -2,8 +2,8 @@ import { ref, watchEffect, type Ref } from "vue";
 import { defineStore } from "pinia";
 
 export const useFontStore = defineStore("font", () => {
-    const size = ["12", "16", "20", "24", "28"];
-    const fontSize: Ref<string> = ref(localStorage.getItem("fontSize") || size[2]);
+    const size = ["12", "14", "16", "18", "20", "22", "24", "26", "28","30"];
+    const fontSize: Ref<string> = ref(localStorage.getItem("fontSize") || "16");
     const fontBold: Ref<string> = ref(localStorage.getItem("fontBold") || "normal");
     watchEffect(() => {
         if (fontSize.value) {
