@@ -5,8 +5,7 @@
             <h3>同步数据</h3>
             <button @click="downloadLocalStorage">导出数据</button>
             <label for="jsonUpload" class="custom-file-upload">
-                <input v-show="false" type="file" id="jsonUpload" ref="fileInputRef" @change="onFileChange"
-                    accept=".json" />
+                <input v-show="false" type="file" id="jsonUpload" ref="fileInputRef" accept=".json" />
                 <span class="button">导入数据</span>
             </label>
         </div>

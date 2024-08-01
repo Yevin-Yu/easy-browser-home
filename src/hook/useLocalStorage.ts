@@ -44,6 +44,7 @@ export function useLocalStorageIO() {
                     message: "导入成功",
                     type: "success",
                 });
+                window.location.reload();
             } catch (error) {
                 ElMessage.error("导入失败");
             }
