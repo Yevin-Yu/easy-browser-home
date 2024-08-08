@@ -31,8 +31,18 @@ export default defineConfig({
         theme_color: '#ccc',
         icons: [
           {
-            src: 'pwa.png',
+            src: 'pwa.webp',
+            sizes: '256x256',
+            type: 'image/png'
+          },
+          {
+            src: 'pwa.webp',
             sizes: '512x512',
+            type: 'image/png'
+          },
+          {
+            src: 'pwa.webp',
+            sizes: '1024x1024',
             type: 'image/png'
           }
         ]

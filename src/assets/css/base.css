@@ -4,5 +4,8 @@
   box-sizing: border-box;
   margin: 0;
   font-weight: normal;
+  scrollbar-width: thin;
+  scrollbar-color: #ccc transparent;
 }
+
 

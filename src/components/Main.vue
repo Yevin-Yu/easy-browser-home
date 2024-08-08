@@ -224,7 +224,8 @@ ul::-webkit-scrollbar-thumb {
         ul {
             padding-left: 0;
             list-style: none;
-            overflow: auto;
+            overflow-x: hidden;
+            overflow-y: auto;
             height: calc(100% - 35px);
             margin: 6px 0 12px 0;
             li {
