@@ -14,22 +14,22 @@
             </div>
             <ul ref="todosListRef">
                 <li v-for="(item, index) in store.todosList" :key="item.id">
-                    <span class="checkbox" :class="{ 'checked': item.checked }" @click.stop="item.checked = !item.checked">
+                    <span class="checkbox" :class="{ 'checked': item.checked }" @click.stop="changeCheck(item)">
                         <svg v-if="item.checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
-                            <path
-                                fill="currentColor"
-                                d="M329.956 257.138a254.862 254.862 0 0 0 0 509.724h364.088a254.862 254.862 0 0 0 0-509.724zm0-72.818h364.088a327.68 327.68 0 1 1 0 655.36H329.956a327.68 327.68 0 1 1 0-655.36z"></path>
-                            <path
-                                fill="currentColor"
-                                d="M694.044 621.227a109.227 109.227 0 1 0 0-218.454 109.227 109.227 0 0 0 0 218.454m0 72.817a182.044 182.044 0 1 1 0-364.088 182.044 182.044 0 0 1 0 364.088"></path>
+                            <path fill="currentColor"
+                                d="M329.956 257.138a254.862 254.862 0 0 0 0 509.724h364.088a254.862 254.862 0 0 0 0-509.724zm0-72.818h364.088a327.68 327.68 0 1 1 0 655.36H329.956a327.68 327.68 0 1 1 0-655.36z">
+                            </path>
+                            <path fill="currentColor"
+                                d="M694.044 621.227a109.227 109.227 0 1 0 0-218.454 109.227 109.227 0 0 0 0 218.454m0 72.817a182.044 182.044 0 1 1 0-364.088 182.044 182.044 0 0 1 0 364.088">
+                            </path>
                         </svg>
                         <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
-                            <path
-                                fill="currentColor"
-                                d="M329.956 257.138a254.862 254.862 0 0 0 0 509.724h364.088a254.862 254.862 0 0 0 0-509.724zm0-72.818h364.088a327.68 327.68 0 1 1 0 655.36H329.956a327.68 327.68 0 1 1 0-655.36z"></path>
-                            <path
-                                fill="currentColor"
-                                d="M329.956 621.227a109.227 109.227 0 1 0 0-218.454 109.227 109.227 0 0 0 0 218.454m0 72.817a182.044 182.044 0 1 1 0-364.088 182.044 182.044 0 0 1 0 364.088"></path>
+                            <path fill="currentColor"
+                                d="M329.956 257.138a254.862 254.862 0 0 0 0 509.724h364.088a254.862 254.862 0 0 0 0-509.724zm0-72.818h364.088a327.68 327.68 0 1 1 0 655.36H329.956a327.68 327.68 0 1 1 0-655.36z">
+                            </path>
+                            <path fill="currentColor"
+                                d="M329.956 621.227a109.227 109.227 0 1 0 0-218.454 109.227 109.227 0 0 0 0 218.454m0 72.817a182.044 182.044 0 1 1 0-364.088 182.044 182.044 0 0 1 0 364.088">
+                            </path>
                         </svg>
                     </span>
                     <input class="todo-input" v-if="!item.checked" v-model="item.title" type="text" />
@@ -113,6 +113,16 @@ watchEffect(() => {
 function go(item) {
     window.open(item.linkPath);
 }
+// 完成待办 列表重新排序 已完成排在未完成后
+const changeCheck = (item) => {
+    item.checked = !item.checked
+    if (store.todosList && store.todosList.length) {
+        store.todosList.sort((a, b) => {
+            return (a.checked === b.checked) ? 0 : a.checked ? 1 : -1;
+        })
+    }
+}
+
 </script>
 <style lang="less" scoped>
 .main::-webkit-scrollbar,
@@ -221,6 +231,7 @@ ul::-webkit-scrollbar-thumb {
     .left-todo {
         overflow: hidden;
         padding-right: 0;
+
         ul {
             padding-left: 0;
             list-style: none;
@@ -228,6 +239,7 @@ ul::-webkit-scrollbar-thumb {
             overflow-y: auto;
             height: calc(100% - 35px);
             margin: 6px 0 12px 0;
+
             li {
                 cursor: pointer;
                 position: relative;
