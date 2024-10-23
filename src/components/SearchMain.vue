@@ -5,9 +5,10 @@
         <button @click="onSearch">搜索</button>
     </div>
 </template>
-  
-<script setup>
+
+<script setup lang="ts">
 import { ref, onMounted } from "vue";
+
 // 引入Stores
 import { useMyStoreHook } from "@/stores/useStore";
 let store = useMyStoreHook();
@@ -23,7 +24,7 @@ function onSearch() {
 }
 
 // 自动获取焦点
-let searchRef = ref(null);
+const searchRef = ref<HTMLInputElement | null>(null); 
 onMounted(() => {
     // 默认引擎
     const searchEngine = localStorage.getItem("searchEngine");
@@ -37,13 +38,14 @@ onMounted(() => {
     });
 });
 </script>
-  
+
 <style lang="less" scoped>
 .search-main {
     position: relative;
     margin: 0 auto;
     width: 50vw;
     color: var(--searchFontColor);
+
     input[type="text"] {
         font-size: 22px;
         padding: 0 120px 0 80px;
@@ -55,11 +57,13 @@ onMounted(() => {
         background: var(--searchInputBg);
         box-shadow: var(--searchShadow);
     }
+
     .icon {
         position: absolute;
         left: 24px;
         top: 18px;
     }
+
     button {
         font-size: 16px;
         outline: none;
@@ -76,9 +80,21 @@ onMounted(() => {
         box-shadow: var(--searchShadow);
         transition: box-shadow 0.5s ease;
     }
+
     button:hover,
     button:active {
         box-shadow: var(--sideShadowActive);
+    }
+}
+
+// 移动端
+.isMobile {
+    .search-main {
+        width: 80vw;
+
+        input[type="text"] {
+            width: 80vw;
+        }
     }
 }
 </style>

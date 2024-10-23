@@ -1,7 +1,16 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { inject, ref } from "vue";
 import { RouterView } from "vue-router";
 
+// 获取是否是移动端
+const isMobile = inject<boolean>('isMobile');
+
+// 响应式布局
+import { useResponsiveLayout } from '@/hook/useResponsiveLayout';
+// 375 * 1.5 = 562.5
+useResponsiveLayout({ designWidth: 562.5 });
+
+// 初始化数据
 if (!localStorage.length || (!localStorage.newsMenu && !localStorage.notesList && !localStorage.navMenu)) {
     fetch("localStorage.json")
         .then((response) => {
@@ -26,26 +35,14 @@ if (!localStorage.length || (!localStorage.newsMenu && !localStorage.notesList &
             console.error("Error fetching or parsing data:", error);
         });
 }
-// 判断是否是APP
-function isMobile() {
-    // 检查navigator.userAgent中是否包含特定的移动端关键字
-    return (
-        typeof window.orientation !== "undefined" ||
-        navigator.userAgent.indexOf("IEMobile") !== -1 ||
-        navigator.userAgent.indexOf("iPhone") !== -1 ||
-        (navigator.userAgent.indexOf("Android") !== -1 && navigator.userAgent.indexOf("Mobile") !== -1)
-    );
-}
-const isApp = ref(isMobile());
+
 </script>
 
 <template>
-    <div v-if="isApp" class="is-app">
-        当前导航页只支持PC端 <br />
-        移动端正在加急设计中 <br />
-        敬请期待~
+    <!-- 主出口 -->
+    <div :class="{ 'isMobile': isMobile }">
+        <RouterView />
     </div>
-    <RouterView v-else />
 </template>
 
 <style>

@@ -5,7 +5,7 @@
                 <div>
                     <img :src="item.iconPath" alt="icon" />
                 </div>
-                <span>{{ item.name }}</span>
+                <span class="nav-item-name">{{ item.name }}</span>
             </li>
         </ul>
     </div>
@@ -99,6 +99,15 @@ function go(item) {
                 text-overflow: ellipsis;
                 color: var(--fontColor);
             }
+        }
+    }
+}
+
+.isMobile {
+    .nav-main {
+        width: 90vw;
+        .nav-item-name{
+            font-size: 16px;
         }
     }
 }
