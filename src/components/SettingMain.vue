@@ -12,14 +12,14 @@
         <div class="item-card">
             <h3>主题设置</h3>
             <button @click="theme.toggleTheme">切换主题</button>
-            <span>[ 可以根据需要，调整主题色，适应亮色背景或者暗色背景 ]</span> <br />
+            <span class="tip">[ 可以根据需要，调整主题色，适应亮色背景或者暗色背景 ]</span> <br />
             <label for="imageUpload" class="custom-file-upload">
                 <input v-show="false" type="file" id="imageUpload" ref="fileInput" @change="onFileChange"
                     accept="image/*" />
                 <span class="button">设置背景图片</span>
             </label>
             <button @click="delFile">删除背景</button>
-            <span>[ 上传图片，设置为背景，同步背景需要登陆 ]</span>
+            <span class="tip">[ 上传图片，设置为背景，同步背景需要登陆 ]</span>
         </div>
         <div class="item-card">
             <h3>搜索引擎</h3>
@@ -36,7 +36,7 @@
                         <div>
                             <img :src="item.iconPath" alt="icon" />
                         </div>
-                        <span>{{ item.name }}</span>
+                        <span class="item-name">{{ item.name }}</span>
                         <img @click="delNav(index)" class="del-icon" src="@/assets/icon/close.svg" alt="" />
                     </li>
                 </ul>
@@ -337,5 +337,27 @@ let dialogVisible = ref(false);
         border-radius: 16px;
         padding: 0 24px;
     }
+}
+
+.isMobile {
+    .setting-main {
+        width: 90vw;
+        margin: 5vh auto;
+        .item-card {
+
+            button,
+            .button {
+                width: 120px;
+                font-size: 16px;
+            }
+            .tip{
+                display: block
+            }
+            .item-name{
+                font-size: 16px;
+            }
+        }
+    }
+
 }
 </style>

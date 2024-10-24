@@ -1,6 +1,6 @@
 <template>
     <div class="main">
-        <div class="left-todo">
+        <div class="left-todo" >
             <div class="title">
                 <span class="edit" @click="isEdit = !isEdit">
                     <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
@@ -65,9 +65,11 @@
 
 <script setup>
 import Sortable from "sortablejs";
-import { ref, onMounted, watchEffect } from "vue";
+import { ref, onMounted, watchEffect, inject } from "vue";
 import { useMyStoreHook } from "@/stores/useStore";
 let store = useMyStoreHook();
+
+const isMobile = inject('isMobile');
 // 初始加载
 onMounted(() => {
     const navMenu = JSON.parse(localStorage.getItem("navMenu"));
@@ -426,6 +428,24 @@ ul::-webkit-scrollbar-thumb {
             margin: 0 auto;
             overflow: hidden;
             text-align: center;
+        }
+    }
+}
+.isMobile {
+    .nav-main {
+        width: 90vw;
+
+        .nav-item-name {
+            font-size: 16px;
+        }
+
+        ul {
+            margin: 0 24px;
+            justify-content: space-between;
+        }
+
+        li {
+            margin: 8px 16px;
         }
     }
 }

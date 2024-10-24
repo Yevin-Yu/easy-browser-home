@@ -7,7 +7,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, inject } from "vue";
+// 获取是否是移动端
+const isMobile = inject<boolean>('isMobile');
 
 // 引入Stores
 import { useMyStoreHook } from "@/stores/useStore";
@@ -24,18 +26,20 @@ function onSearch() {
 }
 
 // 自动获取焦点
-const searchRef = ref<HTMLInputElement | null>(null); 
+const searchRef = ref<HTMLInputElement | null>(null);
 onMounted(() => {
     // 默认引擎
     const searchEngine = localStorage.getItem("searchEngine");
     if (searchEngine) store.searchEngineChange(parseInt(searchEngine));
     // 默认焦点
-    if (searchRef.value) searchRef.value.focus();
-    window.addEventListener("focus", function () {
-        console.log("页面获得焦点");
-        // 执行页面获得焦点时的操作
+    if (!isMobile) {
         if (searchRef.value) searchRef.value.focus();
-    });
+        window.addEventListener("focus", function () {
+            console.log("页面获得焦点");
+            // 执行页面获得焦点时的操作
+            if (searchRef.value) searchRef.value.focus();
+        });
+    }
 });
 </script>
 
@@ -90,10 +94,24 @@ onMounted(() => {
 // 移动端
 .isMobile {
     .search-main {
-        width: 80vw;
+        width: 85vw;
 
         input[type="text"] {
-            width: 80vw;
+            width: 85vw;
+            height: 70px;
+            font-size: 22px;
+            padding-left: 72px;
+        }
+
+        .icon {
+            width: 30px;
+            height: 30px;
+            top: 21px;
+        }
+
+        button {
+            height: 68px;
+            font-size: 20px;
         }
     }
 }

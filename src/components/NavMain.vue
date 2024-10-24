@@ -49,10 +49,9 @@ function go(item) {
 
     ul {
         list-style: none;
-        display: flex;
-        flex-wrap: wrap;
         display: inline-block;
         padding-left: 0;
+
 
         li {
             display: inline-block;
@@ -106,8 +105,15 @@ function go(item) {
 .isMobile {
     .nav-main {
         width: 90vw;
-        .nav-item-name{
+        margin: 5vh auto;
+        padding: 24px;
+
+        .nav-item-name {
             font-size: 16px;
+        }
+
+        li {
+            margin: 8px 16px;
         }
     }
 }
