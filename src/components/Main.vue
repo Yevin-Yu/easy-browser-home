@@ -1,6 +1,6 @@
 <template>
     <div class="main">
-        <div class="left-todo" >
+        <div class="left-todo">
             <div class="title">
                 <span class="edit" @click="isEdit = !isEdit">
                     <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
@@ -55,7 +55,7 @@
                         <div>
                             <img :src="item.iconPath" alt="icon" />
                         </div>
-                        <span>{{ item.name }}</span>
+                        <span class="nav-item-name">{{ item.name }}</span>
                     </li>
                 </ul>
             </div>
@@ -431,22 +431,66 @@ ul::-webkit-scrollbar-thumb {
         }
     }
 }
-.isMobile {
-    .nav-main {
-        width: 90vw;
 
-        .nav-item-name {
-            font-size: 16px;
+.isMobile {
+    .main {
+        width: 90vw;
+        height: 55vh;
+        margin: 5vh auto;
+        padding: 24px;
+        display: block;
+        overflow: auto;
+    }
+
+    .left-todo {
+        width: 100%;
+        margin-bottom: 25px;
+
+        .title {
+            font-size: 20px;
         }
 
         ul {
-            margin: 0 24px;
-            justify-content: space-between;
-        }
+            padding: 0 6px;
 
-        li {
-            margin: 8px 16px;
+            li {
+                width: calc(100% - 24px);
+
+                .todo-input {
+                    font-size: 18px;
+                }
+
+                .todo-text {
+                    font-size: 18px;
+                }
+            }
         }
     }
+
+    .right {
+        .big-nav {
+            padding: 0;
+            padding-left: 5px;
+            p {
+                font-size: 20px;
+            }
+        }
+
+        .nav-main {
+            min-height: 260px;
+            max-height: 260px;
+
+            .nav-item-name {
+                font-size: 16px;
+            }
+
+            ul {
+                li {
+                    margin: 8px 16px;
+                }
+            }
+        }
+    }
+
 }
 </style>
