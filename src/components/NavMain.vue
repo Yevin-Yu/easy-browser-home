@@ -112,8 +112,10 @@ function go(item) {
             font-size: 16px;
         }
 
-        li {
-            margin: 8px 16px;
+        ul {
+            li {
+                margin: 8px 16px;
+            }
         }
     }
 }

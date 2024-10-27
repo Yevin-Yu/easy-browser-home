@@ -1,8 +1,9 @@
 <template>
     <div class="side-menu">
         <ul>
-            <li @click.stop="onSideMenu(item)" :class="{'active':item.value === store.activeMenuId}" v-for="item in sideMenuList" :key="item.value">
-                {{item.label}}
+            <li @click.stop="onSideMenu(item)" :class="{ 'active': item.value === store.activeMenuId }"
+                v-for="item in sideMenuList" :key="item.value">
+                {{ item.label }}
             </li>
         </ul>
     </div>
@@ -33,9 +34,11 @@ function onSideMenu(item) {
     left: 0;
     top: 50%;
     transform: translate(0, -50%);
+
     ul {
         list-style: none;
         padding: 0;
+
         li {
             transition: 0.5s;
             box-sizing: border-box;
@@ -52,12 +55,38 @@ function onSideMenu(item) {
             box-shadow: var(--sideShadow);
             transition: box-shadow 0.5s ease;
         }
+
         li.active {
             box-shadow: var(--sideShadowActive);
         }
+
         li:hover,
         li:active {
             box-shadow: var(--sideShadowActive);
+        }
+    }
+}
+
+.isMobile {
+    .side-menu {
+        width: 100%;
+        height: 50px;
+        position: fixed;
+        top: unset;
+        left: 0;
+        bottom: 1px;
+        transform: none;
+
+        ul {
+            width: 100%;
+            display: flex;
+
+            li {
+                font-size: 18px;
+                border-radius: 10px 10px 0 0;
+                text-align: center;
+                flex: 1;
+            }
         }
     }
 }

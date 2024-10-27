@@ -2,7 +2,7 @@
     <div class="notes-main-content">
 
         <div class="notes-main">
-            <div class="left">
+            <div class="left" v-show="!isShowNote">
                 <div class="title">
                     <span class="edit" @click="isDel = !isDel">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
@@ -28,7 +28,7 @@
                     </li>
                 </ul>
             </div>
-            <div class="right" v-if="store.activeNotes && false">
+            <div class="right" v-if="store.activeNotes && true">
                 <div class="tools">
                     <svg @click="fontBold" t="1722237098445" fill="#6CB9B4" class="icon" viewBox="0 0 1024 1024"
                         version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4638" width="20" height="32">
@@ -52,13 +52,23 @@
                     placeholder="标题" /><br />
                 <textarea :style="textStyle" @input="onInput" v-model="noteDetails.data" class="content"
                     placeholder="笔记"></textarea>
+                <div class="back-btn" @click="isShowNote = false" v-if="isMobile && isShowNote">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 1024 1024">
+                        <path fill="currentColor"
+                            d="M118.656 438.656a32 32 0 0 1 0-45.248L416 96l4.48-3.776A32 32 0 0 1 461.248 96l3.712 4.48a32.064 32.064 0 0 1-3.712 40.832L218.56 384H928a32 32 0 1 1 0 64H141.248a32 32 0 0 1-22.592-9.344zM64 608a32 32 0 0 1 32-32h786.752a32 32 0 0 1 22.656 54.592L608 928l-4.48 3.776a32.064 32.064 0 0 1-40.832-49.024L805.632 640H96a32 32 0 0 1-32-32">
+                        </path>
+                    </svg>
+                </div>
             </div>
-        </div>    </div>
+        </div>
+    </div>
 </template>
 
 <script setup>
 import Sortable from "sortablejs";
-import { onMounted, onBeforeUnmount, reactive, ref, computed } from "vue";
+import { onMounted, onBeforeUnmount, reactive, ref, computed, inject } from "vue";
+const isMobile = inject('isMobile');
+const isShowNote = ref(false);
 // 引入Stores
 import { useMyStoreHook } from "@/stores/useStore";
 let store = useMyStoreHook();
@@ -74,6 +84,9 @@ onMounted(() => {
             noteDetails = store.notesList[0];
             store.activeNotesChange(noteDetails.id);
         }
+    }
+    if (isMobile) {
+        store.activeNotesChange('')
     }
     // 排序
     const notesSortable = Sortable.create(notesListRef.value, {
@@ -101,6 +114,7 @@ function selectNote(data) {
     store.activeNotes = data.id;
     localStorage.setItem("activeNotes", data.id);
     noteDetails = data;
+    isShowNote.value = true;
 }
 onBeforeUnmount(() => {
     localStorage.setItem("notesList", JSON.stringify(store.notesList));
@@ -310,7 +324,7 @@ ul::-webkit-scrollbar-thumb {
     .right {
         flex: 1;
         border-radius: 6px;
-        overflow: height;
+        overflow: hidden;
         position: relative;
 
         .title {
@@ -420,20 +434,35 @@ ul::-webkit-scrollbar-thumb {
     .notes-main {
         width: 100%;
         margin: 0 auto;
+        display: block;
 
         .left {
             margin-left: 0;
             width: 100%;
-            .title{
+
+            .title {
                 font-size: 20px;
             }
-            ul{
+
+            ul {
                 width: 100%;
-                
+                padding: 12px;
+
+                li {
+                    width: calc(100% - 12px);
+                }
             }
         }
 
-        .right {}
+        .right {
+            height: calc(55vh - 36px);
+
+            .back-btn {
+                position: absolute;
+                right: 24px;
+                top: 16px;
+            }
+        }
     }
 }
 </style>

@@ -39,8 +39,6 @@
                         <span class="item-name">{{ item.name }}</span>
                         <img @click="delNav(index)" class="del-icon" src="@/assets/icon/close.svg" alt="" />
                     </li>
-                </ul>
-                <ul>
                     <li @click="dialogVisible = true">
                         <div>
                             <img src="@/assets/icon/add.svg" alt="icon" />
@@ -343,6 +341,7 @@ let dialogVisible = ref(false);
     .setting-main {
         width: 90vw;
         margin: 5vh auto;
+
         .item-card {
 
             button,
@@ -350,12 +349,19 @@ let dialogVisible = ref(false);
                 width: 120px;
                 font-size: 16px;
             }
-            .tip{
+
+            .tip {
                 display: block
             }
-            .item-name{
+
+            .item-name {
                 font-size: 16px;
             }
+        }
+
+        ul {
+            width: 100%;
+            text-align: center;
         }
     }
 
