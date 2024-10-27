@@ -122,7 +122,7 @@ onMounted(() => {
         height: 412px;
 
         .title {
-            font-size: 22px;
+            font-size: 24px;
         }
 
         ul {

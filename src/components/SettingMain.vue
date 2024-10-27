@@ -50,7 +50,7 @@
         </div>
         <div class="item-card">
             <h3>新闻排序</h3>
-            <div ref="newsList">
+            <div ref="newsList" class="news-list">
                 <button v-for="item in store.newsMenu" :key="item">
                     {{ item.label }}
                 </button>
@@ -215,6 +215,10 @@ let dialogVisible = ref(false);
         color: var(--fontColor);
         padding: 12px;
 
+        .news-list {
+            text-align: center;
+        }
+
         h3 {
             padding: 12px 0;
         }
@@ -347,7 +351,7 @@ let dialogVisible = ref(false);
             button,
             .button {
                 width: 120px;
-                font-size: 16px;
+                font-size: 18px;
             }
 
             .tip {
@@ -355,7 +359,7 @@ let dialogVisible = ref(false);
             }
 
             .item-name {
-                font-size: 16px;
+                font-size: 18px;
             }
         }
 

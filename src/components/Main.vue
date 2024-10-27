@@ -47,7 +47,7 @@
         <div class="right">
             <div class="big-nav">
                 <img src="@/assets/images/banner.jpg" alt="" />
-                <p>—— 认真生活，简单做人，用心做事。</p>
+                <p>—— 认真生活，简单做人，用心做事</p>
             </div>
             <div class="nav-main">
                 <ul>
@@ -77,15 +77,17 @@ onMounted(() => {
     const todosList = JSON.parse(localStorage.getItem("todosList"));
     if (todosList) store.todosListChange(todosList);
     // 排序
-    const notesSortable = Sortable.create(todosListRef.value, {
-        group: "shared",
-        animation: 150,
-        ghostClass: "ghost",
-        onEnd: ({ newIndex, oldIndex }) => {
-            const item = store.todosList.splice(oldIndex, 1)[0];
-            store.todosList.splice(newIndex, 0, item);
-        },
-    });
+    if (!isMobile) {
+        const notesSortable = Sortable.create(todosListRef.value, {
+            group: "shared",
+            animation: 150,
+            ghostClass: "ghost",
+            onEnd: ({ newIndex, oldIndex }) => {
+                const item = store.todosList.splice(oldIndex, 1)[0];
+                store.todosList.splice(newIndex, 0, item);
+            },
+        });
+    }
 });
 // 新建删除
 let isEdit = ref(false);
@@ -162,7 +164,7 @@ ul::-webkit-scrollbar-thumb {
         box-shadow: var(--shadow);
         border: var(--border);
         color: var(--fontColor);
-        padding: 12px;
+        padding: 16px;
         margin-right: 20px;
     }
 
@@ -417,7 +419,7 @@ ul::-webkit-scrollbar-thumb {
             p {
                 color: rgba(255, 255, 245, 0.86);
                 position: absolute;
-                right: 40px;
+                right: 20px;
                 bottom: 12px;
             }
         }
@@ -439,7 +441,8 @@ ul::-webkit-scrollbar-thumb {
         margin: 5vh auto;
         padding: 24px;
         display: block;
-        overflow: auto;
+        overflow: hidden;
+        overflow-y: auto;
     }
 
     .left-todo {
@@ -447,7 +450,11 @@ ul::-webkit-scrollbar-thumb {
         margin-bottom: 25px;
 
         .title {
-            font-size: 20px;
+            font-size: 22px;
+
+            .add {
+                font-size: 38px;
+            }
         }
 
         ul {
@@ -457,11 +464,11 @@ ul::-webkit-scrollbar-thumb {
                 width: calc(100% - 24px);
 
                 .todo-input {
-                    font-size: 18px;
+                    font-size: 20px;
                 }
 
                 .todo-text {
-                    font-size: 18px;
+                    font-size: 20px;
                 }
             }
         }
@@ -471,17 +478,18 @@ ul::-webkit-scrollbar-thumb {
         .big-nav {
             padding: 0;
             padding-left: 5px;
+
             p {
-                font-size: 20px;
+                font-size: 22px;
             }
         }
 
         .nav-main {
-            min-height: 260px;
-            max-height: 260px;
+            min-height: 265px;
+            max-height: 265px;
 
             .nav-item-name {
-                font-size: 16px;
+                font-size: 18px;
             }
 
             ul {

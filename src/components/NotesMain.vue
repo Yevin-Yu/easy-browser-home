@@ -89,16 +89,18 @@ onMounted(() => {
         store.activeNotesChange('')
     }
     // 排序
-    const notesSortable = Sortable.create(notesListRef.value, {
-        group: "shared",
-        animation: 150,
-        ghostClass: "ghost",
-        onEnd: ({ newIndex, oldIndex }) => {
-            const item = store.notesList.splice(oldIndex, 1)[0];
-            store.notesList.splice(newIndex, 0, item);
-            localStorage.setItem("notesList", JSON.stringify(store.notesList));
-        },
-    });
+    if (!isMobile) {
+        const notesSortable = Sortable.create(notesListRef.value, {
+            group: "shared",
+            animation: 150,
+            ghostClass: "ghost",
+            onEnd: ({ newIndex, oldIndex }) => {
+                const item = store.notesList.splice(oldIndex, 1)[0];
+                store.notesList.splice(newIndex, 0, item);
+                localStorage.setItem("notesList", JSON.stringify(store.notesList));
+            },
+        });
+    }
 });
 function noteAdd() {
     const data = {
@@ -221,7 +223,7 @@ ul::-webkit-scrollbar-thumb {
         .add {
             display: block;
             position: absolute;
-            right: 20px;
+            right: 6px;
             cursor: pointer;
             top: -1px;
             width: 32px;
@@ -287,9 +289,9 @@ ul::-webkit-scrollbar-thumb {
         ul {
             padding-left: 0;
             list-style: none;
-            height: calc(100% - 30px);
+            height: calc(100% - 35px);
             overflow: auto;
-            margin-top: 6px;
+            margin: 6px 0 12px 0;
 
             li {
                 cursor: pointer;
@@ -435,21 +437,28 @@ ul::-webkit-scrollbar-thumb {
         width: 100%;
         margin: 0 auto;
         display: block;
+        padding-right: 0;
+        height: 100%;
 
         .left {
-            margin-left: 0;
             width: 100%;
+            margin-right: 0;
 
             .title {
-                font-size: 20px;
+                font-size: 22px;
+
+                .add {
+                    font-size: 38px;
+                }
             }
 
             ul {
                 width: 100%;
-                padding: 12px;
+                padding: 0 6px;
+                font-size: 20px;
 
                 li {
-                    width: calc(100% - 12px);
+                    width: calc(100% - 24px);
                 }
             }
         }
@@ -457,10 +466,14 @@ ul::-webkit-scrollbar-thumb {
         .right {
             height: calc(55vh - 36px);
 
+            .title {
+                font-size: 22px;
+            }
+
             .back-btn {
                 position: absolute;
                 right: 24px;
-                top: 16px;
+                top: 14px;
             }
         }
     }

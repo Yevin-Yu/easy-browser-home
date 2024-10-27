@@ -109,7 +109,7 @@ function go(item) {
         padding: 24px;
 
         .nav-item-name {
-            font-size: 16px;
+            font-size: 18px;
         }
 
         ul {

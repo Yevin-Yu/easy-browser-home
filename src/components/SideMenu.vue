@@ -82,7 +82,7 @@ function onSideMenu(item) {
             display: flex;
 
             li {
-                font-size: 18px;
+                font-size: 20px;
                 border-radius: 10px 10px 0 0;
                 text-align: center;
                 flex: 1;

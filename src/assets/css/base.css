@@ -8,4 +8,6 @@
   scrollbar-color: #ccc transparent;
 }
 
-
+* {
+  -webkit-tap-highlight-color: transparent
+}
