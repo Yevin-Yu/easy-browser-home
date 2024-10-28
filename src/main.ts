@@ -3,7 +3,7 @@ import '@/assets/css/main.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
-import { isMobile } from '@/utils/tools'
+import { isMobile, isLogin } from '@/utils/tools'
 
 import App from './App.vue'
 import router from './router'
@@ -18,5 +18,9 @@ app.use(createPinia())
 app.use(router)
 app.use(ElementPlus);
 
+// 全局属性 是否是移动端
 app.provide('isMobile', isMobile())
+// 全局属性 是否登录
+app.provide('isLogin', isLogin())
+
 app.mount('#app')

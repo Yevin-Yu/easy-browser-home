@@ -1,6 +1,13 @@
 <script setup lang="ts">
-import { inject, ref } from "vue";
+import { inject, onMounted } from "vue";
 import { RouterView } from "vue-router";
+
+import api from '@/api/api.js'; // 导入封装的 API
+
+onMounted(async () => {
+    let data = await api.get('/user')
+    console.log(data)
+})
 
 // 获取是否是移动端
 const isMobile = inject<boolean>('isMobile');
@@ -54,19 +61,5 @@ if (!localStorage.length || (!localStorage.newsMenu && !localStorage.notesList &
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
-}
-
-.is-app {
-    margin: 20vh 10vw;
-    width: 80vw;
-    height: 50vh;
-    padding: 20px;
-    font-size: 20px;
-    line-height: 42px;
-    color: var(--fontColor);
-    border: var(--border);
-    background-color: var(--bgColorDefaut);
-    box-shadow: var(--shadow);
-    border-radius: 15px;
 }
 </style>
