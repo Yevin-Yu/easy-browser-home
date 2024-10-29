@@ -33,6 +33,8 @@ apiClient.interceptors.response.use(
         if (error.response && error.response.status === 401) {
             // 处理未授权的情况，例如重定向到登录页面
             console.error('Unauthorized, redirecting to login...');
+            // 删除 token
+            localStorage.removeItem('token');
         }
         return Promise.reject(error);
     }

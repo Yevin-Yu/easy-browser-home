@@ -2,7 +2,7 @@
 import { inject, onMounted } from "vue";
 import { RouterView } from "vue-router";
 
-import api from '@/api/api.js'; // 导入封装的 API
+import api from '@/api/api'; // 导入封装的 API
 
 onMounted(async () => {
     let data = await api.get('/user')

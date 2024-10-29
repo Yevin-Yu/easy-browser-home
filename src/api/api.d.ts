@@ -1,2 +1,4 @@
-// src/api/api.d.ts 
-declare module '@/api/api.js' { export function get(url: string): Promise<any>; }
+declare module '@/api/api' {
+    export function get(url: string): Promise<any>;
+    export function post(url: string, data: any): Promise<any>;
+}

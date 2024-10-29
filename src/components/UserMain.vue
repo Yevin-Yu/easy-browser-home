@@ -5,7 +5,7 @@
                 d="M628.736 528.896A416 416 0 0 1 928 928H96a415.872 415.872 0 0 1 299.264-399.104L512 704zM720 304a208 208 0 1 1-416 0 208 208 0 0 1 416 0">
             </path>
         </svg>
-        <span v-if="!isMobile">耶温导航</span>
+        <span v-if="!isMobile">{{ isLogin ? userInfo.username : '未登录' }}</span>
     </div>
 
     <!-- 用户弹窗 -->
@@ -14,7 +14,7 @@
         <div v-if="!isLogin">
             <div class="login-content">
                 <h3>邮箱</h3>
-                <input type="text" v-model="loginParams.username" />
+                <input type="text" v-model="loginParams.email" />
                 <h3>密码</h3>
                 <input type="password" v-model="loginParams.password" />
             </div>
@@ -27,9 +27,9 @@
         <!-- 个人信息 -->
         <div v-else class="user-content">
             <ul>
-                <li><span>用户名：</span><span>耶温</span></li>
-                <li><span>邮箱：</span><span>yuwb0521@outlook.com</span></li>
-                <li><span>最后登录：</span><span>2024-10-28 21:11:12</span></li>
+                <li><span>用户名：</span><span>{{ userInfo.username }}</span></li>
+                <li><span>邮箱：</span><span>{{ userInfo.email }}</span></li>
+                <li><span>最后登录：</span><span>{{ formatDate(userInfo.last_login, 'YYYY-MM-DD HH:mm:ss') }}</span></li>
             </ul>
             <div class="dialog-footer">
                 <el-button @click="dialogVisible = false">修改密码</el-button>
@@ -40,7 +40,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject } from "vue";
+import { ref, onMounted, inject } from "vue";
+import { ElMessage } from 'element-plus'
+import api from '@/api/api'; // 导入封装的 API
+
+import { formatDate } from '@/hook/useFormatDate'
 // 获取是否是移动端
 const isMobile = inject<boolean>('isMobile');
 // 判断是否登录
@@ -48,20 +52,58 @@ const isLogin = inject<boolean>('isLogin');
 
 let dialogVisible = ref(false);
 let loginParams = ref({
-    username: '',
+    email: '',
     password: ''
+})
+
+
+let userInfo = ref({
+    username: '',
+    email: '',
+    last_login: ''
+})
+onMounted(() => {
+    // 获取当前登录用户信息
+    api.get('/user').then(res => {
+        if (res.code == 200) {
+            userInfo.value = res.data
+            console.log(res.data)
+        }
+    })
 })
 
 function openUserInfo() {
     dialogVisible.value = true
 }
 
-function subLogin() {
-
+async function subLogin() {
+    if (loginParams.value.email == '' || loginParams.value.password == '') {
+        return ElMessage({
+            message: '邮箱或密码不能为空',
+            type: 'warning',
+        })
+    }
+    let data = await api.post('/login', loginParams.value)
+    if (data.code == 200) {
+        ElMessage({
+            message: '登录成功',
+            type: 'success',
+        })
+        dialogVisible.value = false
+        localStorage.setItem('token', data.data.token);
+        // 刷新页面
+        setTimeout(() => {
+            location.reload()
+        }, 500)
+    }
 }
 
 function loginOut() {
-
+    localStorage.removeItem('token');
+    // 刷新页面
+    setTimeout(() => {
+        location.reload()
+    }, 500)
 }
 </script>
 
