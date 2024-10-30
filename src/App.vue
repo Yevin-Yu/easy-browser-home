@@ -1,21 +1,13 @@
 <script setup lang="ts">
-import { inject, onMounted } from "vue";
+import { inject } from "vue";
 import { RouterView } from "vue-router";
-
-import api from '@/api/api'; // 导入封装的 API
-
-onMounted(async () => {
-    let data = await api.get('/user')
-    console.log(data)
-})
-
 // 获取是否是移动端
 const isMobile = inject<boolean>('isMobile');
-
 // 响应式布局
 import { useResponsiveLayout } from '@/hook/useResponsiveLayout';
 // 375 * 1.5 = 562.5
 useResponsiveLayout({ designWidth: 562.5 });
+
 
 // 初始化数据
 if (!localStorage.length || (!localStorage.newsMenu && !localStorage.notesList && !localStorage.navMenu)) {

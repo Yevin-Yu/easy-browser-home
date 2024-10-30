@@ -1,26 +1,24 @@
-import '@/assets/css/main.css'
+import "@/assets/css/main.css";
 
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
+import { createApp, ref } from "vue";
+import { createPinia } from "pinia";
 
-import { isMobile, isLogin } from '@/utils/tools'
+import { isMobile } from "@/utils/tools";
 
-import App from './App.vue'
-import router from './router'
+import App from "./App.vue";
+import router from "./router";
 
 // Element引入组件
-import ElementPlus from 'element-plus';
-import 'element-plus/dist/index.css';
+import ElementPlus from "element-plus";
+import "element-plus/dist/index.css";
 
-const app = createApp(App)
+const app = createApp(App);
 
-app.use(createPinia())
-app.use(router)
+app.use(createPinia());
+app.use(router);
 app.use(ElementPlus);
 
 // 全局属性 是否是移动端
-app.provide('isMobile', isMobile())
-// 全局属性 是否登录
-app.provide('isLogin', isLogin())
+app.provide("isMobile", isMobile());
 
-app.mount('#app')
+app.mount("#app");

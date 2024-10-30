@@ -9,7 +9,7 @@
     </div>
 
     <!-- 用户弹窗 -->
-    <el-dialog v-model="dialogVisible" :show-close="false" :title="isLogin ? '个人信息' : '登录'" width="500">
+    <el-dialog v-model="isShowUserInfo" :show-close="false" :title="isLogin ? '个人信息' : '登录'" width="500">
         <!-- 登录 -->
         <div v-if="!isLogin">
             <div class="login-content">
@@ -19,7 +19,7 @@
                 <input type="password" v-model="loginParams.password" />
             </div>
             <div class="dialog-footer">
-                <el-button @click="dialogVisible = false">取消</el-button>
+                <el-button @click="isShowUserInfo = false">取消</el-button>
                 <el-button type="primary" @click="subLogin"> 登录 </el-button>
                 <p class="tips">当前未开放注册，如有需要可以联系作者添加账号：iyuwb0521@outlook.com</p>
             </div>
@@ -32,50 +32,53 @@
                 <li><span>最后登录：</span><span>{{ formatDate(userInfo.last_login, 'YYYY-MM-DD HH:mm:ss') }}</span></li>
             </ul>
             <div class="dialog-footer">
-                <el-button @click="dialogVisible = false">修改密码</el-button>
+                <el-button @click="openChangePassowrd">修改密码</el-button>
                 <el-button type="primary" @click="loginOut">登出</el-button>
+            </div>
+        </div>
+    </el-dialog>
+    <!-- 修改密码 -->
+    <el-dialog v-model="isShowChangePassword" :show-close="false" title="修改密码" width="500">
+        <div>
+            <div class="login-content">
+                <h3>旧密码</h3>
+                <input type="password" v-model="resetPasswordParams.old_password" />
+                <h3>新密码</h3>
+                <input type="password" v-model="resetPasswordParams.new_password" />
+                <h3>确认新密码</h3>
+                <input type="password" v-model="resetPasswordParams.confirm_password" />
+            </div>
+            <div class="dialog-footer">
+                <el-button @click="isShowChangePassword = false">取消</el-button>
+                <el-button type="primary" @click="changePassword">确认</el-button>
             </div>
         </div>
     </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, inject } from "vue";
+import { ref, inject, watchEffect, onMounted } from "vue";
 import { ElMessage } from 'element-plus'
+import { storeToRefs } from 'pinia'
 import api from '@/api/api'; // 导入封装的 API
-
-import { formatDate } from '@/hook/useFormatDate'
 // 获取是否是移动端
 const isMobile = inject<boolean>('isMobile');
-// 判断是否登录
-const isLogin = inject<boolean>('isLogin');
-
-let dialogVisible = ref(false);
-let loginParams = ref({
-    email: '',
-    password: ''
-})
+// 时间格式化
+import { formatDate } from '@/hook/useFormatDate'
+// 获取用户信息
+import { useUserStore } from '@/stores/useAuthStore'
+let { updateIsLogin, updateUserInfo } = useUserStore()
+let { isLogin, userInfo } = storeToRefs(useUserStore());
 
 
-let userInfo = ref({
-    username: '',
-    email: '',
-    last_login: ''
-})
-onMounted(() => {
-    // 获取当前登录用户信息
-    api.get('/user').then(res => {
-        if (res.code == 200) {
-            userInfo.value = res.data
-            console.log(res.data)
-        }
-    })
-})
 
+// 弹窗登陆以及信息相关
+let isShowUserInfo = ref(false);
+let loginParams = ref({ email: '', password: '' })
 function openUserInfo() {
-    dialogVisible.value = true
+    isShowUserInfo.value = true
 }
-
+// 登录
 async function subLogin() {
     if (loginParams.value.email == '' || loginParams.value.password == '') {
         return ElMessage({
@@ -89,21 +92,47 @@ async function subLogin() {
             message: '登录成功',
             type: 'success',
         })
-        dialogVisible.value = false
+        isShowUserInfo.value = false
         localStorage.setItem('token', data.data.token);
-        // 刷新页面
-        setTimeout(() => {
-            location.reload()
-        }, 500)
+        updateIsLogin(true)
+        updateUserInfo()
     }
 }
-
+// 登出
 function loginOut() {
     localStorage.removeItem('token');
-    // 刷新页面
-    setTimeout(() => {
-        location.reload()
-    }, 500)
+    updateIsLogin(false)
+}
+
+// 修改密码
+const isShowChangePassword = ref(false)
+const resetPasswordParams = ref({ old_password: '', new_password: '', confirm_password: '' })
+function openChangePassowrd() {
+    isShowUserInfo.value = false
+    isShowChangePassword.value = true
+}
+function changePassword() {
+    if (resetPasswordParams.value.old_password == '' || resetPasswordParams.value.new_password == '' || resetPasswordParams.value.confirm_password == '') {
+        return ElMessage({
+            message: '请输入完整信息',
+            type: 'warning',
+        })
+    }
+    if (resetPasswordParams.value.new_password != resetPasswordParams.value.confirm_password) {
+        return ElMessage({
+            message: '两次密码不一致',
+            type: 'warning',
+        })
+    }
+    api.post('/login/reset', resetPasswordParams.value).then(res => {
+        if (res.code == 200) {
+            ElMessage({
+                message: '修改成功',
+                type: 'success',
+            })
+            isShowChangePassword.value = false
+        }
+    })
 }
 </script>
 
@@ -129,7 +158,7 @@ function loginOut() {
 
     svg {
         position: relative;
-        top: 5px;
+        top: 7px;
     }
 
     span {
