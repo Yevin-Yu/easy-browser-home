@@ -5,7 +5,7 @@
                 d="M628.736 528.896A416 416 0 0 1 928 928H96a415.872 415.872 0 0 1 299.264-399.104L512 704zM720 304a208 208 0 1 1-416 0 208 208 0 0 1 416 0">
             </path>
         </svg>
-        <span v-if="!isMobile">{{ isLogin ? userInfo.username : '未登录' }}</span>
+        <span>{{ isLogin ? userInfo.username : '未登录' }}</span>
     </div>
 
     <!-- 用户弹窗 -->
@@ -19,9 +19,8 @@
                 <input type="password" v-model="loginParams.password" />
             </div>
             <div class="dialog-footer">
-                <el-button @click="isShowUserInfo = false">取消</el-button>
+                <el-button @click="openRegister">注册</el-button>
                 <el-button type="primary" @click="subLogin"> 登录 </el-button>
-                <p class="tips">当前未开放注册，如有需要可以联系作者添加账号：iyuwb0521@outlook.com</p>
             </div>
         </div>
         <!-- 个人信息 -->
@@ -51,6 +50,28 @@
             <div class="dialog-footer">
                 <el-button @click="isShowChangePassword = false">取消</el-button>
                 <el-button type="primary" @click="changePassword">确认</el-button>
+            </div>
+        </div>
+    </el-dialog>
+    <!-- 注册 -->
+    <el-dialog v-model="isShowRegister" :show-close="false" title="注册" width="500">
+        <div>
+            <div class="login-content">
+                <h3>用户名</h3>
+                <input type="text" v-model="registerParams.username" />
+                <h3>邮箱</h3>
+                <input type="text" v-model="registerParams.email" />
+                <h3>密码</h3>
+                <input type="password" v-model="registerParams.password" />
+                <h3>确认密码</h3>
+                <input type="password" v-model="registerParams.confirm_password" />
+                <h3>注册码</h3>
+                <input type="password" v-model="registerParams.code" />
+            </div>
+            <div class="dialog-footer">
+                <el-button @click="isShowRegister = false">取消</el-button>
+                <el-button type="primary" @click="subRegister">确认</el-button>
+                <p class="tips">注册码可以联系作者获取：iyuwb0521@outlook.com</p>
             </div>
         </div>
     </el-dialog>
@@ -134,6 +155,50 @@ function changePassword() {
         }
     })
 }
+// 注册
+const isShowRegister = ref(false)
+const registerParams = ref({ username: '', email: '', password: '', confirm_password: '', code: '' })
+
+function openRegister() {
+    isShowUserInfo.value = false
+    isShowRegister.value = true
+}
+function subRegister() {
+    if (registerParams.value.username == '' || registerParams.value.email == '' || registerParams.value.password == '' || registerParams.value.confirm_password == '' || registerParams.value.code == '') {
+        return ElMessage({
+            message: '请输入完整信息',
+            type: 'warning',
+        })
+    }
+    let emailReg = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
+    if (!emailReg.test(registerParams.value.email)) {
+        return ElMessage({
+            message: '邮箱格式不正确',
+            type: 'warning',
+        })
+    }
+    if (registerParams.value.password != registerParams.value.confirm_password) {
+        return ElMessage({
+            message: '两次密码不一致',
+        })
+    }
+
+    api.post('/login/register', registerParams.value).then(res => {
+        if (res.code == 200) {
+            ElMessage({
+                message: '注册成功',
+                type: 'success',
+            })
+            isShowRegister.value = false
+            isShowUserInfo.value = true
+        } else {
+            ElMessage({
+                message: res.message,
+                type: 'warning',
+            })
+        }
+    })
+}
 </script>
 
 <style lang="less" scoped>
@@ -165,7 +230,6 @@ function changePassword() {
         text-align: center;
         font-size: 14px;
         display: inline-block;
-        width: 80px;
         padding: 0 10px 0 10px;
         overflow: hidden;
         text-overflow: ellipsis;
