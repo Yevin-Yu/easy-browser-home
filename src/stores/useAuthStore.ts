@@ -5,14 +5,14 @@ import api from "@/api/api"; // 导入封装的 API
 
 export const useUserStore = defineStore("user", () => {
     const isLogin = ref(false);
+    isLogin.value = localStorage.getItem("token") ? true : false;
+
     const userInfo = ref({
         username: "",
         email: "",
         last_login: "",
     });
-
     onMounted(() => {
-        isLogin.value = localStorage.getItem("token") ? true : false;
         // 加载用户信息
         updateUserInfo();
     });

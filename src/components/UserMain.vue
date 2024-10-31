@@ -28,7 +28,7 @@
             <ul>
                 <li><span>用户名：</span><span>{{ userInfo.username }}</span></li>
                 <li><span>邮箱：</span><span>{{ userInfo.email }}</span></li>
-                <li><span>最后登录：</span><span>{{ formatDate(userInfo.last_login, 'YYYY-MM-DD HH:mm:ss') }}</span></li>
+                <li><span>最后登录：</span><span>{{ userInfo.last_login ? formatDate(userInfo.last_login, 'YYYY-MM-DD HH:mm:ss') : '' }}</span></li>
             </ul>
             <div class="dialog-footer">
                 <el-button @click="openChangePassowrd">修改密码</el-button>
@@ -82,8 +82,6 @@ import { ref, inject, watchEffect, onMounted } from "vue";
 import { ElMessage } from 'element-plus'
 import { storeToRefs } from 'pinia'
 import api from '@/api/api'; // 导入封装的 API
-// 获取是否是移动端
-const isMobile = inject<boolean>('isMobile');
 // 时间格式化
 import { formatDate } from '@/hook/useFormatDate'
 // 获取用户信息

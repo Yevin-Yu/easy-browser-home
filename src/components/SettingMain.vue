@@ -8,6 +8,7 @@
                 <input v-show="false" type="file" id="jsonUpload" ref="fileInputRef" accept=".json" />
                 <span class="button">导入数据</span>
             </label>
+            <p class="tips">请注意：该导入导出数据，只适用于未登陆用户。已登陆用户会根据登陆账号自动同步数据。</p>
         </div>
         <div class="item-card">
             <h3>主题设置</h3>
@@ -32,14 +33,13 @@
             <h3>导航设置</h3>
             <div class="nav-list">
                 <ul ref="navsList">
-                    <li v-for="(item, index) in store.navMenu" @click="go(item)" :key="item.name">
+                    <li v-for="(item, index) in navItems" @click="openEditNav(item, index)" :key="item.name">
                         <div>
-                            <img :src="item.iconPath" alt="icon" />
+                            <img :src="item.iconPath" alt="icon" @error="onImageError(item)" />
                         </div>
                         <span class="item-name">{{ item.name }}</span>
-                        <img @click="delNav(index)" class="del-icon" src="@/assets/icon/close.svg" alt="" />
                     </li>
-                    <li @click="dialogVisible = true">
+                    <li @click="openAddNav">
                         <div>
                             <img src="@/assets/icon/add.svg" alt="icon" />
                         </div>
@@ -47,6 +47,7 @@
                     </li>
                 </ul>
             </div>
+            <p class="tips">点击导航图标可以修改或者删除单个导航，长按可以拖动图标排序。</p>
         </div>
         <div class="item-card">
             <h3>新闻排序</h3>
@@ -58,30 +59,113 @@
         </div>
     </div>
     <!-- 添加导航 -->
-    <el-dialog v-model="dialogVisible" :show-close="false" title="添加导航" width="500">
+    <el-dialog v-model="isShowAddNav" :show-close="false" :title="navParams.id ? '添加导航' : '修改导航'" width="500">
         <div class="add-nav">
-            <h3>名字</h3>
+            <h3>导航名称</h3>
             <input type="text" v-model="navParams.name" />
             <h3>图标链接</h3>
             <input type="text" v-model="navParams.iconPath" />
             <h3>网站链接</h3>
             <input type="text" v-model="navParams.linkPath" />
         </div>
+        <p class="tips">注意：图标链接加载失败或为空，会使用默认图标</p>
         <template #footer>
             <div class="dialog-footer">
-                <el-button @click="dialogVisible = false">取消</el-button>
-                <el-button type="primary" @click="addNav"> 添加 </el-button>
+                <el-button v-if="isEditNav" @click="delNav" type="primary">删除</el-button>
+                <el-button v-else @click="isShowAddNav = false">取消</el-button>
+                <el-button v-if="isEditNav" type="primary" @click="submitEditNav">修改</el-button>
+                <el-button v-else type="primary" @click="addNav">添加</el-button>
             </div>
         </template>
     </el-dialog>
 </template>
 
 <script setup>
+import { ElMessage } from 'element-plus'
 import Sortable from "sortablejs";
+import { storeToRefs } from "pinia";
+import { ref, onMounted, reactive, watchEffect, inject, watch } from "vue";
+// 获取用户信息 是否登陆
+import { useUserStore } from '@/stores/useAuthStore'
+let { isLogin } = storeToRefs(useUserStore());
+// 引入NavMenu
+import { useNavStore } from "@/stores/useNavStore"
+let { loadNavMenu, addNavMenu, editNavMenu, delNavMenu } = useNavStore();
+let { navItems } = storeToRefs(useNavStore());
+// 加载NavMenu
+watch(isLogin, () => {
+    loadNavMenu(isLogin.value)
+})
+// 添加导航
+let isShowAddNav = ref(false);
+let isEditNav = ref(false);
+let editIndex = ref(0);
+const navParams = reactive({ id: "", name: "", iconPath: "", linkPath: "" });
+function openAddNav() {
+    isEditNav.value = false;
+    isShowAddNav.value = true;
+    navParams.id = "";
+    navParams.name = "";
+    navParams.iconPath = "";
+    navParams.linkPath = "";
+}
+async function addNav() {
+    if (navParams.name && navParams.linkPath) {
+        await addNavMenu(isLogin.value, navParams)
+        isShowAddNav.value = false;
+        // 清空表单
+        navParams.id = "";
+        navParams.name = "";
+        navParams.iconPath = "";
+        navParams.linkPath = "";
+    } else {
+        ElMessage({
+            message: "请输入导航名称和网站链接",
+            type: "warning",
+        });
+    }
+}
+// 修改导航
+function openEditNav(item, index) {
+    isEditNav.value = true;
+    editIndex.value = index;
+    navParams.id = item.id;
+    navParams.name = item.name;
+    navParams.iconPath = item.iconPath;
+    navParams.linkPath = item.linkPath;
+    isShowAddNav.value = true;
+}
+async function submitEditNav() {
+    if (navParams.name && navParams.linkPath) {
+        await editNavMenu(isLogin.value, navParams)
+        isShowAddNav.value = false;
+        // 清空表单
+        navParams.id = "";
+        navParams.name = "";
+        navParams.iconPath = "";
+        navParams.linkPath = "";
+    } else {
+        ElMessage({
+            message: "请输入导航名称和网站链接",
+            type: "warning",
+        });
+    }
+}
+// 删除导航
+async function delNav() {
+    console.log(navParams, editIndex.value)
+    await delNavMenu(isLogin.value, navParams, editIndex.value)
+    isShowAddNav.value = false;
+    // 清空表单
+    editIndex.value = 0;
+    navParams.id = "";
+    navParams.name = "";
+    navParams.iconPath = "";
+    navParams.linkPath = "";
+}
+
 // 主题切换
 import { useTheme } from "@/hook/useTheme";
-import { onMounted, reactive, ref } from "vue";
-
 // 引入Stores
 import { useMyStoreHook } from "@/stores/useStore";
 let store = useMyStoreHook();
@@ -162,27 +246,10 @@ function delFile() {
 const newsList = ref(null);
 // 导航
 const navsList = ref(null);
-// 添加导航
-const navParams = reactive({
-    name: "",
-    iconPath: "",
-    linkPath: "",
-});
-function addNav() {
-    if (navParams.name && navParams.iconPath && navParams.linkPath) {
-        store.navMenu.push(navParams);
-        localStorage.setItem("navMenu", JSON.stringify(store.navMenu));
-        dialogVisible = false;
-        navParams.name = "";
-        navParams.iconPath = "";
-        navParams.linkPath = "";
-    }
+// 图片加载失败
+function onImageError(item) {
+    item.iconPath = "https://yuwb.cn/nav/pwa.png";
 }
-function delNav(index) {
-    store.navMenu.splice(index, 1);
-    localStorage.setItem("navMenu", JSON.stringify(store.navMenu));
-}
-let dialogVisible = ref(false);
 </script>
 
 <style lang="less" scoped>
@@ -214,6 +281,7 @@ let dialogVisible = ref(false);
         border: var(--border);
         color: var(--fontColor);
         padding: 12px;
+
 
         .news-list {
             text-align: center;
@@ -257,8 +325,8 @@ let dialogVisible = ref(false);
             list-style: none;
             display: flex;
             flex-wrap: wrap;
-            display: inline-block;
             padding-left: 0;
+            justify-content: center;
 
             li {
                 display: inline-block;
@@ -277,6 +345,7 @@ let dialogVisible = ref(false);
                     box-shadow: var(--shadow);
 
                     img {
+                        display: block;
                         padding: 12px;
                         background-color: #fff;
                         width: 50px;
@@ -317,6 +386,14 @@ let dialogVisible = ref(false);
             }
         }
     }
+}
+
+.tips {
+    color: #999;
+    font-size: 12px;
+    margin-top: 20px;
+    padding: 0 12px;
+    text-align: center;
 }
 
 .dialog-footer {

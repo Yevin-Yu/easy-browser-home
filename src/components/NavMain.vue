@@ -1,9 +1,9 @@
 <template>
     <div class="nav-main">
         <ul>
-            <li v-for="item in store.navMenu" @click="go(item)" :key="item.name">
+            <li v-for="item in navItems" @click="go(item)" :key="item.name">
                 <div>
-                    <img :src="item.iconPath" alt="icon" />
+                    <img :src="item.iconPath" alt="icon" @error="onImageError(item)" />
                 </div>
                 <span class="nav-item-name">{{ item.name }}</span>
             </li>
@@ -12,17 +12,33 @@
 </template>
 
 <script setup>
-import { onMounted } from "vue";
+import { onMounted, watchEffect,watch } from "vue";
+import { storeToRefs } from "pinia";
 // 引入Stores
 import { useMyStoreHook } from "@/stores/useStore";
 let store = useMyStoreHook();
-
+// 获取用户信息 是否登陆
+import { useUserStore } from '@/stores/useAuthStore'
+let { isLogin } = storeToRefs(useUserStore());
+// 引入NavMenu
+import { useNavStore } from "@/stores/useNavStore"
+let { loadNavMenu } = useNavStore();
+let { navItems } = storeToRefs(useNavStore());
+// 加载NavMenu
+watch(isLogin, () => {
+    loadNavMenu(isLogin.value)
+})
 onMounted(() => {
     const navMenu = JSON.parse(localStorage.getItem("navMenu"));
     if (navMenu) store.navMenuChange(navMenu);
 });
+// 点击跳转
 function go(item) {
     window.open(item.linkPath);
+}
+// 图片加载失败
+function onImageError(item) {
+    item.iconPath = "https://yuwb.cn/nav/pwa.png";
 }
 </script>
 
@@ -49,9 +65,10 @@ function go(item) {
 
     ul {
         list-style: none;
-        display: inline-block;
+        display: flex;
+        flex-wrap: wrap;
         padding-left: 0;
-
+        justify-content: center;
 
         li {
             display: inline-block;
@@ -69,6 +86,7 @@ function go(item) {
                 box-shadow: var(--shadow);
 
                 img {
+                    display: block;
                     padding: 12px;
                     background-color: #fff;
                     width: 50px;

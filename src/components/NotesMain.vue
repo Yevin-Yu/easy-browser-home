@@ -2,7 +2,7 @@
     <div class="notes-main-content">
 
         <div class="notes-main">
-            <div class="left" v-show="!isShowNote">
+            <div class="left" v-show="!isMobile||(isMobile && !isShowNote)">
                 <div class="title">
                     <span class="edit" @click="isDel = !isDel">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
@@ -28,7 +28,7 @@
                     </li>
                 </ul>
             </div>
-            <div class="right" v-if="store.activeNotes && true">
+            <div class="right" v-if="store.activeNotes || isShowNote">
                 <div class="tools">
                     <svg @click="fontBold" t="1722237098445" fill="#6CB9B4" class="icon" viewBox="0 0 1024 1024"
                         version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4638" width="20" height="32">

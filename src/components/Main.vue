@@ -51,7 +51,7 @@
             </div>
             <div class="nav-main">
                 <ul>
-                    <li v-for="item in store.navMenu" @click="go(item)" :key="item.name">
+                    <li v-for="item in navItems" @click="go(item)" :key="item.name">
                         <div>
                             <img :src="item.iconPath" alt="icon" />
                         </div>
@@ -65,10 +65,22 @@
 
 <script setup>
 import Sortable from "sortablejs";
-import { ref, onMounted, watchEffect, inject } from "vue";
+import { storeToRefs } from "pinia";
+import { ref, onMounted, watchEffect, inject, watch } from "vue";
+// 获取用户信息 是否登陆
+import { useUserStore } from '@/stores/useAuthStore'
+let { isLogin } = storeToRefs(useUserStore());
+// 引入NavMenu
+import { useNavStore } from "@/stores/useNavStore"
+let { loadNavMenu } = useNavStore();
+let { navItems } = storeToRefs(useNavStore());
+// 加载NavMenu
+watch(isLogin, () => {
+    loadNavMenu(isLogin.value)
+})
+// 获取todoList
 import { useMyStoreHook } from "@/stores/useStore";
 let store = useMyStoreHook();
-
 const isMobile = inject('isMobile');
 // 初始加载
 onMounted(() => {
@@ -243,11 +255,12 @@ ul::-webkit-scrollbar-thumb {
             overflow-y: auto;
             height: calc(100% - 35px);
             margin: 6px 0 12px 0;
+            padding-right: 16px;
 
             li {
                 cursor: pointer;
                 position: relative;
-                width: 285px;
+                width: 275px;
                 height: 56px;
                 line-height: 56px;
                 border-radius: 12px;
