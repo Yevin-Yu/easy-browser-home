@@ -5,8 +5,7 @@ import { RouterView } from "vue-router";
 const isMobile = inject<boolean>('isMobile');
 // 响应式布局
 import { useResponsiveLayout } from '@/hook/useResponsiveLayout';
-// 375 * 1.5 = 562.5
-useResponsiveLayout({ designWidth: 562.5 });
+useResponsiveLayout({ designWidth: 562.5 }); // 375 * 1.5 = 562.5    
 
 
 // 初始化数据
@@ -34,7 +33,6 @@ if (!localStorage.length || (!localStorage.newsMenu && !localStorage.notesList &
             console.error("Error fetching or parsing data:", error);
         });
 }
-
 </script>
 
 <template>

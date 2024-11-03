@@ -1,5 +1,5 @@
 // src/stores/useUserStore.js
-import { defineStore, mapActions } from "pinia";
+import { defineStore } from "pinia";
 import { ref, onMounted } from "vue";
 import api from "@/api/api"; // 导入封装的 API
 
@@ -26,11 +26,9 @@ export const useUserStore = defineStore("user", () => {
         if (isLogin.value) {
             api.get("/user").then((res) => {
                 if (res.code == 200) userInfo.value = res.data;
-                else if (res.code == 401) {
-                    localStorage.removeItem("token");
-                    isLogin.value = false;
-                }
-            });
+            }).catch(() => {
+                isLogin.value = false;
+            })
         }
     };
 

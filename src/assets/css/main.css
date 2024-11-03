@@ -44,3 +44,32 @@
 #app .el-button:active {
     box-shadow: var(--sideShadowActive);
 }
+
+/* 按钮加载 */
+#app .is-loading-btn,
+#app button.is-loading-btn {
+    border: 2px solid transparent;
+    border-width: 2px !important;
+    animation: border-loading 2s linear infinite;
+    box-sizing: border-box;
+    cursor: not-allowed;
+    line-height: 36px;
+}
+
+#app .is-loading-btn .el-icon.is-loading {
+    top: 2px;
+}
+
+@keyframes border-loading {
+    0% {
+        border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    50% {
+        border-color: rgba(0, 0, 0, 0.251);
+    }
+
+    100% {
+        border-color: rgba(255, 255, 255, 0.25);
+    }
+}

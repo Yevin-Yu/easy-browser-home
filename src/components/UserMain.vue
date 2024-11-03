@@ -20,7 +20,8 @@
             </div>
             <div class="dialog-footer">
                 <el-button @click="openRegister">注册</el-button>
-                <el-button type="primary" @click="subLogin"> 登录 </el-button>
+                <el-button type="primary" :class="{ 'is-loading-btn': isLoginLoading }" :loading="isLoginLoading"
+                    @click="subLogin"> 登录 </el-button>
             </div>
         </div>
         <!-- 个人信息 -->
@@ -28,7 +29,12 @@
             <ul>
                 <li><span>用户名：</span><span>{{ userInfo.username }}</span></li>
                 <li><span>邮箱：</span><span>{{ userInfo.email }}</span></li>
-                <li><span>最后登录：</span><span>{{ userInfo.last_login ? formatDate(userInfo.last_login, 'YYYY-MM-DD HH:mm:ss') : '' }}</span></li>
+                <li>
+                    <span>最后登录：</span>
+                    <span>
+                        {{ userInfo.last_login ? formatDate(userInfo.last_login, 'YYYY-MM-DD HH: mm: ss') : '' }}
+                    </span>
+                </li>
             </ul>
             <div class="dialog-footer">
                 <el-button @click="openChangePassowrd">修改密码</el-button>
@@ -49,7 +55,8 @@
             </div>
             <div class="dialog-footer">
                 <el-button @click="isShowChangePassword = false">取消</el-button>
-                <el-button type="primary" @click="changePassword">确认</el-button>
+                <el-button type="primary" :class="{ 'is-loading-btn': isChangeLoading }" :loading="isChangeLoading"
+                    @click="changePassword">确认</el-button>
             </div>
         </div>
     </el-dialog>
@@ -70,7 +77,7 @@
             </div>
             <div class="dialog-footer">
                 <el-button @click="isShowRegister = false">取消</el-button>
-                <el-button type="primary" @click="subRegister">确认</el-button>
+                <el-button type="primary" :class="{ 'is-loading-btn': isRegisterLoading }" :loading="isRegisterLoading" @click="subRegister">确认</el-button>
                 <p class="tips">注册码可以联系作者获取：iyuwb0521@outlook.com</p>
             </div>
         </div>
@@ -78,7 +85,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject, watchEffect, onMounted } from "vue";
+import { ref } from "vue";
 import { ElMessage } from 'element-plus'
 import { storeToRefs } from 'pinia'
 import api from '@/api/api'; // 导入封装的 API
@@ -88,9 +95,6 @@ import { formatDate } from '@/hook/useFormatDate'
 import { useUserStore } from '@/stores/useAuthStore'
 let { updateIsLogin, updateUserInfo } = useUserStore()
 let { isLogin, userInfo } = storeToRefs(useUserStore());
-
-
-
 // 弹窗登陆以及信息相关
 let isShowUserInfo = ref(false);
 let loginParams = ref({ email: '', password: '' })
@@ -98,6 +102,7 @@ function openUserInfo() {
     isShowUserInfo.value = true
 }
 // 登录
+const isLoginLoading = ref(false)
 async function subLogin() {
     if (loginParams.value.email == '' || loginParams.value.password == '') {
         return ElMessage({
@@ -105,8 +110,11 @@ async function subLogin() {
             type: 'warning',
         })
     }
-    let data = await api.post('/login', loginParams.value)
-    if (data.code == 200) {
+    isLoginLoading.value = true
+    let data = await api.post('/login', loginParams.value).catch(() => {
+        isLoginLoading.value = false
+    })
+    if (data && data.code == 200) {
         ElMessage({
             message: '登录成功',
             type: 'success',
@@ -115,6 +123,13 @@ async function subLogin() {
         localStorage.setItem('token', data.data.token);
         updateIsLogin(true)
         updateUserInfo()
+        isLoginLoading.value = false
+    } else {
+        ElMessage({
+            message: data && data.message || '系统错误，请稍后再试',
+            type: 'error',
+        })
+        isLoginLoading.value = false
     }
 }
 // 登出
@@ -130,6 +145,7 @@ function openChangePassowrd() {
     isShowUserInfo.value = false
     isShowChangePassword.value = true
 }
+const isChangeLoading = ref(false)
 function changePassword() {
     if (resetPasswordParams.value.old_password == '' || resetPasswordParams.value.new_password == '' || resetPasswordParams.value.confirm_password == '') {
         return ElMessage({
@@ -143,6 +159,7 @@ function changePassword() {
             type: 'warning',
         })
     }
+    isChangeLoading.value = true
     api.post('/login/reset', resetPasswordParams.value).then(res => {
         if (res.code == 200) {
             ElMessage({
@@ -150,17 +167,29 @@ function changePassword() {
                 type: 'success',
             })
             isShowChangePassword.value = false
+        } else {
+            ElMessage({
+                message: res.message,
+                type: 'error',
+            })
         }
+        isChangeLoading.value = false
+    }).catch(() => {
+        ElMessage({
+            message: '系统错误，请稍后再试',
+            type: 'error',
+        })
+        isChangeLoading.value = false
     })
 }
 // 注册
 const isShowRegister = ref(false)
 const registerParams = ref({ username: '', email: '', password: '', confirm_password: '', code: '' })
-
 function openRegister() {
     isShowUserInfo.value = false
     isShowRegister.value = true
 }
+const isRegisterLoading = ref(false)
 function subRegister() {
     if (registerParams.value.username == '' || registerParams.value.email == '' || registerParams.value.password == '' || registerParams.value.confirm_password == '' || registerParams.value.code == '') {
         return ElMessage({
@@ -180,7 +209,7 @@ function subRegister() {
             message: '两次密码不一致',
         })
     }
-
+    isRegisterLoading.value = true
     api.post('/login/register', registerParams.value).then(res => {
         if (res.code == 200) {
             ElMessage({
@@ -195,6 +224,13 @@ function subRegister() {
                 type: 'warning',
             })
         }
+        isRegisterLoading.value = false
+    }).catch(() => {
+        ElMessage({
+            message: '系统错误，请稍后再试',
+            type: 'error',
+        })
+        isRegisterLoading.value = false
     })
 }
 </script>

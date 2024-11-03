@@ -1,5 +1,6 @@
 // src/api.js
 import axios from 'axios';
+import { ElMessage } from 'element-plus'
 
 // 创建 Axios 实例
 const apiClient = axios.create({
@@ -35,6 +36,12 @@ apiClient.interceptors.response.use(
             console.error('Unauthorized, redirecting to login...');
             // 删除 token
             localStorage.removeItem('token');
+            ElMessage({
+                message: '登录过期，请重新登录',
+                type: 'error',
+                grouping: true,
+                repeatNum: null,
+            })
         }
         return Promise.reject(error);
     }
