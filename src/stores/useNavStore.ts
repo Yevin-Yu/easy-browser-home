@@ -1,7 +1,7 @@
 import { defineStore, storeToRefs } from "pinia";
 import { onMounted, ref, watchEffect, type Ref } from "vue";
 import api from "@/api/api";
-import { isLogin } from "@/utils/tools";
+import { ElMessage } from 'element-plus'
 // 定义导航项的类型
 interface NavItem {
     id?: number;
@@ -25,9 +25,24 @@ export const useNavStore = defineStore("nav", () => {
             // 加载已登陆用户的导航菜单
             api.get("nav").then((res) => {
                 if (res.code === 200) {
-                    navItems.value = res.data;
+                    if (res.data.length === 0) {
+                        // 接口获取用户导航为空时，默认批量上传本地Nav。
+                        const navMenu = JSON.parse(localStorage.getItem("navMenu") || "[]");
+                        navItems.value = navMenu;
+                        api.post("nav/batch", { navMenu }).then((res) => {
+                            if (res.code === 200) {
+                                ElMessage.success('导航菜单同步成功')
+                            }
+                        })
+                    } else {
+                        navItems.value = res.data;
+                        // 获取数据 同步到本地
+                        localStorage.setItem("navMenu", JSON.stringify(res.data))
+                    }
                 }
-            });
+            }).catch(() => {
+                ElMessage.error('系统异常，请稍后再试')
+            })
         } else {
             // 未登陆用户
             const navMenu = localStorage.getItem("navMenu");

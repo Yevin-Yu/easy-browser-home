@@ -26,7 +26,7 @@ onMounted(() => {
     const newsMenu = JSON.parse(localStorage.getItem("newsMenu"));
     if (newsMenu) store.newsMenuChange(newsMenu);
     store.newsMenu.forEach((item) => {
-        fetch(`https://api-hot.efefee.cn/${item.value}?cache=true`)
+        fetch(`https://yuwb.cn/news-api/${item.value}?cache=true`)
             .then((res) => res.json())
             .then((res) => (data[item.value] = res));
     });
