@@ -3,7 +3,7 @@
 欢迎访问 [EasyBrowserHome](https://yuwb.cn/nav)！这是一个功能丰富的在线主页，旨在提供便捷的浏览体验和个性化的导航服务。
 
 <div align="center">
-    <img alt="logo" height="525" width="864" src="https://yuwb.cn/images/easy-browser-home.png"/>
+    <img alt="logo" height="350" width="575" src="https://yuwb.cn/images/easy-browser-home.png"/>
 </div>
 
 ## 功能介绍 ✨
