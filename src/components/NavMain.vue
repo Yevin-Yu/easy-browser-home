@@ -1,6 +1,6 @@
 <template>
     <div class="nav-main">
-        <ul>
+        <ul ref="navsList">
             <li v-for="item in navItems" @click="go(item)" :key="item.name">
                 <div>
                     <img :src="item.iconPath" alt="icon" @error="onImageError(item)" />
@@ -12,7 +12,8 @@
 </template>
 
 <script setup>
-import { onMounted, watchEffect,watch } from "vue";
+import Sortable from "sortablejs";
+import { onMounted, watch, ref } from "vue";
 import { storeToRefs } from "pinia";
 // 引入Stores
 import { useMyStoreHook } from "@/stores/useStore";
@@ -22,16 +23,26 @@ import { useUserStore } from '@/stores/useAuthStore'
 let { isLogin } = storeToRefs(useUserStore());
 // 引入NavMenu
 import { useNavStore } from "@/stores/useNavStore"
-let { loadNavMenu } = useNavStore();
+let { loadNavMenu, updateNavMenuSort } = useNavStore();
 let { navItems } = storeToRefs(useNavStore());
 // 加载NavMenu
 watch(isLogin, () => {
     loadNavMenu(isLogin.value)
 })
+// 监听NavMenu变化
+const navsList = ref(null);
 onMounted(() => {
-    const navMenu = JSON.parse(localStorage.getItem("navMenu"));
-    if (navMenu) store.navMenuChange(navMenu);
-});
+    Sortable.create(navsList.value, {
+        group: "shared",
+        animation: 150,
+        ghostClass: "ghost",
+        onEnd: ({ newIndex, oldIndex }) => {
+            const item = navItems.value.splice(oldIndex, 1)[0];
+            navItems.value.splice(newIndex, 0, item);
+            updateNavMenuSort(isLogin.value, navItems.value)
+        },
+    });
+})
 // 点击跳转
 function go(item) {
     window.open(item.linkPath);

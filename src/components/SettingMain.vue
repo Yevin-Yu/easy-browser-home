@@ -90,7 +90,7 @@ import { useUserStore } from '@/stores/useAuthStore'
 let { isLogin } = storeToRefs(useUserStore());
 // 引入NavMenu
 import { useNavStore } from "@/stores/useNavStore"
-let { loadNavMenu, addNavMenu, editNavMenu, delNavMenu } = useNavStore();
+let { loadNavMenu, addNavMenu, editNavMenu, delNavMenu, updateNavMenuSort } = useNavStore();
 let { navItems } = storeToRefs(useNavStore());
 // 加载NavMenu
 watch(isLogin, () => {
@@ -163,7 +163,20 @@ async function delNav() {
     navParams.iconPath = "";
     navParams.linkPath = "";
 }
-
+// 导航排序
+const navsList = ref(null);
+onMounted(() => {
+    Sortable.create(navsList.value, {
+        group: "shared",
+        animation: 150,
+        ghostClass: "ghost",
+        onEnd: ({ newIndex, oldIndex }) => {
+            const item = navItems.value.splice(oldIndex, 1)[0];
+            navItems.value.splice(newIndex, 0, item);
+            updateNavMenuSort(isLogin.value, navItems.value)
+        },
+    });
+})
 // 主题切换
 import { useTheme } from "@/hook/useTheme";
 // 引入Stores
@@ -182,9 +195,6 @@ onMounted(() => {
     // 默认引擎
     const searchEngine = localStorage.getItem("searchEngine");
     if (searchEngine) store.searchEngineChange(parseInt(searchEngine));
-    // 默认导航
-    const navMenu = JSON.parse(localStorage.getItem("navMenu"));
-    if (navMenu) store.navMenuChange(navMenu);
     // 调整顺序初始化
     const sortable = Sortable.create(newsList.value, {
         group: "shared",
@@ -194,16 +204,6 @@ onMounted(() => {
             const item = store.newsMenu.splice(oldIndex, 1)[0];
             store.newsMenu.splice(newIndex, 0, item);
             localStorage.setItem("newsMenu", JSON.stringify(store.newsMenu));
-        },
-    });
-    const navsSortable = Sortable.create(navsList.value, {
-        group: "shared",
-        animation: 150,
-        ghostClass: "ghost",
-        onEnd: ({ newIndex, oldIndex }) => {
-            const item = store.navMenu.splice(oldIndex, 1)[0];
-            store.navMenu.splice(newIndex, 0, item);
-            localStorage.setItem("navMenu", JSON.stringify(store.navMenu));
         },
     });
 });
@@ -244,8 +244,7 @@ function delFile() {
 }
 // 新闻排序
 const newsList = ref(null);
-// 导航
-const navsList = ref(null);
+
 // 图片加载失败
 function onImageError(item) {
     item.iconPath = "https://yuwb.cn/nav/pwa.png";
