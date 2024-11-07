@@ -1,6 +1,8 @@
 # 耶温导航
 
 
+![image](https://yuwb.cn/images/easy-browser-home.png)
+
 耶温浏览器导航页，支持中屏大屏以及H5手机网页。
 
 
