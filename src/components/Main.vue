@@ -1,5 +1,6 @@
 <template>
     <div class="main">
+        <!-- 待办 -->
         <div class="left-todo">
             <div class="title">
                 <span class="edit" @click="isEdit = !isEdit">
@@ -10,11 +11,11 @@
                     </svg>
                 </span>
                 待办列表
-                <span class="add" @click="addTodo">+</span>
+                <span class="add" @click="addTodoClick">+</span>
             </div>
             <ul ref="todosListRef">
-                <li v-for="(item, index) in store.todosList" :key="item.id">
-                    <span class="checkbox" :class="{ 'checked': item.checked }" @click.stop="changeCheck(item)">
+                <li v-for="(item, index) in todoItems" :key="item.id">
+                    <span class="checkbox" :class="{ 'checked': item.checked }" @click.stop="changeTodoStatus(item)">
                         <svg v-if="item.checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
                             <path fill="currentColor"
                                 d="M329.956 257.138a254.862 254.862 0 0 0 0 509.724h364.088a254.862 254.862 0 0 0 0-509.724zm0-72.818h364.088a327.68 327.68 0 1 1 0 655.36H329.956a327.68 327.68 0 1 1 0-655.36z">
@@ -32,9 +33,10 @@
                             </path>
                         </svg>
                     </span>
-                    <input class="todo-input" v-if="!item.checked" v-model="item.title" type="text" />
+                    <input class="todo-input" v-if="!item.checked" @input="changeTodoTitle(item, $event)"
+                        v-model="item.title" type="text" />
                     <span v-else class="todo-text">{{ item.title }}</span>
-                    <span class="del-btn" v-if="isEdit" @click="delTodo(index)">
+                    <span class="del-btn" v-if="isEdit" @click="delTodoClick(item, index)">
                         <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
                             <path
                                 d="M764.288 214.592 512 466.88 259.712 214.592a31.936 31.936 0 0 0-45.12 45.12L466.752 512 214.528 764.224a31.936 31.936 0 1 0 45.12 45.184L512 557.184l252.288 252.288a31.936 31.936 0 0 0 45.12-45.12L557.12 512.064l252.288-252.352a31.936 31.936 0 1 0-45.12-45.184z"
@@ -44,6 +46,7 @@
                 </li>
             </ul>
         </div>
+        <!-- 默认导航 -->
         <div class="right">
             <div class="big-nav">
                 <img src="@/assets/images/banner.jpg" alt="" />
@@ -70,7 +73,7 @@ import { ref, onMounted, watchEffect, inject, watch } from "vue";
 // 获取用户信息 是否登陆
 import { useUserStore } from '@/stores/useAuthStore'
 let { isLogin } = storeToRefs(useUserStore());
-// 引入NavMenu
+// 加载NavMenu
 import { useNavStore } from "@/stores/useNavStore"
 let { loadNavMenu } = useNavStore();
 let { navItems } = storeToRefs(useNavStore());
@@ -78,67 +81,58 @@ let { navItems } = storeToRefs(useNavStore());
 watch(isLogin, () => {
     loadNavMenu(isLogin.value)
 })
-// 获取todoList
-import { useMyStoreHook } from "@/stores/useStore";
-let store = useMyStoreHook();
-const isMobile = inject('isMobile');
-// 初始加载
-onMounted(() => {
-    const navMenu = JSON.parse(localStorage.getItem("navMenu"));
-    if (navMenu) store.navMenuChange(navMenu);
-    const todosList = JSON.parse(localStorage.getItem("todosList"));
-    if (todosList) store.todosListChange(todosList);
-    // 排序
-    if (!isMobile) {
-        const notesSortable = Sortable.create(todosListRef.value, {
-            group: "shared",
-            animation: 150,
-            ghostClass: "ghost",
-            onEnd: ({ newIndex, oldIndex }) => {
-                const item = store.todosList.splice(oldIndex, 1)[0];
-                store.todosList.splice(newIndex, 0, item);
-            },
-        });
-    }
-});
-// 新建删除
-let isEdit = ref(false);
-function addTodo() {
-    const data = {
+// 加载TodoList
+import { useTodoStore } from "@/stores/useTodoStore"
+let { loadTodos, editTodo, delTodo, addTodo, updateTodoSort } = useTodoStore();
+let { todoItems } = storeToRefs(useTodoStore());
+watch(isLogin, () => {
+    loadTodos(isLogin.value)
+})
+// 新增Todo
+function addTodoClick() {
+    let data = {
         id: new Date().getTime(),
         title: "新建Todo",
         checked: false,
     };
-    store.todosList.unshift(data);
+    addTodo(isLogin.value, data)
 }
-// 删除
-function delTodo(index) {
-    store.todosList.splice(index, 1);
-    localStorage.setItem("todosList", JSON.stringify(store.todosList));
+// 修改状态
+function changeTodoStatus(params) {
+    params.checked = !params.checked;
+    editTodo(isLogin.value, params)
+}
+// 修改内容
+let timeoutId;
+function changeTodoTitle(params, event) {
+    // 清除之前的定时器
+    if (timeoutId) {
+        clearTimeout(timeoutId);
+    }
+    // 设置新的定时器
+    timeoutId = setTimeout(() => {
+        editTodo(isLogin.value, params)
+    }, 2000);
+}
+// 删除Todo
+let isEdit = ref(false);
+function delTodoClick(params, index) {
+    delTodo(isLogin.value, params, index)
 }
 // 排序
 const todosListRef = ref(null);
-// 实时更新
-watchEffect(() => {
-    if (store.todosList && store.todosList.length) {
-        localStorage.setItem("todosList", JSON.stringify(store.todosList));
-    }
-});
-// 导航跳转
-
-function go(item) {
-    window.open(item.linkPath);
-}
-// 完成待办 列表重新排序 已完成排在未完成后
-const changeCheck = (item) => {
-    item.checked = !item.checked
-    if (store.todosList && store.todosList.length) {
-        store.todosList.sort((a, b) => {
-            return (a.checked === b.checked) ? 0 : a.checked ? 1 : -1;
-        })
-    }
-}
-
+onMounted(() => {
+    Sortable.create(todosListRef.value, {
+        group: "shared",
+        animation: 150,
+        ghostClass: "ghost",
+        onEnd: ({ newIndex, oldIndex }) => {
+            const item = todoItems.value.splice(oldIndex, 1)[0];
+            todoItems.value.splice(newIndex, 0, item);
+            updateTodoSort(isLogin.value, todoItems.value)
+        },
+    });
+})
 </script>
 <style lang="less" scoped>
 .main::-webkit-scrollbar,
