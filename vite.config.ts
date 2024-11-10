@@ -51,7 +51,7 @@ export default defineConfig({
       injectRegister: 'auto',
       // 设置缓存资源
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,json,jpg,jpeg}']
+        globPatterns: ['**/*.{css,html,ico,png,svg,json,jpg,jpeg}']
       },
       //dev环境也开启pwa
       devOptions: {

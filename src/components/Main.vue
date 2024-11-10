@@ -34,7 +34,7 @@
                         </svg>
                     </span>
                     <input class="todo-input" v-if="!item.checked" @input="changeTodoTitle(item, $event)"
-                        v-model="item.title" type="text" />
+                        v-model="item.title" type="text" @blur="editTodo(isLogin, item)" />
                     <span v-else class="todo-text">{{ item.title }}</span>
                     <span class="del-btn" v-if="isEdit" @click="delTodoClick(item, index)">
                         <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
@@ -56,7 +56,7 @@
                 <ul>
                     <li v-for="item in navItems" @click="go(item)" :key="item.name">
                         <div>
-                            <img :src="item.iconPath" alt="icon" />
+                            <img :src="item.iconPath" alt="icon" @error="onImageError(item)" />
                         </div>
                         <span class="nav-item-name">{{ item.name }}</span>
                     </li>
@@ -69,7 +69,8 @@
 <script setup>
 import Sortable from "sortablejs";
 import { storeToRefs } from "pinia";
-import { ref, onMounted, watchEffect, inject, watch } from "vue";
+import { ref, onMounted, inject, watch } from "vue";
+const isMobile = inject('isMobile');
 // 获取用户信息 是否登陆
 import { useUserStore } from '@/stores/useAuthStore'
 let { isLogin } = storeToRefs(useUserStore());
@@ -109,9 +110,10 @@ function changeTodoTitle(params, event) {
     if (timeoutId) {
         clearTimeout(timeoutId);
     }
+    const copyParams = JSON.parse(JSON.stringify(params));
     // 设置新的定时器
     timeoutId = setTimeout(() => {
-        editTodo(isLogin.value, params)
+        editTodo(isLogin.value, copyParams)
     }, 2000);
 }
 // 删除Todo
@@ -122,17 +124,23 @@ function delTodoClick(params, index) {
 // 排序
 const todosListRef = ref(null);
 onMounted(() => {
-    Sortable.create(todosListRef.value, {
-        group: "shared",
-        animation: 150,
-        ghostClass: "ghost",
-        onEnd: ({ newIndex, oldIndex }) => {
-            const item = todoItems.value.splice(oldIndex, 1)[0];
-            todoItems.value.splice(newIndex, 0, item);
-            updateTodoSort(isLogin.value, todoItems.value)
-        },
-    });
+    if (!isMobile) {
+        Sortable.create(todosListRef.value, {
+            group: "shared",
+            animation: 150,
+            ghostClass: "ghost",
+            onEnd: ({ newIndex, oldIndex }) => {
+                const item = todoItems.value.splice(oldIndex, 1)[0];
+                todoItems.value.splice(newIndex, 0, item);
+                updateTodoSort(isLogin.value, todoItems.value)
+            },
+        });
+    }
 })
+// 图片加载失败
+function onImageError(item) {
+    item.iconPath = "https://yuwb.cn/nav/pwa.png";
+}
 </script>
 <style lang="less" scoped>
 .main::-webkit-scrollbar,
@@ -426,7 +434,7 @@ ul::-webkit-scrollbar-thumb {
             p {
                 color: rgba(255, 255, 245, 0.86);
                 position: absolute;
-                right: 20px;
+                right: 25px;
                 bottom: 12px;
             }
         }

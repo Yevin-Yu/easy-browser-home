@@ -4,7 +4,8 @@ import { ElMessage } from 'element-plus'
 
 // 创建 Axios 实例
 const apiClient = axios.create({
-    baseURL: 'https://yuwb.cn/api/', // 替换为你的 API 基础 URL
+    // baseURL: 'https://yuwb.cn/api/', // 替换为你的 API 基础 URL
+    baseURL: 'http://localhost:3000/api/', // 替换为你的 API 基础 URL
     timeout: 10000, // 请求超时时间
 });
 

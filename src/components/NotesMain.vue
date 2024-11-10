@@ -2,7 +2,7 @@
     <div class="notes-main-content">
 
         <div class="notes-main">
-            <div class="left" v-show="!isMobile||(isMobile && !isShowNote)">
+            <div class="left" v-show="!isMobile || (isMobile && !isShowNote)">
                 <div class="title">
                     <span class="edit" @click="isDel = !isDel">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
@@ -15,10 +15,10 @@
                     <span @click="noteAdd" class="add">+</span>
                 </div>
                 <ul ref="notesListRef">
-                    <li @click="selectNote(item)" v-for="(item, index) in store.notesList"
-                        :class="{ 'active': item.id == store.activeNotes }" :key="item">
+                    <li @click="selectNote(item)" v-for="(item, index) in noteItems"
+                        :class="{ 'active': item.id == activeNotes }" :key="item">
                         <span>{{ item.title }}</span>
-                        <span v-if="isDel" @click.stop="delNote(index)" class="del-btn">
+                        <span v-if="isDel" @click.stop="delNoteClick(item, index)" class="del-btn">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
                                 <path fill="currentColor"
                                     d="M764.288 214.592 512 466.88 259.712 214.592a31.936 31.936 0 0 0-45.12 45.12L466.752 512 214.528 764.224a31.936 31.936 0 1 0 45.12 45.184L512 557.184l252.288 252.288a31.936 31.936 0 0 0 45.12-45.12L557.12 512.064l252.288-252.352a31.936 31.936 0 1 0-45.12-45.184z">
@@ -28,7 +28,7 @@
                     </li>
                 </ul>
             </div>
-            <div class="right" v-if="store.activeNotes || isShowNote">
+            <div class="right" v-if="activeNotes || isShowNote">
                 <div class="tools">
                     <svg @click="fontBold" t="1722237098445" fill="#6CB9B4" class="icon" viewBox="0 0 1024 1024"
                         version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4638" width="20" height="32">
@@ -48,10 +48,10 @@
                         </ul>
                     </div>
                 </div>
-                <input @input="onInput" maxlength="30" v-model="noteDetails.title" class="title" type="text"
-                    placeholder="标题" /><br />
-                <textarea :style="textStyle" @input="onInput" v-model="noteDetails.data" class="content"
-                    placeholder="笔记"></textarea>
+                <input @input="onInput" maxlength="30" @blur="editNote(isLogin, noteDetails)"
+                    v-model="noteDetails.title" class="title" type="text" placeholder="标题" /><br />
+                <textarea :style="textStyle" @input="onInput" @blur="editNote(isLogin, noteDetails)"
+                    v-model="noteDetails.data" class="content" placeholder="笔记"></textarea>
                 <div class="back-btn" @click="isShowNote = false" v-if="isMobile && isShowNote">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 1024 1024">
                         <path fill="currentColor"
@@ -66,28 +66,52 @@
 
 <script setup>
 import Sortable from "sortablejs";
-import { onMounted, onBeforeUnmount, reactive, ref, computed, inject } from "vue";
+import { watch, onMounted, onBeforeUnmount, reactive, ref, computed, inject } from "vue";
+import { storeToRefs } from "pinia";
 const isMobile = inject('isMobile');
 const isShowNote = ref(false);
-// 引入Stores
-import { useMyStoreHook } from "@/stores/useStore";
-let store = useMyStoreHook();
-let noteDetails = reactive({});
+// 获取用户信息 是否登陆
+import { useUserStore } from '@/stores/useAuthStore'
+let { isLogin } = storeToRefs(useUserStore());
+// 加载Notes
+import { useNotesStore } from "@/stores/useNotesStore"
+let { loadNotes, editNote, delNote, addNote, updateNoteSort } = useNotesStore();
+let { noteItems, activeNotes, noteDetails } = storeToRefs(useNotesStore());
+watch(isLogin, () => {
+    loadNotes(isLogin.value)
+})
+// 选择笔记
+function selectNote(data) {
+    activeNotes.value = data.id;
+    localStorage.setItem("activeNotes", data.id);
+    noteDetails.value = data;
+    isShowNote.value = true;
+}
+// 更新保存笔记
+let timer;
+function onInput() {
+    clearTimeout(timer);
+    const copyParams = JSON.parse(JSON.stringify(noteDetails.value));
+    timer = setTimeout(function () {
+        editNote(isLogin.value, copyParams)
+    }, 2000);
+}
+// 新增笔记
+function noteAdd() {
+    const data = {
+        title: "新建笔记",
+        data: "新建笔记内容",
+    };
+    addNote(isLogin.value, data);
+}
+// 删除
+let isDel = ref(false);
+function delNoteClick(params, index) {
+    delNote(isLogin.value, params, index);
+}
+// 排序
+const notesListRef = ref(null);
 onMounted(() => {
-    const notesList = JSON.parse(localStorage.getItem("notesList"));
-    if (notesList) store.notesListChange(notesList);
-    const activeNotes = localStorage.getItem("activeNotes");
-    if (activeNotes) store.activeNotesChange(activeNotes);
-    if (notesList && activeNotes) {
-        noteDetails = notesList.find((it) => it.id == activeNotes);
-        if (!noteDetails && store.notesList.length) {
-            noteDetails = store.notesList[0];
-            store.activeNotesChange(noteDetails.id);
-        }
-    }
-    if (isMobile) {
-        store.activeNotesChange('')
-    }
     // 排序
     if (!isMobile) {
         const notesSortable = Sortable.create(notesListRef.value, {
@@ -95,59 +119,14 @@ onMounted(() => {
             animation: 150,
             ghostClass: "ghost",
             onEnd: ({ newIndex, oldIndex }) => {
-                const item = store.notesList.splice(oldIndex, 1)[0];
-                store.notesList.splice(newIndex, 0, item);
-                localStorage.setItem("notesList", JSON.stringify(store.notesList));
+                const item = noteItems.value.splice(oldIndex, 1)[0];
+                noteItems.value.splice(newIndex, 0, item);
+                updateNoteSort(isLogin.value, noteItems.value)
             },
         });
     }
 });
-function noteAdd() {
-    const data = {
-        id: new Date().getTime(),
-        title: "新建笔记",
-        data: "",
-    };
-    store.notesList.unshift(data);
-    selectNote(data);
-    localStorage.setItem("notesList", JSON.stringify(store.notesList));
-}
-function selectNote(data) {
-    store.activeNotes = data.id;
-    localStorage.setItem("activeNotes", data.id);
-    noteDetails = data;
-    isShowNote.value = true;
-}
-onBeforeUnmount(() => {
-    localStorage.setItem("notesList", JSON.stringify(store.notesList));
-});
-// 保存优化 2秒内没输入自动保存
-let timer;
-function onInput() {
-    clearTimeout(timer);
-    timer = setTimeout(function () {
-        localStorage.setItem("notesList", JSON.stringify(store.notesList));
-    }, 2000);
-}
-// 删除
-let isDel = ref(false);
-function delNote(index) {
-    store.notesList.splice(index, 1);
-    localStorage.setItem("notesList", JSON.stringify(store.notesList));
-    if (store.notesList && store.activeNotes) {
-        noteDetails = store.notesList.find((it) => it.id == store.activeNotes);
-        if (!noteDetails && store.notesList.length) {
-            noteDetails = store.notesList[0];
-            store.activeNotesChange(noteDetails.id);
-        } else {
-            noteDetails = {};
-            store.activeNotesChange(null);
-        }
-    }
-}
-// 排序
-const notesListRef = ref(null);
-// 字体 放大缩小  加粗
+// 字体设置 放大缩小 加粗
 import { useFontStore } from "@/stores/fontStore";
 let fonstStore = useFontStore();
 const textStyle = computed(() => {
@@ -160,16 +139,6 @@ const fontBold = () => {
     if (fonstStore.fontBold === 'normal') fonstStore.fontBold = 'bold'
     else {
         fonstStore.fontBold = 'normal'
-    }
-}
-const fontLager = () => {
-    const index = fonstStore.size.indexOf(fonstStore.fontSize)
-    if (index !== -1) {
-        console.log(index)
-        if (index !== fonstStore.size.length - 1) { fonstStore.fontSize = fonstStore.size[index + 1] }
-        else {
-            fonstStore.fontSize = fonstStore.size[0]
-        }
     }
 }
 const editFontSize = (data) => {

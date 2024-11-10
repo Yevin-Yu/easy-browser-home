@@ -15,9 +15,6 @@
 import Sortable from "sortablejs";
 import { onMounted, watch, ref } from "vue";
 import { storeToRefs } from "pinia";
-// 引入Stores
-import { useMyStoreHook } from "@/stores/useStore";
-let store = useMyStoreHook();
 // 获取用户信息 是否登陆
 import { useUserStore } from '@/stores/useAuthStore'
 let { isLogin } = storeToRefs(useUserStore());

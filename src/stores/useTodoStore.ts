@@ -61,24 +61,6 @@ export const useTodoStore = defineStore("todo", () => {
         }
     };
 
-    // const addNavMenu = (isLogin: boolean, params: TodoItem) => {
-    //     if (isLogin) {
-    //         api.post("nav", params)
-    //             .then((res) => {
-    //                 if (res.code === 200) {
-    //                     ElMessage.success("添加成功");
-    //                     loadNavMenu(isLogin);
-    //                 }
-    //             })
-    //             .catch(() => {
-    //                 ElMessage.error("系统异常，请稍后再试");
-    //             });
-    //     } else {
-    //         todoItems.value.push(params);
-    //         localStorage.setItem("navMenu", JSON.stringify(todoItems.value));
-    //     }
-    // };
-
     const editTodo = (isLogin: boolean, params: TodoItem) => {
         if (isLogin) {
             api.post("todo/update", params)
