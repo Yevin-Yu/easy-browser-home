@@ -141,6 +141,9 @@ onMounted(() => {
 function onImageError(item) {
     item.iconPath = "https://yuwb.cn/nav/pwa.png";
 }
+function go(item) {
+    window.open(item.linkPath);
+}
 </script>
 <style lang="less" scoped>
 .main::-webkit-scrollbar,

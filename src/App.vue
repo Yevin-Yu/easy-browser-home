@@ -43,10 +43,16 @@ if (!localStorage.length || (!localStorage.newsMenu && !localStorage.notesList &
 </template>
 
 <style>
+html,
+body,
 #app {
-    position: absolute;
-    min-width: 100vw;
-    min-height: 100vh;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+#app {
+    overflow: hidden;
     background-color: var(--bgColor);
     background-repeat: no-repeat;
     background-position: center;
