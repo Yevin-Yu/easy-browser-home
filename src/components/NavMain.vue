@@ -13,8 +13,9 @@
 
 <script setup>
 import Sortable from "sortablejs";
-import { onMounted, watch, ref } from "vue";
+import { onMounted, watch, ref, inject } from "vue";
 import { storeToRefs } from "pinia";
+const isMobile = inject('isMobile');
 // 获取用户信息 是否登陆
 import { useUserStore } from '@/stores/useAuthStore'
 let { isLogin } = storeToRefs(useUserStore());
@@ -29,16 +30,18 @@ watch(isLogin, () => {
 // 监听NavMenu变化
 const navsList = ref(null);
 onMounted(() => {
-    Sortable.create(navsList.value, {
-        group: "shared",
-        animation: 150,
-        ghostClass: "ghost",
-        onEnd: ({ newIndex, oldIndex }) => {
-            const item = navItems.value.splice(oldIndex, 1)[0];
-            navItems.value.splice(newIndex, 0, item);
-            updateNavMenuSort(isLogin.value, navItems.value)
-        },
-    });
+    if (!isMobile) {
+        Sortable.create(navsList.value, {
+            group: "shared",
+            animation: 150,
+            ghostClass: "ghost",
+            onEnd: ({ newIndex, oldIndex }) => {
+                const item = navItems.value.splice(oldIndex, 1)[0];
+                navItems.value.splice(newIndex, 0, item);
+                updateNavMenuSort(isLogin.value, navItems.value)
+            },
+        });
+    }
 })
 // 点击跳转
 function go(item) {
