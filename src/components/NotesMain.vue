@@ -433,7 +433,8 @@ ul::-webkit-scrollbar-thumb {
         }
 
         .right {
-            height: calc(55vh - 36px);
+            height: calc(55vh - 80px);
+            margin-right: 16px;
 
             .title {
                 font-size: 22px;
