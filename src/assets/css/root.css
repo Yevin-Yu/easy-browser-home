@@ -1,7 +1,7 @@
 :root {
     /* main */
     --bgColor: #f3f4fb;
-    --shadow: -3px -3px 9px rgba(255, 255, 255, 0.4), 3px 4px 9px rgba(0, 0, 0, 0.2);
+    --shadow: -3px -3px 6px rgba(0, 0, 0, 0.1), 3px 4px 9px rgba(0, 0, 0, 0.2);
     --activeShadow: inset -3px -3px 9px rgba(255, 255, 255, 0.9), inset 3px 4px 9px rgba(0, 0, 0, 0.5);
     --bgColorDefaut: rgba(243, 244, 251, 0.5);
     --border: 1px solid transparent;
@@ -40,7 +40,7 @@
 :root.dark-theme {
     /* main */
     --bgColor: #000;
-    --shadow: -3px -3px 9px rgba(0, 0, 0, 0.5), 3px 4px 9px rgba(255, 255, 255, 0.5);
+    --shadow: -3px -3px 6px rgba(0, 0, 0, 0.1), 3px 4px 9px rgba(0, 0, 0, 0.2);
     --activeShadow: inset -3px -3px 9px rgba(255, 255, 255, 0.5), inset 3px 4px 9px rgba(0, 0, 0, 0.5);
     --bgColorDefaut: rgba(243, 244, 251, 0.3);
     --fontColor: rgba(255, 255, 255, 1);
@@ -72,5 +72,5 @@
     --notesBg: rgba(243, 244, 251, 0.1);
 
     /* Element */
-    --dialogBgColor: rgba(243, 244, 251, 0.2);
+    --dialogBgColor: rgba(243, 244, 251, 0.8);
 }

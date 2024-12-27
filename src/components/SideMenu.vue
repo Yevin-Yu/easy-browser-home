@@ -208,7 +208,7 @@
                 </svg>
             </li>
             <!-- 设置 -->
-            <li>
+            <li @click="changeMenu('/setting')">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
                     <g fill="none">
                         <path fill="url(#fluentColorWrench160)"
@@ -227,7 +227,12 @@
     </div>
 </template>
 <script setup>
+import { useRouter } from 'vue-router';
+const router = useRouter();
 
+function changeMenu(path) {
+    router.push(path);
+}
 </script>
 <style lang="less" scoped>
 .side-menu {

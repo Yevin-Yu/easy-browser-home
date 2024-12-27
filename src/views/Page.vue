@@ -7,6 +7,9 @@
   <SideMenu />
   <!-- 其他出口 -->
   <RouterView />
+  <button style="margin-left: 300px;" @click="toggleTheme">
+    切换主题
+  </button>
 </template>
 <script setup>
 import { RouterView } from "vue-router";

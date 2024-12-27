@@ -227,7 +227,7 @@ function onImageError(item) {
                 background-color: var(--bgColorDefaut);
                 overflow: hidden;
                 cursor: pointer;
-
+                box-shadow: var(--shadow);
                 // 
                 &:hover {
                     box-shadow: var(--activeShadow);
