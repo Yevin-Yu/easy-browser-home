@@ -4,50 +4,27 @@
         <input ref="searchRef" type="text" v-model="searchKey" @keyup.enter="onSearch" />
         <button @click="onSearch">搜索</button>
     </div>
+    <div class="nav-list">
+        <NavMain />
+    </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, inject } from "vue";
-// 获取是否是移动端
-const isMobile = inject<boolean>('isMobile');
-
-// 引入Stores
-import { useMyStoreHook } from "@/stores/useStore";
-let store = useMyStoreHook();
-
+import { ref, onMounted } from "vue";
+// 引入导航组件
+import NavMain from "@/components/NavMain.vue";
 // 搜索
 let searchKey = ref("");
 function onSearch() {
-    if (store.searchEngine === 1) window.open(`https://www.bing.com/search?q=${searchKey.value}`);
-    else if (store.searchEngine === 2) window.open(`https://www.google.com.hk/search?q=${searchKey.value}`);
-    else if (store.searchEngine === 3) window.open(`https://duckduckgo.com/?t=h_&q=${searchKey.value}&ia=web`);
-    else if (store.searchEngine === 4) window.open(`https://www.baidu.com/s?ie=UTF-8&wd=${searchKey.value}`);
-    searchKey.value = "";
+    window.open(`https://www.bing.com/search?q=${searchKey.value}`);
 }
-
-// 自动获取焦点
-const searchRef = ref<HTMLInputElement | null>(null);
-onMounted(() => {
-    // 默认引擎
-    const searchEngine = localStorage.getItem("searchEngine");
-    if (searchEngine) store.searchEngineChange(parseInt(searchEngine));
-    // 默认焦点
-    if (!isMobile) {
-        if (searchRef.value) searchRef.value.focus();
-        window.addEventListener("focus", function () {
-            console.log("页面获得焦点");
-            // 执行页面获得焦点时的操作
-            if (searchRef.value) searchRef.value.focus();
-        });
-    }
-});
 </script>
 
 <style lang="less" scoped>
 .search-main {
     position: relative;
     margin: 0 auto;
-    width: 50vw;
+    width: 50%;
     color: var(--searchFontColor);
 
     input[type="text"] {
@@ -56,7 +33,7 @@ onMounted(() => {
         height: 55px;
         outline: none;
         border: none;
-        width: 50vw;
+        width: 100%;
         border-radius: 55px;
         background: var(--searchInputBg);
         box-shadow: var(--searchShadow);
@@ -91,28 +68,23 @@ onMounted(() => {
     }
 }
 
-// 移动端
-.isMobile {
+.nav-list {
+    margin: 50px auto 0;
+    width: 60%;
+    height: calc(100% - 450px);
+    box-sizing: border-box;
+    overflow-y: auto;
+    border-radius: 12px;
+}
+
+// 媒体查询
+@media screen and (max-width: 768px) {
     .search-main {
-        width: 85vw;
+        width: 90%;
+    }
 
-        input[type="text"] {
-            width: 85vw;
-            height: 70px;
-            font-size: 22px;
-            padding-left: 72px;
-        }
-
-        .icon {
-            width: 30px;
-            height: 30px;
-            top: 21px;
-        }
-
-        button {
-            height: 68px;
-            font-size: 20px;
-        }
+    .nav-list {
+        width: 90%;
     }
 }
 </style>

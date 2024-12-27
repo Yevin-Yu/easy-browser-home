@@ -3,8 +3,8 @@
         <h3>{{ formattedTime }}</h3>
     </div>
 </template>
-  
-  <script setup>
+
+<script setup>
 import { ref, onMounted, onUnmounted } from "vue";
 
 const formattedTime = ref("");
@@ -25,11 +25,12 @@ onMounted(() => {
     });
 });
 </script>
-  
-  <style lang="less" scoped>
+
+<style lang="less" scoped>
 .top-time {
-    margin: 2.5vh 0 2.5vh 0;
+    margin: 80px 0 40px 0;
     text-align: center;
+
     h3 {
         display: inline-block;
         text-shadow: var(--timeShadow);
