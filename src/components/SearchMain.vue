@@ -22,8 +22,15 @@ function onSearch() {
 import { useRouter } from 'vue-router';
 const router = useRouter();
 const searchRef = ref<HTMLInputElement | null>(null);
+
+// 获取屏幕尺寸 低于500式 为移动端
+const isMobile = ref(false)
+const screenWidth = ref(document.documentElement.clientWidth)
+if (screenWidth.value < 500) {
+    isMobile.value = true
+}
 router.afterEach((to) => {
-    if (to.path === '/') searchRef.value?.focus();
+    if (!isMobile.value) if (to.path === '/') searchRef.value?.focus();
 });
 </script>
 
@@ -92,7 +99,7 @@ router.afterEach((to) => {
 
     .nav-list {
         width: 90%;
-        height: calc(100% - 400px); 
+        height: calc(100% - 400px);
     }
 }
 </style>

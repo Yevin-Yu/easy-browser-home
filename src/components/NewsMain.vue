@@ -19,8 +19,12 @@
 </template>
 
 <script setup>
-
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { reactive, nextTick, watchEffect } from "vue";
+import { storeToRefs } from 'pinia'
+//  快捷键 空格 快速回到主页 并focus 搜索框
+import { useRouter } from 'vue-router';
+const router = useRouter();
+import { ref, onMounted, onBeforeUnmount, effect } from 'vue';
 const isShow = ref(true)
 // 设置弹窗关闭
 function closeDialog() {
@@ -35,18 +39,14 @@ if (screenWidth.value < 500) {
     isMobile.value = true
 }
 // 获取新闻数据
-import { reactive, nextTick } from "vue";
+
 const colors = ["#ea444d", "#ed702d", "#eead3f"];
 
-const newsList = ref(
-    [
-        'weibo', 'baidu', 'zhihu', 'douyin', 'bilibili', 'tieba',
-        'juejin', '36kr', 'ithome', 'thepaper', 'toutiao', 'sspai',
-        '51cto', 'acfun', 'csdn', 'douban-group', 'douban-movie', 'hellogithub',
-        'hupu', 'huxiu', 'ifanr', 'jianshu', 'netease-news', 'ngabbs', 'nodeseek',
-        'qq-news', 'sina-news', 'weread'
-    ]
-)
+// 获取用户数据
+import { useUserStore } from '@/stores/useAuthStore'
+let { updateNewList } = useUserStore()
+let { newsList } = storeToRefs(useUserStore());
+
 // 新闻列表 可视区 懒加载   
 const observer = ref(null);
 const newsMain = ref(null)
@@ -80,13 +80,24 @@ const loadNewDataByKey = (key) => {
             data[key] = res;
         });
 }
+// 监听新闻列表变化
+watchEffect(() => {
+    if (newsList.value.length > 0) {
+        nextTick(() => {
+            if (observer.value) {
+                observer.value.disconnect();
+            }
+            createObserver();
+        })
+    }
+})
 onMounted(() => {
     // 等待 DOM 更新完成后再创建观察器
     nextTick(() => {
-        createObserver();
+        if (newsList.value.length > 0) createObserver();
     })
 });
-
+// 卸载观察器
 onBeforeUnmount(() => {
     if (observer.value) {
         observer.value.disconnect();
@@ -109,8 +120,8 @@ onMounted(() => {
             onEnd: ({ newIndex, oldIndex }) => {
                 const item = newsList.value.splice(oldIndex, 1)[0];
                 newsList.value.splice(newIndex, 0, item);
-                console.log(newsList.value)
                 // 同步新闻列表
+                updateNewList(newsList.value)
             },
         });
     })

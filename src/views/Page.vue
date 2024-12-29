@@ -9,6 +9,8 @@
   <RouterView />
 </template>
 <script setup>
+import { ref } from "vue";
+import { storeToRefs } from 'pinia'
 import { RouterView } from "vue-router";
 // 引入时间组件
 import TopTime from "@/components/TopTime.vue";
@@ -26,4 +28,10 @@ window.addEventListener("keydown", (e) => {
     router.push('/');
   }
 });
+
+// 用户信息
+// 获取用户信息
+import { useUserStore } from '@/stores/useAuthStore'
+let { updateIsLogin, updateUserInfo } = useUserStore()
+let { isLogin, userInfo } = storeToRefs(useUserStore());
 </script>
