@@ -114,7 +114,7 @@
                 </svg>
             </li>
             <!-- 笔记 -->
-            <li>
+            <li @click="changeMenu('/notes')">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <g fill="none">
                         <path fill="url(#fluentColorClipboardTextEdit240)"

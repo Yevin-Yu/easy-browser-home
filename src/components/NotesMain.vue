@@ -1,73 +1,149 @@
 <template>
-    <div class="notes-main-content">
-
+    <el-dialog :fullscreen="isMobile" :style="{ height: !isMobile ? 'calc(100% - 100px)' : '' }" v-model="isShow"
+        :close-on-click-modal="false" :modal="false" top="50px" title="笔记" width="calc(100% - 160px)"
+        :before-close="closeDialog">
         <div class="notes-main">
-            <div class="left" v-show="!isMobile || (isMobile && !isShowNote)">
+            <div class="left">
                 <div class="title">
-                    <span class="edit" @click="isDel = !isDel">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
-                            <path fill="currentColor"
-                                d="m199.04 672.64 193.984 112 224-387.968-193.92-112-224 388.032zm-23.872 60.16 32.896 148.288 144.896-45.696zM455.04 229.248l193.92 112 56.704-98.112-193.984-112-56.64 98.112zM104.32 708.8l384-665.024 304.768 175.936L409.152 884.8h.064l-248.448 78.336zm384 254.272v-64h448v64h-448z">
-                            </path>
+                    <span class="title-text">笔记列表</span>
+                    <span class="edit">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+                            <g fill="none">
+                                <path fill="url(#fluentColorDocumentFolder160)"
+                                    d="M5 5.5A1.5 1.5 0 0 1 6.5 4h5A1.5 1.5 0 0 1 13 5.5v5a1.5 1.5 0 0 1-1.5 1.5h-5A1.5 1.5 0 0 1 5 10.5z" />
+                                <path fill="url(#fluentColorDocumentFolder161)"
+                                    d="M5 5.5A1.5 1.5 0 0 1 6.5 4h5A1.5 1.5 0 0 1 13 5.5v5a1.5 1.5 0 0 1-1.5 1.5h-5A1.5 1.5 0 0 1 5 10.5z" />
+                                <path fill="url(#fluentColorDocumentFolder163)"
+                                    d="M3 3.5A1.5 1.5 0 0 1 4.5 2h5A1.5 1.5 0 0 1 11 3.5v7A1.5 1.5 0 0 1 9.5 12h-5A1.5 1.5 0 0 1 3 10.5z" />
+                                <path fill="url(#fluentColorDocumentFolder162)"
+                                    d="M3.5 5A1.5 1.5 0 0 0 2 6.5V12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-.5a1.5 1.5 0 0 0-1.5-1.5h-1.586a.5.5 0 0 1-.353-.146L6.146 5.439A1.5 1.5 0 0 0 5.086 5z" />
+                                <defs>
+                                    <linearGradient id="fluentColorDocumentFolder160" x1="14.2" x2="15.247" y1="13.539"
+                                        y2="5.069" gradientUnits="userSpaceOnUse">
+                                        <stop stop-color="#bb45ea" />
+                                        <stop offset="1" stop-color="#9c6cfe" />
+                                    </linearGradient>
+                                    <linearGradient id="fluentColorDocumentFolder161" x1="13" x2="11" y1="6.769"
+                                        y2="6.769" gradientUnits="userSpaceOnUse">
+                                        <stop offset=".338" stop-color="#5750e2" stop-opacity="0" />
+                                        <stop offset="1" stop-color="#5750e2" />
+                                    </linearGradient>
+                                    <linearGradient id="fluentColorDocumentFolder162" x1="4.571" x2="4.571" y1="5"
+                                        y2="17.273" gradientUnits="userSpaceOnUse">
+                                        <stop offset=".241" stop-color="#ffd638" />
+                                        <stop offset=".637" stop-color="#fab500" />
+                                        <stop offset=".985" stop-color="#ca6407" />
+                                    </linearGradient>
+                                    <radialGradient id="fluentColorDocumentFolder163" cx="0" cy="0" r="1"
+                                        gradientTransform="matrix(5.2 -7.66667 11.90405 8.07405 5.4 10)"
+                                        gradientUnits="userSpaceOnUse">
+                                        <stop offset=".228" stop-color="#2764e7" />
+                                        <stop offset=".685" stop-color="#5cd1ff" />
+                                        <stop offset="1" stop-color="#6ce0ff" />
+                                    </radialGradient>
+                                </defs>
+                            </g>
                         </svg>
                     </span>
-                    笔记列表
-                    <span @click="noteAdd" class="add">+</span>
+                    <span class="delete" @click="isDel = !isDel">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+                            <g fill="none">
+                                <path fill="url(#fluentColorDismissCircle160)" d="M8 2a6 6 0 1 1 0 12A6 6 0 0 1 8 2" />
+                                <path fill="url(#fluentColorDismissCircle161)"
+                                    d="M5.896 5.896a.5.5 0 0 1 .638-.057l.07.057L8 7.293l1.396-1.397a.5.5 0 0 1 .638-.057l.07.057a.5.5 0 0 1 .057.638l-.057.07L8.707 8l1.397 1.396a.5.5 0 0 1 .057.638l-.057.07a.5.5 0 0 1-.638.057l-.07-.057L8 8.707l-1.396 1.397a.5.5 0 0 1-.638.057l-.07-.057a.5.5 0 0 1-.057-.638l.057-.07L7.293 8L5.896 6.604a.5.5 0 0 1-.057-.638z" />
+                                <defs>
+                                    <linearGradient id="fluentColorDismissCircle160" x1="3.875" x2="13" y1="2.75"
+                                        y2="16" gradientUnits="userSpaceOnUse">
+                                        <stop stop-color="#f83f54" />
+                                        <stop offset="1" stop-color="#ca2134" />
+                                    </linearGradient>
+                                    <linearGradient id="fluentColorDismissCircle161" x1="6.011" x2="8.354" y1="8.199"
+                                        y2="10.635" gradientUnits="userSpaceOnUse">
+                                        <stop stop-color="#fdfdfd" />
+                                        <stop offset="1" stop-color="#fecbe6" />
+                                    </linearGradient>
+                                </defs>
+                            </g>
+                        </svg>
+                    </span>
+                    <span @click="noteAdd" class="add">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+                            <g fill="none">
+                                <path fill="url(#fluentColorAddCircle160)" d="M2 8a6 6 0 1 1 12 0A6 6 0 0 1 2 8" />
+                                <path fill="url(#fluentColorAddCircle161)"
+                                    d="M8 5a.5.5 0 0 0-.5.5v2h-2a.5.5 0 0 0 0 1h2v2a.5.5 0 0 0 1 0v-2h2a.5.5 0 0 0 0-1h-2v-2A.5.5 0 0 0 8 5" />
+                                <defs>
+                                    <linearGradient id="fluentColorAddCircle160" x1="2.429" x2="10.71" y1="4.25"
+                                        y2="12.854" gradientUnits="userSpaceOnUse">
+                                        <stop stop-color="#52d17c" />
+                                        <stop offset="1" stop-color="#22918b" />
+                                    </linearGradient>
+                                    <linearGradient id="fluentColorAddCircle161" x1="6.125" x2="7.966" y1="5.612"
+                                        y2="12.111" gradientUnits="userSpaceOnUse">
+                                        <stop stop-color="#fff" />
+                                        <stop offset="1" stop-color="#e3ffd9" />
+                                    </linearGradient>
+                                </defs>
+                            </g>
+                        </svg>
+                    </span>
                 </div>
                 <ul ref="notesListRef">
                     <li @click="selectNote(item)" v-for="(item, index) in noteItems"
                         :class="{ 'active': item.id == activeNotes }" :key="item">
                         <span>{{ item.title }}</span>
                         <span v-if="isDel" @click.stop="delNoteClick(item, index)" class="del-btn">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
-                                <path fill="currentColor"
-                                    d="M764.288 214.592 512 466.88 259.712 214.592a31.936 31.936 0 0 0-45.12 45.12L466.752 512 214.528 764.224a31.936 31.936 0 1 0 45.12 45.184L512 557.184l252.288 252.288a31.936 31.936 0 0 0 45.12-45.12L557.12 512.064l252.288-252.352a31.936 31.936 0 1 0-45.12-45.184z">
-                                </path>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+                                <g fill="none">
+                                    <path fill="url(#fluentColorDismissCircle160)"
+                                        d="M8 2a6 6 0 1 1 0 12A6 6 0 0 1 8 2" />
+                                    <path fill="url(#fluentColorDismissCircle161)"
+                                        d="M5.896 5.896a.5.5 0 0 1 .638-.057l.07.057L8 7.293l1.396-1.397a.5.5 0 0 1 .638-.057l.07.057a.5.5 0 0 1 .057.638l-.057.07L8.707 8l1.397 1.396a.5.5 0 0 1 .057.638l-.057.07a.5.5 0 0 1-.638.057l-.07-.057L8 8.707l-1.396 1.397a.5.5 0 0 1-.638.057l-.07-.057a.5.5 0 0 1-.057-.638l.057-.07L7.293 8L5.896 6.604a.5.5 0 0 1-.057-.638z" />
+                                    <defs>
+                                        <linearGradient id="fluentColorDismissCircle160" x1="3.875" x2="13" y1="2.75"
+                                            y2="16" gradientUnits="userSpaceOnUse">
+                                            <stop stop-color="#f83f54" />
+                                            <stop offset="1" stop-color="#ca2134" />
+                                        </linearGradient>
+                                        <linearGradient id="fluentColorDismissCircle161" x1="6.011" x2="8.354"
+                                            y1="8.199" y2="10.635" gradientUnits="userSpaceOnUse">
+                                            <stop stop-color="#fdfdfd" />
+                                            <stop offset="1" stop-color="#fecbe6" />
+                                        </linearGradient>
+                                    </defs>
+                                </g>
                             </svg>
                         </span>
                     </li>
                 </ul>
             </div>
-            <div class="right" v-if="activeNotes || isShowNote">
-                <div class="tools">
-                    <svg @click="fontBold" t="1722237098445" fill="#6CB9B4" class="icon" viewBox="0 0 1024 1024"
-                        version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4638" width="20" height="32">
-                        <path
-                            d="M768.96 575.072c-22.144-34.112-54.816-56.8-97.984-68.032v-2.176c22.88-10.88 42.112-23.04 57.696-36.48 15.616-12.704 27.584-26.144 35.936-40.288 16.32-29.76 24.128-60.96 23.392-93.632 0-63.872-19.776-115.232-59.328-154.08-39.2-38.464-97.824-58.048-175.84-58.784H215.232v793.728H579.52c62.432 0 114.496-20.864 156.256-62.624 42.112-39.936 63.52-94.176 64.224-162.752 0-41.376-10.336-79.68-31.04-114.88zM344.32 228.832h194.912c43.904 0.736 76.224 11.424 96.896 32.128 21.056 22.144 31.584 49.184 31.584 81.12s-10.528 58.432-31.584 79.488c-20.672 22.848-52.992 34.304-96.896 34.304H344.32V228.832z m304.352 536.256c-20.672 23.584-53.344 35.744-97.984 36.48H344.32v-238.432h206.336c44.64 0.704 77.312 12.512 97.984 35.392 20.672 23.232 31.04 51.168 31.04 83.84 0 31.904-10.336 59.488-31.008 82.72z"
-                            p-id="4639"></path>
-                    </svg>
-                    <svg t="1722237109755" fill="#6CB9B4" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                        xmlns="http://www.w3.org/2000/svg" p-id="4800" width="20" height="32">
-                        <path
-                            d="M792.864 922.112l103.584-2.176L572.576 110.24h-89.184L161.696 919.936H264l66.944-167.936h394.112l67.808 170.112zM369.216 656L528 257.632 686.784 656h-317.568z"
-                            p-id="4801"></path>
-                    </svg>
-                    <div class="font-size-list">
-                        <ul>
-                            <li @click="editFontSize(item)" v-for="item in fonstStore.size" :key="item">{{ item }}</li>
-                        </ul>
-                    </div>
-                </div>
+            <div class="right">
                 <input @input="onInput" maxlength="30" @blur="editNote(isLogin, noteDetails)"
                     v-model="noteDetails.title" class="title" type="text" placeholder="标题" /><br />
                 <textarea :style="textStyle" @input="onInput" @blur="editNote(isLogin, noteDetails)"
                     v-model="noteDetails.data" class="content" placeholder="笔记"></textarea>
-                <div class="back-btn" @click="isShowNote = false" v-if="isMobile && isShowNote">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 1024 1024">
-                        <path fill="currentColor"
-                            d="M118.656 438.656a32 32 0 0 1 0-45.248L416 96l4.48-3.776A32 32 0 0 1 461.248 96l3.712 4.48a32.064 32.064 0 0 1-3.712 40.832L218.56 384H928a32 32 0 1 1 0 64H141.248a32 32 0 0 1-22.592-9.344zM64 608a32 32 0 0 1 32-32h786.752a32 32 0 0 1 22.656 54.592L608 928l-4.48 3.776a32.064 32.064 0 0 1-40.832-49.024L805.632 640H96a32 32 0 0 1-32-32">
-                        </path>
-                    </svg>
-                </div>
             </div>
         </div>
-    </div>
+    </el-dialog>
 </template>
 
 <script setup>
 import Sortable from "sortablejs";
 import { watch, onMounted, onBeforeUnmount, reactive, ref, computed, inject } from "vue";
 import { storeToRefs } from "pinia";
+
+
+import { useRouter } from 'vue-router';
+const router = useRouter();
+
+const isShow = ref(true)
+// 设置弹窗关闭
+function closeDialog() {
+    isShow.value = false
+    // 跳转到首页
+    router.push('/');
+}
+
 const isMobile = inject('isMobile');
 const isShowNote = ref(false);
 // 获取用户信息 是否登陆
@@ -110,22 +186,22 @@ function delNoteClick(params, index) {
     delNote(isLogin.value, params, index);
 }
 // 排序
-const notesListRef = ref(null);
-onMounted(() => {
-    // 排序
-    if (!isMobile) {
-        const notesSortable = Sortable.create(notesListRef.value, {
-            group: "shared",
-            animation: 150,
-            ghostClass: "ghost",
-            onEnd: ({ newIndex, oldIndex }) => {
-                const item = noteItems.value.splice(oldIndex, 1)[0];
-                noteItems.value.splice(newIndex, 0, item);
-                updateNoteSort(isLogin.value, noteItems.value)
-            },
-        });
-    }
-});
+// const notesListRef = ref(null);
+// onMounted(() => {
+//     // 排序
+//     if (!isMobile) {
+//         const notesSortable = Sortable.create(notesListRef.value, {
+//             group: "shared",
+//             animation: 150,
+//             ghostClass: "ghost",
+//             onEnd: ({ newIndex, oldIndex }) => {
+//                 const item = noteItems.value.splice(oldIndex, 1)[0];
+//                 noteItems.value.splice(newIndex, 0, item);
+//                 updateNoteSort(isLogin.value, noteItems.value)
+//             },
+//         });
+//     }
+// });
 // 字体设置 放大缩小 加粗
 import { useFontStore } from "@/stores/fontStore";
 let fonstStore = useFontStore();
@@ -169,91 +245,62 @@ ul::-webkit-scrollbar-thumb {
 }
 
 .notes-main {
-    width: 75vw;
-    height: 55vh;
-    margin: 7.5vh auto;
+    width: 100%;
+    height: 100%;
     overflow: auto;
     display: flex;
     flex-wrap: wrap;
-    margin-bottom: 20px;
-    border-radius: 15px;
-    background: var(--bgColorDefaut);
-    box-shadow: var(--shadow);
-    border: var(--border);
     color: var(--fontColor);
-    padding: 16px;
     overflow: hidden;
 
     .title {
+        margin: 0 12px 0 6px;
         padding: 0 56px 0;
         position: relative;
-        line-height: 32px;
+        line-height: 36px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+  
+        .title-text {
+            font-weight: bold;
+        }
 
-        .add {
+        .add,
+        .delete,
+        .edit {
             display: block;
             position: absolute;
             right: 6px;
             cursor: pointer;
-            top: -1px;
-            width: 32px;
-            height: 32px;
+            top: 4px;
+            width: 24px;
+            height: 24px;
             font-size: 24px;
         }
-    }
 
-    .edit {
-        cursor: pointer;
-        display: block;
-        position: absolute;
-        left: 6px;
-        top: 0;
-        border-radius: 50%;
-        width: 32px;
-        height: 32px;
-        background: var(--notesBg);
-        box-shadow: var(--notesShadowActive);
-        text-align: center;
-
-        svg {
-            width: 16px;
-            height: 16px;
-            position: relative;
+        .edit {
+            left: 4px;
+            width: 32px;
+            height: 32px;
             top: 2px;
+
+        }
+
+        .delete {
+            right: 32px;
         }
     }
 
-    .del-btn {
-        cursor: pointer;
-        display: block;
-        position: absolute;
-        right: 8px;
-        top: 16px;
-        border-radius: 50%;
-        width: 24px;
-        height: 24px;
-        background: var(--notesBg);
-        box-shadow: var(--shadow);
-        text-align: center;
 
-        svg {
-            width: 16px;
-            height: 16px;
-            position: relative;
-            top: -13px;
-        }
-    }
 
-    .del-btn:hover,
-    .del-btn:active {
-        box-shadow: var(--notesShadowActive);
-    }
+
 
     .left {
-        width: 320px;
+        width: 300px;
         border-radius: 6px;
         margin-right: 12px;
         overflow: hidden;
-        height: calc(55vh - 32px);
+        height: 100%;
 
         ul {
             padding-left: 0;
@@ -266,15 +313,15 @@ ul::-webkit-scrollbar-thumb {
                 cursor: pointer;
                 position: relative;
                 width: 285px;
-                height: 56px;
-                line-height: 56px;
-                border-radius: 12px;
+                height: 42px;
+                line-height: 42px;
+                border-radius: 6px;
                 padding: 0 12px;
                 background: var(--notesBg);
                 box-shadow: var(--notesShadow);
                 border: var(--border);
                 color: var(--fontColor);
-                margin: 16px 5px;
+                margin: 12px 5px;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
@@ -289,6 +336,17 @@ ul::-webkit-scrollbar-thumb {
             li:active {
                 box-shadow: var(--notesShadowActive);
             }
+        }
+
+        .del-btn {
+            cursor: pointer;
+            display: block;
+            position: absolute;
+            right: 8px;
+            top: 8px;
+            width: 24px;
+            height: 24px;
+            text-align: center;
         }
     }
 
@@ -389,61 +447,6 @@ ul::-webkit-scrollbar-thumb {
 
             .font-size-list:hover {
                 display: block;
-            }
-        }
-    }
-}
-
-.isMobile {
-    .notes-main-content {
-        width: 90vw;
-        height: 55vh;
-        margin: 5vh auto;
-        padding: 24px;
-    }
-
-    .notes-main {
-        width: 100%;
-        margin: 0 auto;
-        display: block;
-        padding-right: 0;
-        height: 100%;
-
-        .left {
-            width: 100%;
-            margin-right: 0;
-
-            .title {
-                font-size: 22px;
-
-                .add {
-                    font-size: 38px;
-                }
-            }
-
-            ul {
-                width: 100%;
-                padding: 0 6px;
-                font-size: 20px;
-
-                li {
-                    width: calc(100% - 24px);
-                }
-            }
-        }
-
-        .right {
-            height: calc(55vh - 80px);
-            margin-right: 16px;
-
-            .title {
-                font-size: 22px;
-            }
-
-            .back-btn {
-                position: absolute;
-                right: 24px;
-                top: 14px;
             }
         }
     }
