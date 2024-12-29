@@ -6,6 +6,7 @@
     --bgColorDefaut: rgba(243, 244, 251, 0.5);
     --border: 1px solid transparent;
     --fontColor: #333;
+    --fontColorLabel: #666;
     --fontColorDefaut: #fff;
 
     /* SideMenu */
@@ -35,6 +36,15 @@
 
     /* Element */
     --dialogBgColor: rgba(243, 244, 251, 0.8);
+
+    /* button */
+    --btnColor: #fff;
+    --btnBg: #666;
+    --btnShadow: -2px -2px 2px rgba(0, 0, 0, 0.1), 5px 5px 3px rgba(0, 0, 0, 0.2);
+    --btnShadowActive: inset -4px -4px 4px rgba(255, 255, 255, 0.4), inset 4px 4px 4px rgba(0, 0, 0, 0.4);
+
+    /* news */
+    --newsShadow:  3px 3px 12px #aaaaaa69;
 }
 
 :root.dark-theme {
@@ -43,7 +53,8 @@
     --shadow: -3px -3px 6px rgba(0, 0, 0, 0.1), 3px 4px 9px rgba(0, 0, 0, 0.2);
     --activeShadow: inset -3px -3px 9px rgba(255, 255, 255, 0.5), inset 3px 4px 9px rgba(0, 0, 0, 0.5);
     --bgColorDefaut: rgba(243, 244, 251, 0.3);
-    --fontColor: rgba(255, 255, 255, 1);
+    --fontColor: #333;
+    --fontColorLabel: #666;
     --fontColorDefaut: #fff;
 
     /* SideMenu */
@@ -73,4 +84,13 @@
 
     /* Element */
     --dialogBgColor: rgba(243, 244, 251, 0.8);
+
+    /* button */
+    --btnColor: #fff;
+    --btnBg: #666;
+    --btnShadow: -2px -2px 2px rgba(0, 0, 0, 0.1), 5px 5px 3px rgba(0, 0, 0, 0.2);
+    --btnShadowActive: inset -4px -4px 4px rgba(255, 255, 255, 0.4), inset 4px 4px 4px rgba(0, 0, 0, 0.4);
+
+    /* news */
+    --newsShadow:  3px 3px 12px #aaaaaa69;
 }

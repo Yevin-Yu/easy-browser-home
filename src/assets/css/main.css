@@ -9,10 +9,14 @@
     color: var(--fontColor);
     border-radius: 8px;
     backdrop-filter: blur(5px);
+
+    .el-dialog__body {
+        height: calc(100% - 40px);
+    }
 }
 
 .el-dialog .el-dialog__title {
-    color: var(--fontColor);   
+    color: var(--fontColor);
 }
 
 .el-dialog .el-dialog__title .el-dialog__headerbtn {
@@ -48,16 +52,7 @@
 /* 按钮加载 */
 #app .is-loading-btn,
 #app button.is-loading-btn {
-    border: 2px solid transparent;
-    border-width: 2px !important;
-    animation: border-loading 2s linear infinite;
-    box-sizing: border-box;
     cursor: not-allowed;
-    line-height: 36px;
-}
-
-#app .is-loading-btn .el-icon.is-loading {
-    top: 2px;
 }
 
 @keyframes border-loading {
@@ -72,4 +67,27 @@
     100% {
         border-color: rgba(255, 255, 255, 0.25);
     }
+}
+
+/* 按钮全局 */
+.button-default {
+    font-size: 12px;
+    text-align: center;
+    display: inline-block;
+    margin: 12px;
+    cursor: pointer;
+    padding: 4px 20px;
+    box-sizing: border-box;
+    line-height: 24px;
+    border-radius: 6px;
+    box-shadow: var(--btnShadow);
+    border: var(--border);
+    color: var(--btnColor);
+    background-color: var(--btnBg)
+}
+
+.button-default.active,
+.button-default:hover,
+.button-default:active {
+    box-shadow: var(--btnShadowActive);
 }

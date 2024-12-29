@@ -2,7 +2,7 @@
     <div class="side-menu">
         <ul>
             <!-- 首页 -->
-            <li>
+            <li @click="changeMenu('/')">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
                     <g fill="none">
                         <path fill="url(#fluentColorHome160)" d="M6 9h4v5H6z" />
@@ -32,7 +32,7 @@
                 </svg>
             </li>
             <!-- 新闻 -->
-            <li>
+            <li @click="changeMenu('/news')">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
                     <g fill="none">
                         <path fill="url(#fluentColorNews166)"
@@ -244,7 +244,7 @@ function changeMenu(path) {
     border-radius: 12px;
     box-shadow: var(--shadow);
     width: 60px;
-
+    z-index: 99999;
     ul {
         list-style: none;
         padding: 0;

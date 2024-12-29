@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 // 引入导航组件
 import NavMain from "@/components/NavMain.vue";
 // 搜索
@@ -18,6 +18,13 @@ let searchKey = ref("");
 function onSearch() {
     window.open(`https://www.bing.com/search?q=${searchKey.value}`);
 }
+//  快捷键 空格 快速回到主页 并focus 搜索框
+import { useRouter } from 'vue-router';
+const router = useRouter();
+const searchRef = ref<HTMLInputElement | null>(null);
+router.afterEach((to) => {
+    if (to.path === '/') searchRef.value?.focus();
+});
 </script>
 
 <style lang="less" scoped>
@@ -85,6 +92,7 @@ function onSearch() {
 
     .nav-list {
         width: 90%;
+        height: calc(100% - 400px); 
     }
 }
 </style>
