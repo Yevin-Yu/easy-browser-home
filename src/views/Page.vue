@@ -22,14 +22,16 @@ import SideMenu from "@/components/SideMenu.vue";
 //  快捷键 空格 快速回到主页 并focus 搜索框
 import { useRouter } from 'vue-router';
 const router = useRouter();
-// 监听 空格按键 事件 回到主页
+// 监听  ctrl + 空格按键 事件 回到主页
 window.addEventListener("keydown", (e) => {
-  if (e.code === "Space") {
+  if (e.code === "Space" && e.ctrlKey) {
     router.push('/');
   }
 });
+// 引入主题切换 主题切换不保存云端
+import { useTheme } from "@/hook/useTheme";
+const { toggleTheme, currentTheme } = useTheme();
 
-// 用户信息
 // 获取用户信息
 import { useUserStore } from '@/stores/useAuthStore'
 let { updateIsLogin, updateUserInfo } = useUserStore()

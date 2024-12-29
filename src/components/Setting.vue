@@ -26,18 +26,40 @@
                 </div>
                 <button class="button-default" @click="toggleTheme">切换主题</button>
             </div>
+            <h3>【导航链接】</h3>
+            <div class="item">
+                <div class="nav-main">
+                    <ul ref="navsList">
+                        <li v-for="(item, index) in navItems" @click="openEditNav(item, index)" :key="item.name">
+                            <div>
+                                <img :src="item.iconPath" alt="icon" @error="onImageError(item)" />
+                            </div>
+                            <span class="nav-item-name">{{ item.name }}</span>
+                        </li>
+                        <li @click="openAddNav">
+                            <div>
+                                <img src="@/assets/icon/add.svg" alt="icon" />
+                            </div>
+                            <span>添加</span>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
             <h3>【提示帮助】</h3>
             <div class="item">
                 <div class="text">
                     <p>新闻模块：点击新闻标题可以跳转原网站内查看更多信息。</p>
                     <p>新闻模块：可以通过拖拽 Card 进行排序，把自己需要的新闻信息放到最前排。</p>
+                    <p></p>
+                    <p>导航模块：在导航链接设置中，点击导航图标可以修改或者删除单个导航，长按可以拖动图标排序。</p>
+                    <p>导航模块：请注意，图标链接加载失败或为空，会使用默认图标</p>
                 </div>
             </div>
         </div>
     </el-dialog>
     <!-- 注册弹窗 -->
-    <!-- 注册 -->
-    <el-dialog v-model="isShowRegister" :show-close="false" title="注册" width="500">
+    <el-dialog v-model="isShowRegister" :show-close="false" title="注册" :width="isMobile ? 375 : 500">
         <div>
             <div class="form-content">
                 <div class="form-item">
@@ -70,7 +92,7 @@
         </div>
     </el-dialog>
     <!-- 登录弹窗 -->
-    <el-dialog v-model="isShowLogin" :show-close="false" title="登录" width="500">
+    <el-dialog v-model="isShowLogin" :show-close="false" title="登录" :width="isMobile ? 375 : 500">
         <div class="form-content">
             <div class="form-item">
                 <h3>邮箱</h3>
@@ -88,7 +110,7 @@
         </div>
     </el-dialog>
     <!-- 修改密码 -->
-    <el-dialog v-model="isShowChangePassword" :show-close="false" title="修改密码" width="500">
+    <el-dialog v-model="isShowChangePassword" :show-close="false" title="修改密码" :width="isMobile ? 375 : 500">
         <div>
             <div class="form-content">
                 <div class="form-item">
@@ -111,6 +133,23 @@
             </div>
         </div>
     </el-dialog>
+    <!-- 添加导航 -->
+    <el-dialog v-model="isShowAddNav" :show-close="false" :title="navParams.id ? '添加导航' : '修改导航'" width="500">
+        <div class="form-content">
+            <h3>导航名称</h3>
+            <input type="text" v-model="navParams.name" />
+            <h3>图标链接</h3>
+            <input type="text" v-model="navParams.iconPath" />
+            <h3>网站链接</h3>
+            <input type="text" v-model="navParams.linkPath" />
+        </div>
+        <div class="dialog-footer">
+            <button class="button-default" v-if="isEditNav" @click="delNav" type="primary">删除</button>
+            <button class="button-default" v-else @click="isShowAddNav = false">取消</button>
+            <button class="button-default" v-if="isEditNav" type="primary" @click="submitEditNav">修改</button>
+            <button class="button-default" v-else type="primary" @click="addNav">添加</button>
+        </div>
+    </el-dialog>
 </template>
 
 <script setup>
@@ -119,14 +158,11 @@ import api from '@/api/api'; // 导入封装的 API
 // 时间格式化
 import { formatDate } from '@/hook/useFormatDate'
 import { storeToRefs } from 'pinia'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch, reactive, watchEffect, nextTick } from 'vue'
 import { useRouter } from 'vue-router';
 const router = useRouter();
 
-const isShow = ref(false)
-onMounted(() => {
-    isShow.value = true
-})
+const isShow = ref(true)
 // 设置弹窗关闭
 function closeDialog() {
     isShow.value = false
@@ -207,7 +243,7 @@ function subRegister() {
     })
 }
 
-// 弹窗登陆以及信息相关
+// 弹窗登陆
 let isShowLogin = ref(false);
 let loginParams = ref({ email: '', password: '' })
 function openUserLogin() {
@@ -292,6 +328,101 @@ function changePassword() {
         isChangeLoading.value = false
     })
 }
+
+// 引入NavMenu
+import { useNavStore } from "@/stores/useNavStore"
+let { loadNavMenu, addNavMenu, editNavMenu, delNavMenu, updateNavMenuSort } = useNavStore();
+let { navItems } = storeToRefs(useNavStore());
+// 加载NavMenu
+watch(isLogin, () => {
+    loadNavMenu(isLogin.value)
+})
+// 添加导航
+let isShowAddNav = ref(false);
+let isEditNav = ref(false);
+let editIndex = ref(0);
+const navParams = reactive({ id: "", name: "", iconPath: "", linkPath: "" });
+function openAddNav() {
+    isEditNav.value = false;
+    isShowAddNav.value = true;
+    navParams.id = "";
+    navParams.name = "";
+    navParams.iconPath = "";
+    navParams.linkPath = "";
+}
+async function addNav() {
+    if (navParams.name && navParams.linkPath) {
+        await addNavMenu(isLogin.value, navParams)
+        isShowAddNav.value = false;
+        // 清空表单
+        navParams.id = "";
+        navParams.name = "";
+        navParams.iconPath = "";
+        navParams.linkPath = "";
+    } else {
+        ElMessage({
+            message: "请输入导航名称和网站链接",
+            type: "warning",
+        });
+    }
+}
+// 修改导航
+function openEditNav(item, index) {
+    isEditNav.value = true;
+    editIndex.value = index;
+    navParams.id = item.id;
+    navParams.name = item.name;
+    navParams.iconPath = item.iconPath;
+    navParams.linkPath = item.linkPath;
+    isShowAddNav.value = true;
+}
+async function submitEditNav() {
+    if (navParams.name && navParams.linkPath) {
+        await editNavMenu(isLogin.value, navParams)
+        isShowAddNav.value = false;
+        // 清空表单
+        navParams.id = "";
+        navParams.name = "";
+        navParams.iconPath = "";
+        navParams.linkPath = "";
+    } else {
+        ElMessage({
+            message: "请输入导航名称和网站链接",
+            type: "warning",
+        });
+    }
+}
+// 删除导航
+async function delNav() {
+    console.log(navParams, editIndex.value)
+    await delNavMenu(isLogin.value, navParams, editIndex.value)
+    isShowAddNav.value = false;
+    // 清空表单
+    editIndex.value = 0;
+    navParams.id = "";
+    navParams.name = "";
+    navParams.iconPath = "";
+    navParams.linkPath = "";
+}
+// 导航排序
+const navsList = ref(null);
+import Sortable from "sortablejs";
+watchEffect(() => {
+    if (navsList.value) {
+        nextTick(() => {
+            Sortable.create(navsList.value, {
+                group: "shared",
+                animation: 150,
+                ghostClass: "ghost",
+                onEnd: ({ newIndex, oldIndex }) => {
+                    const item = navItems.value.splice(oldIndex, 1)[0];
+                    navItems.value.splice(newIndex, 0, item);
+                    updateNavMenuSort(isLogin.value, navItems.value)
+                },
+            });
+        })
+    }
+})
 </script>
 
 <style lang="less" scoped>
@@ -299,7 +430,10 @@ function changePassword() {
 
     .setting-content {
         padding: 12px;
+        padding-bottom: 36px;
         text-align: left;
+        overflow: auto;
+        height: 100%;
 
         .item {
             padding: 12px 24px;
@@ -311,6 +445,58 @@ function changePassword() {
             .user-info {
                 span {
                     padding-right: 24px;
+                }
+            }
+        }
+
+        .nav-main {
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            text-align: center;
+
+            ul {
+                list-style: none;
+                display: flex;
+                flex-wrap: wrap;
+                padding-left: 0;
+                justify-content: center;
+
+                li {
+                    display: inline-block;
+                    margin: 12px 18px;
+                    text-align: center;
+                    width: 60px;
+
+                    img {
+                        display: block;
+                        padding: 18px;
+                        background-color: #fff;
+                        width: 60px;
+                        height: 60px;
+                        border-radius: 15px;
+                        background-color: var(--bgColorDefaut);
+                        overflow: hidden;
+                        cursor: pointer;
+                        box-shadow: var(--shadow);
+
+                        // 
+                        &:hover {
+                            box-shadow: var(--activeShadow);
+                        }
+                    }
+
+                    .nav-item-name {
+                        display: block;
+                        width: 60px;
+                        padding-top: 12px;
+                        font-size: 12px;
+                        overflow: hidden;
+                        white-space: nowrap;
+                        text-overflow: ellipsis;
+                        color: var(--fontColor);
+                        line-height: 12px;
+                    }
                 }
             }
         }
@@ -334,6 +520,7 @@ function changePassword() {
         width: 300px;
         border-radius: 16px;
         padding: 0 24px;
+        font-size: 14px;
     }
 
 }

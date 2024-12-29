@@ -3,8 +3,7 @@ import { ref, onMounted, watch } from "vue";
 type Theme = "light" | "dark";
 
 export function useTheme() {
-    const currentTheme = ref<Theme>("light");
-
+    const currentTheme = ref<Theme>(localStorage.getItem("theme") as Theme || "light");
     const setTheme = (theme: Theme) => {
         const rootElement = document.documentElement;
         if (theme === "dark") {
