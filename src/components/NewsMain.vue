@@ -112,7 +112,7 @@ import Sortable from "sortablejs";
 onMounted(() => {
     nextTick(() => {
         // 移动端不排序
-        if (isMobile.value) return
+        if (isMobile.value && !newsMain.value) return
         Sortable.create(newsMain.value, {
             group: "shared",
             animation: 150,
@@ -204,6 +204,13 @@ onMounted(() => {
                 }
             }
         }
+    }
+}
+
+// 媒体查询
+@media screen and (max-width: 768px) {
+    .news-main .item-card ul li {
+        font-size: 16px;
     }
 }
 </style>

@@ -3,7 +3,7 @@
         :close-on-click-modal="false" :modal="false" top="50px" title="笔记" width="calc(100% - 160px)"
         :before-close="closeDialog">
         <div class="notes-main">
-            <div class="left">
+            <div class="left" v-if="!isMobile || (isMobile && !isShowNotes)">
                 <div class="title">
                     <span class="title-text">笔记列表</span>
                     <span class="edit">
@@ -117,11 +117,18 @@
                     </li>
                 </ul>
             </div>
-            <div class="right">
+            <div class="right" v-if="!isMobile || (isMobile && isShowNotes)">
+                <span class="back" @click="backList">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                        <path fill="#2f88ff" fill-rule="evenodd" stroke="#000" stroke-linejoin="round" stroke-width="4"
+                            d="M44 40.8361C39.1069 34.8632 34.7617 31.4739 30.9644 30.6682C27.1671 29.8625 23.5517 29.7408 20.1182 30.303V41L4 23.5453L20.1182 7V17.167C26.4667 17.2172 31.8638 19.4948 36.3095 24C40.7553 28.5052 43.3187 34.1172 44 40.8361Z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </span>
                 <input @input="onInput" maxlength="30" @blur="editNote(isLogin, noteDetails)"
-                    v-model="noteDetails.title" class="title" type="text" placeholder="标题" /><br />
-                <textarea :style="textStyle" @input="onInput" @blur="editNote(isLogin, noteDetails)"
-                    v-model="noteDetails.data" class="content" placeholder="笔记"></textarea>
+                    v-model="noteDetails.title" class="title" type="text" placeholder="标题" />
+                <textarea @input="onInput" @blur="editNote(isLogin, noteDetails)" v-model="noteDetails.data"
+                    class="content" placeholder="笔记"></textarea>
             </div>
         </div>
     </el-dialog>
@@ -129,10 +136,8 @@
 
 <script setup>
 import Sortable from "sortablejs";
-import { watch, onMounted, onBeforeUnmount, reactive, ref, computed, inject } from "vue";
+import { watch, onMounted, onBeforeUnmount, reactive, ref, computed, inject, nextTick } from "vue";
 import { storeToRefs } from "pinia";
-
-
 import { useRouter } from 'vue-router';
 const router = useRouter();
 
@@ -144,8 +149,15 @@ function closeDialog() {
     router.push('/');
 }
 
-const isMobile = inject('isMobile');
-const isShowNote = ref(false);
+// 获取屏幕尺寸 低于500式 为移动端
+const isMobile = ref(false)
+const isShowNotes = ref(true)
+const screenWidth = ref(document.documentElement.clientWidth)
+if (screenWidth.value < 768) {
+    isMobile.value = true
+    isShowNotes.value = true
+}
+
 // 获取用户信息 是否登陆
 import { useUserStore } from '@/stores/useAuthStore'
 let { isLogin } = storeToRefs(useUserStore());
@@ -156,12 +168,20 @@ let { noteItems, activeNotes, noteDetails } = storeToRefs(useNotesStore());
 watch(isLogin, () => {
     loadNotes(isLogin.value)
 })
+
+// app 返回列表
+function backList() {
+    isShowNotes.value = false
+    activeNotes.value = ''
+    localStorage.setItem("activeNotes", '');
+    noteDetails.value = {};
+}
 // 选择笔记
 function selectNote(data) {
     activeNotes.value = data.id;
     localStorage.setItem("activeNotes", data.id);
     noteDetails.value = data;
-    isShowNote.value = true;
+    isShowNotes.value = true
 }
 // 更新保存笔记
 let timer;
@@ -185,41 +205,25 @@ let isDel = ref(false);
 function delNoteClick(params, index) {
     delNote(isLogin.value, params, index);
 }
-// 排序
-// const notesListRef = ref(null);
-// onMounted(() => {
-//     // 排序
-//     if (!isMobile) {
-//         const notesSortable = Sortable.create(notesListRef.value, {
-//             group: "shared",
-//             animation: 150,
-//             ghostClass: "ghost",
-//             onEnd: ({ newIndex, oldIndex }) => {
-//                 const item = noteItems.value.splice(oldIndex, 1)[0];
-//                 noteItems.value.splice(newIndex, 0, item);
-//                 updateNoteSort(isLogin.value, noteItems.value)
-//             },
-//         });
-//     }
-// });
-// 字体设置 放大缩小 加粗
-import { useFontStore } from "@/stores/fontStore";
-let fonstStore = useFontStore();
-const textStyle = computed(() => {
-    return {
-        fontSize: fonstStore.fontSize + "px",
-        fontWeight: fonstStore.fontBold,
-    }
+
+// 笔记排序
+const notesListRef = ref(null);
+onMounted(() => {
+    nextTick(() => {
+        // 移动端不排序
+        if (isMobile.value && !notesListRef.value) return
+        Sortable.create(notesListRef.value, {
+            group: "shared",
+            animation: 150,
+            ghostClass: "ghost",
+            onEnd: ({ newIndex, oldIndex }) => {
+                const item = noteItems.value.splice(oldIndex, 1)[0];
+                noteItems.value.splice(newIndex, 0, item);
+                updateNoteSort(isLogin.value, noteItems.value)
+            },
+        });
+    })
 })
-const fontBold = () => {
-    if (fonstStore.fontBold === 'normal') fonstStore.fontBold = 'bold'
-    else {
-        fonstStore.fontBold = 'normal'
-    }
-}
-const editFontSize = (data) => {
-    fonstStore.fontSize = data
-}
 </script>
 
 <style lang="less" scoped>
@@ -253,54 +257,51 @@ ul::-webkit-scrollbar-thumb {
     color: var(--fontColor);
     overflow: hidden;
 
-    .title {
-        margin: 0 12px 0 6px;
-        padding: 0 56px 0;
-        position: relative;
-        line-height: 36px;
-        border-radius: 6px;
-        border: 1px solid #ccc;
-  
-        .title-text {
-            font-weight: bold;
-        }
-
-        .add,
-        .delete,
-        .edit {
-            display: block;
-            position: absolute;
-            right: 6px;
-            cursor: pointer;
-            top: 4px;
-            width: 24px;
-            height: 24px;
-            font-size: 24px;
-        }
-
-        .edit {
-            left: 4px;
-            width: 32px;
-            height: 32px;
-            top: 2px;
-
-        }
-
-        .delete {
-            right: 32px;
-        }
-    }
-
-
-
-
-
     .left {
         width: 300px;
         border-radius: 6px;
         margin-right: 12px;
         overflow: hidden;
         height: 100%;
+
+        .title {
+            margin: 0 12px 0 6px;
+            padding: 0 56px 0;
+            position: relative;
+            line-height: 36px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+
+            .title-text {
+                font-weight: bold;
+            }
+
+            .add,
+            .delete,
+            .edit {
+                display: block;
+                position: absolute;
+                right: 6px;
+                cursor: pointer;
+                top: 4px;
+                width: 24px;
+                height: 24px;
+                font-size: 24px;
+            }
+
+            .edit {
+                left: 4px;
+                width: 32px;
+                height: 32px;
+                top: 2px;
+
+            }
+
+            .delete {
+                right: 32px;
+            }
+        }
+
 
         ul {
             padding-left: 0;
@@ -356,6 +357,15 @@ ul::-webkit-scrollbar-thumb {
         overflow: hidden;
         position: relative;
 
+        .back {
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            right: 12px;
+            top: 12px;
+            cursor: pointer;
+        }
+
         .title {
             font-size: 18px;
             width: 100%;
@@ -384,71 +394,13 @@ ul::-webkit-scrollbar-thumb {
             color: var(--fontColor);
             padding-top: 30px;
         }
+    }
+}
 
-        .tools {
-            position: absolute;
-            top: 55px;
-            right: 12px;
-            z-index: 1;
-            line-height: 32px;
-            height: 32px;
-            padding: 0 12px;
-            background: var(--notesBg);
-            box-shadow: var(--notesShadow);
-            box-shadow: 3px 3px 3px #6cb9b480;
-            border: var(--border);
-            color: var(--fontColor);
-            border-radius: 4px;
-
-            svg {
-                cursor: pointer;
-                margin: 0 4px;
-                color: var(--fontColor);
-            }
-
-            .font-size-list {
-                position: absolute;
-                right: -6px;
-                top: 32px;
-                display: none;
-                background: var(--notesBg);
-                box-shadow: var(--notesShadow);
-                box-shadow: 3px 3px 3px #6cb9b480;
-                border: var(--border);
-                color: var(--fontColor);
-                border-radius: 6px;
-
-                ul {
-                    list-style: none;
-                    padding-left: 0;
-                    display: flex;
-                    flex-wrap: wrap;
-                    width: 60px;
-                    border-radius: 6px;
-
-                    li {
-                        text-align: center;
-                        width: 30px;
-                        padding: 2px 8px;
-                        font-size: 14px;
-                        line-height: 20px;
-                        cursor: pointer;
-
-                        &:hover {
-                            color: #6cb9b4;
-                        }
-                    }
-                }
-            }
-
-            svg:nth-of-type(2):hover+.font-size-list {
-                display: block;
-            }
-
-            .font-size-list:hover {
-                display: block;
-            }
-        }
+// 媒体查询
+@media screen and (max-width: 768px) {
+    .notes-main .left {
+        margin: 0 auto;
     }
 }
 </style>

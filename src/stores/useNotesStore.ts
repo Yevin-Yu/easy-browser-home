@@ -6,7 +6,7 @@ import { ElMessage } from "element-plus";
 interface NoteItem {
     id?: number;
     title: string;
-    data: boolean | number;
+    data: string;
     sort_order?: number;
 }
 
@@ -64,7 +64,7 @@ export const useNotesStore = defineStore("notes", () => {
         } else {
             // 未登陆用户
             const notesList = localStorage.getItem("notesList");
-            if (notesList) {
+            if (notesList && notesList !== "[]") {
                 noteItems.value = JSON.parse(notesList);
                 // 判断是否有激活的笔记
                 if (activeNotes.value) {
@@ -75,12 +75,24 @@ export const useNotesStore = defineStore("notes", () => {
                 }
             } else {
                 noteItems.value = [];
+                // 默认新建一个笔记 并且选择激活
+                const noteItem: NoteItem = {
+                    id: new Date().getTime(),
+                    title: "笔记模块",
+                    data: "在这里可以记录你的笔记，支持Markdown语法"
+                };
+                addNote(isLogin, noteItem);
+                activeNotes.value = noteItem.id + '';
+                noteDetails.value = noteItem;
             }
         }
     };
 
     const editNote = (isLogin: boolean, params: NoteItem) => {
         if (isLogin) {
+            // 查看列表是否有该笔记
+            const index = noteItems.value.findIndex((item) => item.id === params.id);
+            if (index == -1) return
             api.post("note/update", params)
                 .then((res) => {
                     if (res.code !== 200) {
@@ -145,10 +157,9 @@ export const useNotesStore = defineStore("notes", () => {
                     sort_order: index,
                 };
             });
-            api.post("note/sort", params)                 
+            api.post("note/sort", params)
                 .then((res) => {
                     if (res.code === 200) {
-                        ElMessage.success("排序成功");
                         loadNotes(isLogin);
                     }
                 })
