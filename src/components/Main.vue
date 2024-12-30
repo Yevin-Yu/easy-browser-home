@@ -1,69 +1,149 @@
 <template>
-    <div class="main">
-        <!-- 待办 -->
-        <div class="left-todo">
-            <div class="title">
-                <span class="edit" @click="isEdit = !isEdit">
-                    <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="m199.04 672.64 193.984 112 224-387.968-193.92-112-224 388.032zm-23.872 60.16 32.896 148.288 144.896-45.696zM455.04 229.248l193.92 112 56.704-98.112-193.984-112-56.64 98.112zM104.32 708.8l384-665.024 304.768 175.936L409.152 884.8h.064l-248.448 78.336zm384 254.272v-64h448v64h-448z"
-                            fill="currentColor"></path>
-                    </svg>
-                </span>
-                待办列表
-                <span class="add" @click="addTodoClick">+</span>
-            </div>
-            <ul ref="todosListRef">
-                <li v-for="(item, index) in todoItems" :key="item.id">
-                    <span class="checkbox" :class="{ 'checked': item.checked }" @click.stop="changeTodoStatus(item)">
-                        <svg v-if="item.checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
-                            <path fill="currentColor"
-                                d="M329.956 257.138a254.862 254.862 0 0 0 0 509.724h364.088a254.862 254.862 0 0 0 0-509.724zm0-72.818h364.088a327.68 327.68 0 1 1 0 655.36H329.956a327.68 327.68 0 1 1 0-655.36z">
-                            </path>
-                            <path fill="currentColor"
-                                d="M694.044 621.227a109.227 109.227 0 1 0 0-218.454 109.227 109.227 0 0 0 0 218.454m0 72.817a182.044 182.044 0 1 1 0-364.088 182.044 182.044 0 0 1 0 364.088">
-                            </path>
-                        </svg>
-                        <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
-                            <path fill="currentColor"
-                                d="M329.956 257.138a254.862 254.862 0 0 0 0 509.724h364.088a254.862 254.862 0 0 0 0-509.724zm0-72.818h364.088a327.68 327.68 0 1 1 0 655.36H329.956a327.68 327.68 0 1 1 0-655.36z">
-                            </path>
-                            <path fill="currentColor"
-                                d="M329.956 621.227a109.227 109.227 0 1 0 0-218.454 109.227 109.227 0 0 0 0 218.454m0 72.817a182.044 182.044 0 1 1 0-364.088 182.044 182.044 0 0 1 0 364.088">
-                            </path>
-                        </svg>
-                    </span>
-                    <input class="todo-input" v-if="!item.checked" @input="changeTodoTitle(item, $event)"
-                        v-model="item.title" type="text" @blur="editTodo(isLogin, item)" />
-                    <span v-else class="todo-text">{{ item.title }}</span>
-                    <span class="del-btn" v-if="isEdit" @click="delTodoClick(item, index)">
+    <el-dialog :fullscreen="isMobile" :style="{ height: !isMobile ? 'calc(100% - 100px)' : '' }" v-model="isShow"
+        :close-on-click-modal="false" :modal="false" top="50px" title="待办" width="calc(100% - 160px)"
+        :before-close="closeDialog">
+        <div class="main">
+            <!-- 待办 -->
+            <div class="left-todo">
+                <div class="title">
+                    <span class="edit" @click="isEdit = !isEdit">
                         <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
                             <path
-                                d="M764.288 214.592 512 466.88 259.712 214.592a31.936 31.936 0 0 0-45.12 45.12L466.752 512 214.528 764.224a31.936 31.936 0 1 0 45.12 45.184L512 557.184l252.288 252.288a31.936 31.936 0 0 0 45.12-45.12L557.12 512.064l252.288-252.352a31.936 31.936 0 1 0-45.12-45.184z"
+                                d="m199.04 672.64 193.984 112 224-387.968-193.92-112-224 388.032zm-23.872 60.16 32.896 148.288 144.896-45.696zM455.04 229.248l193.92 112 56.704-98.112-193.984-112-56.64 98.112zM104.32 708.8l384-665.024 304.768 175.936L409.152 884.8h.064l-248.448 78.336zm384 254.272v-64h448v64h-448z"
                                 fill="currentColor"></path>
                         </svg>
                     </span>
-                </li>
-            </ul>
-        </div>
-        <!-- 默认导航 -->
-        <div class="right">
-            <div class="big-nav">
-                <img src="@/assets/images/banner.jpg" alt="" />
-                <p>—— 认真生活，简单做人，用心做事</p>
+                    待办列表
+                    <span class="add" @click="addTodoClick">+</span>
+                </div>
+                <ul ref="todosListRef">
+                    <li v-for="(item, index) in todoItems" :key="item.id">
+                        <span class="checkbox" :class="{ 'checked': item.checked }"
+                            @click.stop="changeTodoStatus(item)">
+                            <svg v-if="item.checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+                                <path fill="currentColor"
+                                    d="M329.956 257.138a254.862 254.862 0 0 0 0 509.724h364.088a254.862 254.862 0 0 0 0-509.724zm0-72.818h364.088a327.68 327.68 0 1 1 0 655.36H329.956a327.68 327.68 0 1 1 0-655.36z">
+                                </path>
+                                <path fill="currentColor"
+                                    d="M694.044 621.227a109.227 109.227 0 1 0 0-218.454 109.227 109.227 0 0 0 0 218.454m0 72.817a182.044 182.044 0 1 1 0-364.088 182.044 182.044 0 0 1 0 364.088">
+                                </path>
+                            </svg>
+                            <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+                                <path fill="currentColor"
+                                    d="M329.956 257.138a254.862 254.862 0 0 0 0 509.724h364.088a254.862 254.862 0 0 0 0-509.724zm0-72.818h364.088a327.68 327.68 0 1 1 0 655.36H329.956a327.68 327.68 0 1 1 0-655.36z">
+                                </path>
+                                <path fill="currentColor"
+                                    d="M329.956 621.227a109.227 109.227 0 1 0 0-218.454 109.227 109.227 0 0 0 0 218.454m0 72.817a182.044 182.044 0 1 1 0-364.088 182.044 182.044 0 0 1 0 364.088">
+                                </path>
+                            </svg>
+                        </span>
+                        <input class="todo-input" v-if="!item.checked" @input="changeTodoTitle(item, $event)"
+                            v-model="item.title" type="text" @blur="editTodo(isLogin, item)" />
+                        <span v-else class="todo-text">{{ item.title }}</span>
+                        <span class="del-btn" v-if="isEdit" @click="delTodoClick(item, index)">
+                            <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M764.288 214.592 512 466.88 259.712 214.592a31.936 31.936 0 0 0-45.12 45.12L466.752 512 214.528 764.224a31.936 31.936 0 1 0 45.12 45.184L512 557.184l252.288 252.288a31.936 31.936 0 0 0 45.12-45.12L557.12 512.064l252.288-252.352a31.936 31.936 0 1 0-45.12-45.184z"
+                                    fill="currentColor"></path>
+                            </svg>
+                        </span>
+                    </li>
+                </ul>
             </div>
-            <div class="nav-main">
-                <ul>
-                    <li v-for="item in navItems" @click="go(item)" :key="item.name">
-                        <div>
-                            <img :src="item.iconPath" alt="icon" @error="onImageError(item)" />
-                        </div>
-                        <span class="nav-item-name">{{ item.name }}</span>
+            <div class="left-todo">
+                <div class="title">
+                    <span class="edit" @click="isEdit = !isEdit">
+                        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="m199.04 672.64 193.984 112 224-387.968-193.92-112-224 388.032zm-23.872 60.16 32.896 148.288 144.896-45.696zM455.04 229.248l193.92 112 56.704-98.112-193.984-112-56.64 98.112zM104.32 708.8l384-665.024 304.768 175.936L409.152 884.8h.064l-248.448 78.336zm384 254.272v-64h448v64h-448z"
+                                fill="currentColor"></path>
+                        </svg>
+                    </span>
+                    待办列表
+                    <span class="add" @click="addTodoClick">+</span>
+                </div>
+                <ul ref="todosListRef">
+                    <li v-for="(item, index) in todoItems" :key="item.id">
+                        <span class="checkbox" :class="{ 'checked': item.checked }"
+                            @click.stop="changeTodoStatus(item)">
+                            <svg v-if="item.checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+                                <path fill="currentColor"
+                                    d="M329.956 257.138a254.862 254.862 0 0 0 0 509.724h364.088a254.862 254.862 0 0 0 0-509.724zm0-72.818h364.088a327.68 327.68 0 1 1 0 655.36H329.956a327.68 327.68 0 1 1 0-655.36z">
+                                </path>
+                                <path fill="currentColor"
+                                    d="M694.044 621.227a109.227 109.227 0 1 0 0-218.454 109.227 109.227 0 0 0 0 218.454m0 72.817a182.044 182.044 0 1 1 0-364.088 182.044 182.044 0 0 1 0 364.088">
+                                </path>
+                            </svg>
+                            <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+                                <path fill="currentColor"
+                                    d="M329.956 257.138a254.862 254.862 0 0 0 0 509.724h364.088a254.862 254.862 0 0 0 0-509.724zm0-72.818h364.088a327.68 327.68 0 1 1 0 655.36H329.956a327.68 327.68 0 1 1 0-655.36z">
+                                </path>
+                                <path fill="currentColor"
+                                    d="M329.956 621.227a109.227 109.227 0 1 0 0-218.454 109.227 109.227 0 0 0 0 218.454m0 72.817a182.044 182.044 0 1 1 0-364.088 182.044 182.044 0 0 1 0 364.088">
+                                </path>
+                            </svg>
+                        </span>
+                        <input class="todo-input" v-if="!item.checked" @input="changeTodoTitle(item, $event)"
+                            v-model="item.title" type="text" @blur="editTodo(isLogin, item)" />
+                        <span v-else class="todo-text">{{ item.title }}</span>
+                        <span class="del-btn" v-if="isEdit" @click="delTodoClick(item, index)">
+                            <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M764.288 214.592 512 466.88 259.712 214.592a31.936 31.936 0 0 0-45.12 45.12L466.752 512 214.528 764.224a31.936 31.936 0 1 0 45.12 45.184L512 557.184l252.288 252.288a31.936 31.936 0 0 0 45.12-45.12L557.12 512.064l252.288-252.352a31.936 31.936 0 1 0-45.12-45.184z"
+                                    fill="currentColor"></path>
+                            </svg>
+                        </span>
+                    </li>
+                </ul>
+            </div>
+            <div class="left-todo">
+                <div class="title">
+                    <span class="edit" @click="isEdit = !isEdit">
+                        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="m199.04 672.64 193.984 112 224-387.968-193.92-112-224 388.032zm-23.872 60.16 32.896 148.288 144.896-45.696zM455.04 229.248l193.92 112 56.704-98.112-193.984-112-56.64 98.112zM104.32 708.8l384-665.024 304.768 175.936L409.152 884.8h.064l-248.448 78.336zm384 254.272v-64h448v64h-448z"
+                                fill="currentColor"></path>
+                        </svg>
+                    </span>
+                    待办列表
+                    <span class="add" @click="addTodoClick">+</span>
+                </div>
+                <ul ref="todosListRef">
+                    <li v-for="(item, index) in todoItems" :key="item.id">
+                        <span class="checkbox" :class="{ 'checked': item.checked }"
+                            @click.stop="changeTodoStatus(item)">
+                            <svg v-if="item.checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+                                <path fill="currentColor"
+                                    d="M329.956 257.138a254.862 254.862 0 0 0 0 509.724h364.088a254.862 254.862 0 0 0 0-509.724zm0-72.818h364.088a327.68 327.68 0 1 1 0 655.36H329.956a327.68 327.68 0 1 1 0-655.36z">
+                                </path>
+                                <path fill="currentColor"
+                                    d="M694.044 621.227a109.227 109.227 0 1 0 0-218.454 109.227 109.227 0 0 0 0 218.454m0 72.817a182.044 182.044 0 1 1 0-364.088 182.044 182.044 0 0 1 0 364.088">
+                                </path>
+                            </svg>
+                            <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+                                <path fill="currentColor"
+                                    d="M329.956 257.138a254.862 254.862 0 0 0 0 509.724h364.088a254.862 254.862 0 0 0 0-509.724zm0-72.818h364.088a327.68 327.68 0 1 1 0 655.36H329.956a327.68 327.68 0 1 1 0-655.36z">
+                                </path>
+                                <path fill="currentColor"
+                                    d="M329.956 621.227a109.227 109.227 0 1 0 0-218.454 109.227 109.227 0 0 0 0 218.454m0 72.817a182.044 182.044 0 1 1 0-364.088 182.044 182.044 0 0 1 0 364.088">
+                                </path>
+                            </svg>
+                        </span>
+                        <input class="todo-input" v-if="!item.checked" @input="changeTodoTitle(item, $event)"
+                            v-model="item.title" type="text" @blur="editTodo(isLogin, item)" />
+                        <span v-else class="todo-text">{{ item.title }}</span>
+                        <span class="del-btn" v-if="isEdit" @click="delTodoClick(item, index)">
+                            <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M764.288 214.592 512 466.88 259.712 214.592a31.936 31.936 0 0 0-45.12 45.12L466.752 512 214.528 764.224a31.936 31.936 0 1 0 45.12 45.184L512 557.184l252.288 252.288a31.936 31.936 0 0 0 45.12-45.12L557.12 512.064l252.288-252.352a31.936 31.936 0 1 0-45.12-45.184z"
+                                    fill="currentColor"></path>
+                            </svg>
+                        </span>
                     </li>
                 </ul>
             </div>
         </div>
-    </div>
+    </el-dialog>
 </template>
 
 <script setup>
@@ -71,6 +151,19 @@ import Sortable from "sortablejs";
 import { storeToRefs } from "pinia";
 import { ref, onMounted, inject, watch } from "vue";
 const isMobile = inject('isMobile');
+
+
+import { useRouter } from 'vue-router';
+const router = useRouter();
+const isShow = ref(true)
+// 设置弹窗关闭
+function closeDialog() {
+    isShow.value = false
+    // 跳转到首页
+    router.push('/');
+}
+
+
 // 获取用户信息 是否登陆
 import { useUserStore } from '@/stores/useAuthStore'
 let { isLogin } = storeToRefs(useUserStore());
@@ -125,16 +218,16 @@ function delTodoClick(params, index) {
 const todosListRef = ref(null);
 onMounted(() => {
     if (!isMobile) {
-        Sortable.create(todosListRef.value, {
-            group: "shared",
-            animation: 150,
-            ghostClass: "ghost",
-            onEnd: ({ newIndex, oldIndex }) => {
-                const item = todoItems.value.splice(oldIndex, 1)[0];
-                todoItems.value.splice(newIndex, 0, item);
-                updateTodoSort(isLogin.value, todoItems.value)
-            },
-        });
+        // Sortable.create(todosListRef.value, {
+        //     group: "shared",
+        //     animation: 150,
+        //     ghostClass: "ghost",
+        //     onEnd: ({ newIndex, oldIndex }) => {
+        //         const item = todoItems.value.splice(oldIndex, 1)[0];
+        //         todoItems.value.splice(newIndex, 0, item);
+        //         updateTodoSort(isLogin.value, todoItems.value)
+        //     },
+        // });
     }
 })
 // 图片加载失败
@@ -341,179 +434,6 @@ ul::-webkit-scrollbar-thumb {
             .checkbox:hover,
             .checkbox:active {
                 box-shadow: var(--notesShadowActive);
-            }
-        }
-    }
-
-    .right {
-        flex: 1;
-        overflow: auto;
-
-        .nav-main::-webkit-scrollbar {
-            width: 5px;
-            height: 5px;
-            background-color: transparent;
-        }
-
-        .nav-main::-webkit-scrollbar-thumb {
-            width: 5px;
-            height: 5px;
-            border-radius: 2px;
-            background-color: #ccc;
-        }
-
-        ul {
-            list-style: none;
-            display: flex;
-            flex-wrap: wrap;
-            display: inline-block;
-            padding-left: 0;
-
-            li {
-                display: inline-block;
-                margin: 12px 25px;
-                text-align: center;
-                width: 80px;
-
-                div {
-                    cursor: pointer;
-                    border-radius: 17px;
-                    min-width: 80px;
-                    height: 80px;
-                    border: var(--border);
-                    background-color: var(--bgColorDefaut);
-                    box-shadow: var(--shadow);
-
-                    img {
-                        padding: 12px;
-                        background-color: #fff;
-                        width: 50px;
-                        height: 50px;
-                        margin: 14px;
-                        border-radius: 15px;
-                        background-color: rgba(255, 255, 255, 0.5);
-                    }
-                }
-
-                div:hover,
-                div:active {
-                    box-shadow: var(--sideShadowActive);
-
-                    img {
-                        box-shadow: var(--shadow);
-                    }
-                }
-
-                span {
-                    width: 80px;
-                    display: inline-block;
-                    margin-top: 12px;
-                    font-size: 12px;
-                    overflow: hidden;
-                    white-space: nowrap;
-                    text-overflow: ellipsis;
-                    color: var(--fontColor);
-                }
-            }
-        }
-
-        .big-nav {
-            position: relative;
-            width: 100%;
-            height: 200px;
-            padding: 0 25px;
-            border-radius: 15px;
-            overflow: hidden;
-            margin-bottom: 40px;
-
-            img {
-                height: 200px;
-                width: 100%;
-                border-radius: 15px;
-                overflow: hidden;
-                object-fit: cover;
-            }
-
-            p {
-                color: rgba(255, 255, 245, 0.86);
-                position: absolute;
-                right: 25px;
-                bottom: 12px;
-            }
-        }
-
-        .nav-main {
-            max-height: 280px;
-            min-height: 280px;
-            margin: 0 auto;
-            overflow: hidden;
-            text-align: center;
-        }
-    }
-}
-
-.isMobile {
-    .main {
-        width: 90vw;
-        height: 55vh;
-        margin: 5vh auto;
-        padding: 24px;
-        display: block;
-        overflow: hidden;
-        overflow-y: auto;
-    }
-
-    .left-todo {
-        width: 100%;
-        margin-bottom: 25px;
-
-        .title {
-            font-size: 22px;
-
-            .add {
-                font-size: 38px;
-            }
-        }
-
-        ul {
-            padding: 0 6px;
-
-            li {
-                width: calc(100% - 24px);
-
-                .todo-input {
-                    font-size: 20px;
-                }
-
-                .todo-text {
-                    font-size: 20px;
-                }
-            }
-        }
-    }
-
-    .right {
-        .big-nav {
-            padding: 0;
-            padding-left: 5px;
-
-            p {
-                font-size: 22px;
-            }
-        }
-
-        .nav-main {
-            min-height: 265px;
-            max-height: 265px;
-
-            .nav-item-name {
-                font-size: 18px;
-            }
-
-            ul {
-                li {
-                    margin: 8px 16px;
-                }
             }
         }
     }
