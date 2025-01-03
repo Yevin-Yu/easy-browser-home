@@ -6,16 +6,20 @@
         <div class="main">
             <!-- 添加代办 -->
             <div class="add-todo">
-                <el-input class="todo-input" size="large" v-model="input" placeholder="请输入待办事项"></el-input>
-                <el-date-picker size="large" class="todo-time" v-model="value1" type="date" placeholder="代办时间">
+
+                <el-input class="todo-input" size="large" v-model="todoTitle" placeholder="请输入待办事项"></el-input>
+                <el-date-picker size="large" class="todo-time" :clearable="false" :editable="false" v-model="todoTime"
+                    type="date" placeholder="代办时间">
                 </el-date-picker>
-                <button class="button-default">添加</button>
+                <button class="button-default" @click="addTodoClick">添加</button>
+                <button class="button-default" @click="isEdit = !isEdit">删除</button>
+
             </div>
             <div class="todo-list">
                 <!-- 待办 -->
                 <div class="left-todo">
                     <div class="title">
-                        <span class="edit" @click="isEdit = !isEdit">
+                        <span class="edit">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
                                 <g fill="none">
                                     <path fill="url(#fluentColorCalendarClock160)"
@@ -70,34 +74,99 @@
                         今日待办
                     </div>
                     <ul ref="todosListRef">
-                        <li v-for="(item, index) in todoItems" :key="item.id">
+                        <li v-for="(item, index) in todoToday" :key="item.id">
+                            <!-- 是否完成 -->
                             <span class="checkbox" :class="{ 'checked': item.checked }"
                                 @click.stop="changeTodoStatus(item)">
-                                <svg v-if="item.checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
-                                    <path fill="currentColor"
-                                        d="M329.956 257.138a254.862 254.862 0 0 0 0 509.724h364.088a254.862 254.862 0 0 0 0-509.724zm0-72.818h364.088a327.68 327.68 0 1 1 0 655.36H329.956a327.68 327.68 0 1 1 0-655.36z">
-                                    </path>
-                                    <path fill="currentColor"
-                                        d="M694.044 621.227a109.227 109.227 0 1 0 0-218.454 109.227 109.227 0 0 0 0 218.454m0 72.817a182.044 182.044 0 1 1 0-364.088 182.044 182.044 0 0 1 0 364.088">
-                                    </path>
+                                <!-- -->
+                                <svg v-if="item.checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+                                    <g fill="none">
+                                        <path fill="url(#fluentColorApprovalsApp160)" fill-rule="evenodd"
+                                            d="M8.571.236a.806.806 0 0 0-1.14 1.14l.73.728H8a6.448 6.448 0 1 0 6.449 6.448a.806.806 0 1 0-1.612 0a4.837 4.837 0 1 1-4.836-4.837h.248l-.818.818a.806.806 0 1 0 1.14 1.14l2.148-2.149a.806.806 0 0 0 0-1.14z"
+                                            clip-rule="evenodd" />
+                                        <path fill="url(#fluentColorApprovalsApp161)" fill-rule="evenodd"
+                                            d="M11.61 5.812a.806.806 0 0 1 0 1.14l-3.472 3.471a.806.806 0 0 1-1.14 0L5.696 9.121a.806.806 0 1 1 1.14-1.14l.732.733l2.902-2.902a.806.806 0 0 1 1.14 0"
+                                            clip-rule="evenodd" />
+                                        <defs>
+                                            <linearGradient id="fluentColorApprovalsApp160" x1="1.554" x2="5.941"
+                                                y1="1.231" y2="17.422" gradientUnits="userSpaceOnUse">
+                                                <stop stop-color="#0fafff" />
+                                                <stop offset="1" stop-color="#0067bf" />
+                                            </linearGradient>
+                                            <linearGradient id="fluentColorApprovalsApp161" x1="10.891" x2="4.999"
+                                                y1="6.555" y2="9.484" gradientUnits="userSpaceOnUse">
+                                                <stop stop-color="#42b870" />
+                                                <stop offset="1" stop-color="#309c61" />
+                                            </linearGradient>
+                                        </defs>
+                                    </g>
                                 </svg>
-                                <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
-                                    <path fill="currentColor"
-                                        d="M329.956 257.138a254.862 254.862 0 0 0 0 509.724h364.088a254.862 254.862 0 0 0 0-509.724zm0-72.818h364.088a327.68 327.68 0 1 1 0 655.36H329.956a327.68 327.68 0 1 1 0-655.36z">
-                                    </path>
-                                    <path fill="currentColor"
-                                        d="M329.956 621.227a109.227 109.227 0 1 0 0-218.454 109.227 109.227 0 0 0 0 218.454m0 72.817a182.044 182.044 0 1 1 0-364.088 182.044 182.044 0 0 1 0 364.088">
-                                    </path>
+                                <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+                                    <g fill="none">
+                                        <path fill="url(#fluentColorHistory160)"
+                                            d="M7.698 5a.75.75 0 0 1 .75.75V7.5h1.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1-.75-.75v-2.5a.75.75 0 0 1 .75-.75" />
+                                        <path fill="url(#fluentColorHistory161)"
+                                            d="M7.947 3.5a4.5 4.5 0 1 1-4.454 5.14a.75.75 0 1 0-1.485.212a6.001 6.001 0 1 0 1.94-5.324V2.75a.75.75 0 1 0-1.5 0v3c0 .414.335.75.75.75h2.5a.75.75 0 1 0 0-1.5H4.592a4.5 4.5 0 0 1 3.354-1.5" />
+                                        <defs>
+                                            <linearGradient id="fluentColorHistory160" x1="6.357" x2="14.586"
+                                                y1="12.633" y2="8.988" gradientUnits="userSpaceOnUse">
+                                                <stop stop-color="#d373fc" />
+                                                <stop offset="1" stop-color="#6d37cd" />
+                                            </linearGradient>
+                                            <linearGradient id="fluentColorHistory161" x1="2" x2="5.234" y1="2.706"
+                                                y2="16.186" gradientUnits="userSpaceOnUse">
+                                                <stop stop-color="#0fafff" />
+                                                <stop offset="1" stop-color="#0067bf" />
+                                            </linearGradient>
+                                        </defs>
+                                    </g>
                                 </svg>
+
                             </span>
-                            <input class="todo-input" v-if="!item.checked" @input="changeTodoTitle(item, $event)"
-                                v-model="item.title" type="text" @blur="editTodo(isLogin, item)" />
-                            <span v-else class="todo-text">{{ item.title }}</span>
+                            <!-- 待办标题 -->
+                            <div class="todo-title">
+                                <input class="todo-input" v-if="!item.checked" @input="changeTodoTitle(item, $event)"
+                                    v-model="item.title" type="text" @blur="editTodo(isLogin, item)" />
+                                <div v-else class="todo-text">{{ item.title }}</div>
+                            </div>
+                            <!-- 时间选择 -->
+                            <div class="todo-time">
+                                <span>时间：</span>
+                                <el-date-picker @change="changeTodoTitle(item, $event)" size="small" class="todo-time"
+                                    :disabled="item.checked ? true : false" :clearable="false" :editable="false"
+                                    v-model="item.time" type="date" placeholder="时间">
+                                </el-date-picker>
+                            </div>
+                            <!-- 备注输入 -->
+                            <div class="todo-remark">
+                                <span>备注：</span>
+                                <el-input type="textarea" @input="changeTodoTitle(item, $event)"
+                                    :autosize="{ minRows: 2, maxRows: 6 }" rows="3"
+                                    :disabled="item.checked ? true : false" resize="none" placeholder="可输入备注"
+                                    v-model="item.remark">
+                                </el-input>
+                            </div>
+
                             <span class="del-btn" v-if="isEdit" @click="delTodoClick(item, index)">
-                                <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                        d="M764.288 214.592 512 466.88 259.712 214.592a31.936 31.936 0 0 0-45.12 45.12L466.752 512 214.528 764.224a31.936 31.936 0 1 0 45.12 45.184L512 557.184l252.288 252.288a31.936 31.936 0 0 0 45.12-45.12L557.12 512.064l252.288-252.352a31.936 31.936 0 1 0-45.12-45.184z"
-                                        fill="currentColor"></path>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+                                    <g fill="none">
+                                        <path fill="url(#fluentColorDismissCircle160)"
+                                            d="M8 2a6 6 0 1 1 0 12A6 6 0 0 1 8 2" />
+                                        <path fill="url(#fluentColorDismissCircle161)"
+                                            d="M5.896 5.896a.5.5 0 0 1 .638-.057l.07.057L8 7.293l1.396-1.397a.5.5 0 0 1 .638-.057l.07.057a.5.5 0 0 1 .057.638l-.057.07L8.707 8l1.397 1.396a.5.5 0 0 1 .057.638l-.057.07a.5.5 0 0 1-.638.057l-.07-.057L8 8.707l-1.396 1.397a.5.5 0 0 1-.638.057l-.07-.057a.5.5 0 0 1-.057-.638l.057-.07L7.293 8L5.896 6.604a.5.5 0 0 1-.057-.638z" />
+                                        <defs>
+                                            <linearGradient id="fluentColorDismissCircle160" x1="3.875" x2="13"
+                                                y1="2.75" y2="16" gradientUnits="userSpaceOnUse">
+                                                <stop stop-color="#f83f54" />
+                                                <stop offset="1" stop-color="#ca2134" />
+                                            </linearGradient>
+                                            <linearGradient id="fluentColorDismissCircle161" x1="6.011" x2="8.354"
+                                                y1="8.199" y2="10.635" gradientUnits="userSpaceOnUse">
+                                                <stop stop-color="#fdfdfd" />
+                                                <stop offset="1" stop-color="#fecbe6" />
+                                            </linearGradient>
+                                        </defs>
+                                    </g>
                                 </svg>
                             </span>
                         </li>
@@ -160,34 +229,103 @@
                         未完成
                     </div>
                     <ul ref="todosListRef">
-                        <li v-for="(item, index) in todoItems" :key="item.id">
+                        <li v-for="(item, index) in todoUnfinished" :key="item.id">
+                            <!-- 是否完成 -->
                             <span class="checkbox" :class="{ 'checked': item.checked }"
                                 @click.stop="changeTodoStatus(item)">
-                                <svg v-if="item.checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
-                                    <path fill="currentColor"
-                                        d="M329.956 257.138a254.862 254.862 0 0 0 0 509.724h364.088a254.862 254.862 0 0 0 0-509.724zm0-72.818h364.088a327.68 327.68 0 1 1 0 655.36H329.956a327.68 327.68 0 1 1 0-655.36z">
-                                    </path>
-                                    <path fill="currentColor"
-                                        d="M694.044 621.227a109.227 109.227 0 1 0 0-218.454 109.227 109.227 0 0 0 0 218.454m0 72.817a182.044 182.044 0 1 1 0-364.088 182.044 182.044 0 0 1 0 364.088">
-                                    </path>
+                                <!-- -->
+                                <svg v-if="item.checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+                                    <g fill="none">
+                                        <path fill="url(#fluentColorApprovalsApp160)" fill-rule="evenodd"
+                                            d="M8.571.236a.806.806 0 0 0-1.14 1.14l.73.728H8a6.448 6.448 0 1 0 6.449 6.448a.806.806 0 1 0-1.612 0a4.837 4.837 0 1 1-4.836-4.837h.248l-.818.818a.806.806 0 1 0 1.14 1.14l2.148-2.149a.806.806 0 0 0 0-1.14z"
+                                            clip-rule="evenodd" />
+                                        <path fill="url(#fluentColorApprovalsApp161)" fill-rule="evenodd"
+                                            d="M11.61 5.812a.806.806 0 0 1 0 1.14l-3.472 3.471a.806.806 0 0 1-1.14 0L5.696 9.121a.806.806 0 1 1 1.14-1.14l.732.733l2.902-2.902a.806.806 0 0 1 1.14 0"
+                                            clip-rule="evenodd" />
+                                        <defs>
+                                            <linearGradient id="fluentColorApprovalsApp160" x1="1.554" x2="5.941"
+                                                y1="1.231" y2="17.422" gradientUnits="userSpaceOnUse">
+                                                <stop stop-color="#0fafff" />
+                                                <stop offset="1" stop-color="#0067bf" />
+                                            </linearGradient>
+                                            <linearGradient id="fluentColorApprovalsApp161" x1="10.891" x2="4.999"
+                                                y1="6.555" y2="9.484" gradientUnits="userSpaceOnUse">
+                                                <stop stop-color="#42b870" />
+                                                <stop offset="1" stop-color="#309c61" />
+                                            </linearGradient>
+                                        </defs>
+                                    </g>
                                 </svg>
-                                <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
-                                    <path fill="currentColor"
-                                        d="M329.956 257.138a254.862 254.862 0 0 0 0 509.724h364.088a254.862 254.862 0 0 0 0-509.724zm0-72.818h364.088a327.68 327.68 0 1 1 0 655.36H329.956a327.68 327.68 0 1 1 0-655.36z">
-                                    </path>
-                                    <path fill="currentColor"
-                                        d="M329.956 621.227a109.227 109.227 0 1 0 0-218.454 109.227 109.227 0 0 0 0 218.454m0 72.817a182.044 182.044 0 1 1 0-364.088 182.044 182.044 0 0 1 0 364.088">
-                                    </path>
+                                <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+                                    <g fill="none">
+                                        <path fill="url(#fluentColorHistory160)"
+                                            d="M7.698 5a.75.75 0 0 1 .75.75V7.5h1.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1-.75-.75v-2.5a.75.75 0 0 1 .75-.75" />
+                                        <path fill="url(#fluentColorHistory161)"
+                                            d="M7.947 3.5a4.5 4.5 0 1 1-4.454 5.14a.75.75 0 1 0-1.485.212a6.001 6.001 0 1 0 1.94-5.324V2.75a.75.75 0 1 0-1.5 0v3c0 .414.335.75.75.75h2.5a.75.75 0 1 0 0-1.5H4.592a4.5 4.5 0 0 1 3.354-1.5" />
+                                        <defs>
+                                            <linearGradient id="fluentColorHistory160" x1="6.357" x2="14.586"
+                                                y1="12.633" y2="8.988" gradientUnits="userSpaceOnUse">
+                                                <stop stop-color="#d373fc" />
+                                                <stop offset="1" stop-color="#6d37cd" />
+                                            </linearGradient>
+                                            <linearGradient id="fluentColorHistory161" x1="2" x2="5.234" y1="2.706"
+                                                y2="16.186" gradientUnits="userSpaceOnUse">
+                                                <stop stop-color="#0fafff" />
+                                                <stop offset="1" stop-color="#0067bf" />
+                                            </linearGradient>
+                                        </defs>
+                                    </g>
                                 </svg>
+
                             </span>
-                            <input class="todo-input" v-if="!item.checked" @input="changeTodoTitle(item, $event)"
-                                v-model="item.title" type="text" @blur="editTodo(isLogin, item)" />
-                            <span v-else class="todo-text">{{ item.title }}</span>
+                            <!-- 待办标题 -->
+                            <div class="todo-title">
+                                <input class="todo-input" v-if="!item.checked" @input="changeTodoTitle(item, $event)"
+                                    v-model="item.title" type="text" @blur="editTodo(isLogin, item)" />
+                                <div v-else class="todo-text">{{ item.title }}</div>
+                            </div>
+                            <!-- 时间选择 -->
+                            <div class="todo-time">
+                                <span>时间：</span>
+                                <el-date-picker @change="changeTodoTitle(item, $event)" size="small" class="todo-time"
+                                    :disabled="item.checked ? true : false" :clearable="false" :editable="false"
+                                    v-model="item.time" type="date" placeholder="时间">
+                                </el-date-picker>
+                                <!-- 已超时 -->
+                                <span class="over-time"
+                                    v-if="formatDate(new Date(), 'YYYY-MM-DD') > formatDate(item.time, 'YYYY-MM-DD')">
+                                    <el-check-tag size="small" :checked="true" type="warning">已超时</el-check-tag>
+                                </span>
+                            </div>
+                            <!-- 备注输入 -->
+                            <div class="todo-remark">
+                                <span>备注：</span>
+                                <el-input type="textarea" @input="changeTodoTitle(item, $event)"
+                                    :autosize="{ minRows: 2, maxRows: 6 }" rows="3"
+                                    :disabled="item.checked ? true : false" resize="none" placeholder="可输入备注"
+                                    v-model="item.remark">
+                                </el-input>
+                            </div>
                             <span class="del-btn" v-if="isEdit" @click="delTodoClick(item, index)">
-                                <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                        d="M764.288 214.592 512 466.88 259.712 214.592a31.936 31.936 0 0 0-45.12 45.12L466.752 512 214.528 764.224a31.936 31.936 0 1 0 45.12 45.184L512 557.184l252.288 252.288a31.936 31.936 0 0 0 45.12-45.12L557.12 512.064l252.288-252.352a31.936 31.936 0 1 0-45.12-45.184z"
-                                        fill="currentColor"></path>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+                                    <g fill="none">
+                                        <path fill="url(#fluentColorDismissCircle160)"
+                                            d="M8 2a6 6 0 1 1 0 12A6 6 0 0 1 8 2" />
+                                        <path fill="url(#fluentColorDismissCircle161)"
+                                            d="M5.896 5.896a.5.5 0 0 1 .638-.057l.07.057L8 7.293l1.396-1.397a.5.5 0 0 1 .638-.057l.07.057a.5.5 0 0 1 .057.638l-.057.07L8.707 8l1.397 1.396a.5.5 0 0 1 .057.638l-.057.07a.5.5 0 0 1-.638.057l-.07-.057L8 8.707l-1.396 1.397a.5.5 0 0 1-.638.057l-.07-.057a.5.5 0 0 1-.057-.638l.057-.07L7.293 8L5.896 6.604a.5.5 0 0 1-.057-.638z" />
+                                        <defs>
+                                            <linearGradient id="fluentColorDismissCircle160" x1="3.875" x2="13"
+                                                y1="2.75" y2="16" gradientUnits="userSpaceOnUse">
+                                                <stop stop-color="#f83f54" />
+                                                <stop offset="1" stop-color="#ca2134" />
+                                            </linearGradient>
+                                            <linearGradient id="fluentColorDismissCircle161" x1="6.011" x2="8.354"
+                                                y1="8.199" y2="10.635" gradientUnits="userSpaceOnUse">
+                                                <stop stop-color="#fdfdfd" />
+                                                <stop offset="1" stop-color="#fecbe6" />
+                                            </linearGradient>
+                                        </defs>
+                                    </g>
                                 </svg>
                             </span>
                         </li>
@@ -251,34 +389,98 @@
                         已完成
                     </div>
                     <ul ref="todosListRef">
-                        <li v-for="(item, index) in todoItems" :key="item.id">
+                        <li v-for="(item, index) in todoFinished" :key="item.id">
+                            <!-- 是否完成 -->
                             <span class="checkbox" :class="{ 'checked': item.checked }"
                                 @click.stop="changeTodoStatus(item)">
-                                <svg v-if="item.checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
-                                    <path fill="currentColor"
-                                        d="M329.956 257.138a254.862 254.862 0 0 0 0 509.724h364.088a254.862 254.862 0 0 0 0-509.724zm0-72.818h364.088a327.68 327.68 0 1 1 0 655.36H329.956a327.68 327.68 0 1 1 0-655.36z">
-                                    </path>
-                                    <path fill="currentColor"
-                                        d="M694.044 621.227a109.227 109.227 0 1 0 0-218.454 109.227 109.227 0 0 0 0 218.454m0 72.817a182.044 182.044 0 1 1 0-364.088 182.044 182.044 0 0 1 0 364.088">
-                                    </path>
+                                <!-- -->
+                                <svg v-if="item.checked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+                                    <g fill="none">
+                                        <path fill="url(#fluentColorApprovalsApp160)" fill-rule="evenodd"
+                                            d="M8.571.236a.806.806 0 0 0-1.14 1.14l.73.728H8a6.448 6.448 0 1 0 6.449 6.448a.806.806 0 1 0-1.612 0a4.837 4.837 0 1 1-4.836-4.837h.248l-.818.818a.806.806 0 1 0 1.14 1.14l2.148-2.149a.806.806 0 0 0 0-1.14z"
+                                            clip-rule="evenodd" />
+                                        <path fill="url(#fluentColorApprovalsApp161)" fill-rule="evenodd"
+                                            d="M11.61 5.812a.806.806 0 0 1 0 1.14l-3.472 3.471a.806.806 0 0 1-1.14 0L5.696 9.121a.806.806 0 1 1 1.14-1.14l.732.733l2.902-2.902a.806.806 0 0 1 1.14 0"
+                                            clip-rule="evenodd" />
+                                        <defs>
+                                            <linearGradient id="fluentColorApprovalsApp160" x1="1.554" x2="5.941"
+                                                y1="1.231" y2="17.422" gradientUnits="userSpaceOnUse">
+                                                <stop stop-color="#0fafff" />
+                                                <stop offset="1" stop-color="#0067bf" />
+                                            </linearGradient>
+                                            <linearGradient id="fluentColorApprovalsApp161" x1="10.891" x2="4.999"
+                                                y1="6.555" y2="9.484" gradientUnits="userSpaceOnUse">
+                                                <stop stop-color="#42b870" />
+                                                <stop offset="1" stop-color="#309c61" />
+                                            </linearGradient>
+                                        </defs>
+                                    </g>
                                 </svg>
-                                <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
-                                    <path fill="currentColor"
-                                        d="M329.956 257.138a254.862 254.862 0 0 0 0 509.724h364.088a254.862 254.862 0 0 0 0-509.724zm0-72.818h364.088a327.68 327.68 0 1 1 0 655.36H329.956a327.68 327.68 0 1 1 0-655.36z">
-                                    </path>
-                                    <path fill="currentColor"
-                                        d="M329.956 621.227a109.227 109.227 0 1 0 0-218.454 109.227 109.227 0 0 0 0 218.454m0 72.817a182.044 182.044 0 1 1 0-364.088 182.044 182.044 0 0 1 0 364.088">
-                                    </path>
+                                <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+                                    <g fill="none">
+                                        <path fill="url(#fluentColorHistory160)"
+                                            d="M7.698 5a.75.75 0 0 1 .75.75V7.5h1.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1-.75-.75v-2.5a.75.75 0 0 1 .75-.75" />
+                                        <path fill="url(#fluentColorHistory161)"
+                                            d="M7.947 3.5a4.5 4.5 0 1 1-4.454 5.14a.75.75 0 1 0-1.485.212a6.001 6.001 0 1 0 1.94-5.324V2.75a.75.75 0 1 0-1.5 0v3c0 .414.335.75.75.75h2.5a.75.75 0 1 0 0-1.5H4.592a4.5 4.5 0 0 1 3.354-1.5" />
+                                        <defs>
+                                            <linearGradient id="fluentColorHistory160" x1="6.357" x2="14.586"
+                                                y1="12.633" y2="8.988" gradientUnits="userSpaceOnUse">
+                                                <stop stop-color="#d373fc" />
+                                                <stop offset="1" stop-color="#6d37cd" />
+                                            </linearGradient>
+                                            <linearGradient id="fluentColorHistory161" x1="2" x2="5.234" y1="2.706"
+                                                y2="16.186" gradientUnits="userSpaceOnUse">
+                                                <stop stop-color="#0fafff" />
+                                                <stop offset="1" stop-color="#0067bf" />
+                                            </linearGradient>
+                                        </defs>
+                                    </g>
                                 </svg>
+
                             </span>
-                            <input class="todo-input" v-if="!item.checked" @input="changeTodoTitle(item, $event)"
-                                v-model="item.title" type="text" @blur="editTodo(isLogin, item)" />
-                            <span v-else class="todo-text">{{ item.title }}</span>
+                            <!-- 待办标题 -->
+                            <div class="todo-title">
+                                <input class="todo-input" v-if="!item.checked" @input="changeTodoTitle(item, $event)"
+                                    v-model="item.title" type="text" @blur="editTodo(isLogin, item)" />
+                                <div v-else class="todo-text">{{ item.title }}</div>
+                            </div>
+                            <!-- 时间选择 -->
+                            <div class="todo-time">
+                                <span>时间：</span>
+                                <el-date-picker @change="changeTodoTitle(item, $event)" size="small" class="todo-time"
+                                    :disabled="item.checked ? true : false" :clearable="false" :editable="false"
+                                    v-model="item.time" type="date" placeholder="时间">
+                                </el-date-picker>
+                            </div>
+                            <!-- 备注输入 -->
+                            <div class="todo-remark">
+                                <span>备注：</span>
+                                <el-input type="textarea" @input="changeTodoTitle(item, $event)"
+                                    :autosize="{ minRows: 2, maxRows: 6 }" rows="3"
+                                    :disabled="item.checked ? true : false" resize="none" placeholder="可输入备注"
+                                    v-model="item.remark">
+                                </el-input>
+                            </div>
                             <span class="del-btn" v-if="isEdit" @click="delTodoClick(item, index)">
-                                <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                        d="M764.288 214.592 512 466.88 259.712 214.592a31.936 31.936 0 0 0-45.12 45.12L466.752 512 214.528 764.224a31.936 31.936 0 1 0 45.12 45.184L512 557.184l252.288 252.288a31.936 31.936 0 0 0 45.12-45.12L557.12 512.064l252.288-252.352a31.936 31.936 0 1 0-45.12-45.184z"
-                                        fill="currentColor"></path>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+                                    <g fill="none">
+                                        <path fill="url(#fluentColorDismissCircle160)"
+                                            d="M8 2a6 6 0 1 1 0 12A6 6 0 0 1 8 2" />
+                                        <path fill="url(#fluentColorDismissCircle161)"
+                                            d="M5.896 5.896a.5.5 0 0 1 .638-.057l.07.057L8 7.293l1.396-1.397a.5.5 0 0 1 .638-.057l.07.057a.5.5 0 0 1 .057.638l-.057.07L8.707 8l1.397 1.396a.5.5 0 0 1 .057.638l-.057.07a.5.5 0 0 1-.638.057l-.07-.057L8 8.707l-1.396 1.397a.5.5 0 0 1-.638.057l-.07-.057a.5.5 0 0 1-.057-.638l.057-.07L7.293 8L5.896 6.604a.5.5 0 0 1-.057-.638z" />
+                                        <defs>
+                                            <linearGradient id="fluentColorDismissCircle160" x1="3.875" x2="13"
+                                                y1="2.75" y2="16" gradientUnits="userSpaceOnUse">
+                                                <stop stop-color="#f83f54" />
+                                                <stop offset="1" stop-color="#ca2134" />
+                                            </linearGradient>
+                                            <linearGradient id="fluentColorDismissCircle161" x1="6.011" x2="8.354"
+                                                y1="8.199" y2="10.635" gradientUnits="userSpaceOnUse">
+                                                <stop stop-color="#fdfdfd" />
+                                                <stop offset="1" stop-color="#fecbe6" />
+                                            </linearGradient>
+                                        </defs>
+                                    </g>
                                 </svg>
                             </span>
                         </li>
@@ -291,10 +493,14 @@
 
 <script setup>
 import Sortable from "sortablejs";
+// 时间格式化
+import { formatDate } from '@/hook/useFormatDate'
 import { storeToRefs } from "pinia";
-import { ref, onMounted, inject, watch } from "vue";
+import { ref, onMounted, inject, watch, watchEffect } from "vue";
 const isMobile = inject('isMobile');
 
+const todoTitle = ref("");
+const todoTime = ref(new Date())
 
 import { useRouter } from 'vue-router';
 const router = useRouter();
@@ -306,18 +512,10 @@ function closeDialog() {
     router.push('/');
 }
 
-
 // 获取用户信息 是否登陆
 import { useUserStore } from '@/stores/useAuthStore'
 let { isLogin } = storeToRefs(useUserStore());
-// 加载NavMenu
-import { useNavStore } from "@/stores/useNavStore"
-let { loadNavMenu } = useNavStore();
-let { navItems } = storeToRefs(useNavStore());
-// 加载NavMenu
-watch(isLogin, () => {
-    loadNavMenu(isLogin.value)
-})
+
 // 加载TodoList
 import { useTodoStore } from "@/stores/useTodoStore"
 let { loadTodos, editTodo, delTodo, addTodo, updateTodoSort } = useTodoStore();
@@ -325,12 +523,29 @@ let { todoItems } = storeToRefs(useTodoStore());
 watch(isLogin, () => {
     loadTodos(isLogin.value)
 })
+
+// 计算 todo 今日待办 未完成 已完成
+let todoToday = ref([]);
+let todoUnfinished = ref([]);
+let todoFinished = ref([]);
+
+watchEffect(() => {
+    todoToday.value = todoItems.value.filter(item => item.checked == false && formatDate(item.time, 'YYYY-MM-DD') == formatDate(new Date(), 'YYYY-MM-DD'));
+    todoUnfinished.value = todoItems.value.filter(item => item.checked == false);
+    // 已完成和未完成根据时间排序
+    todoUnfinished.value = todoUnfinished.value.sort((a, b) => new Date(b.time) - new Date(a.time));
+    todoFinished.value = todoItems.value.filter(item => item.checked == true);
+    todoFinished.value = todoFinished.value.sort((a, b) => new Date(b.time) - new Date(a.time));
+})
+
 // 新增Todo
 function addTodoClick() {
     let data = {
         id: new Date().getTime(),
-        title: "新建Todo",
+        time: formatDate(new Date(todoTime.value), 'YYYY-MM-DD'),
+        title: todoTitle.value || "新建Todo",
         checked: false,
+        remark: "",
     };
     addTodo(isLogin.value, data)
 }
@@ -357,29 +572,7 @@ let isEdit = ref(false);
 function delTodoClick(params, index) {
     delTodo(isLogin.value, params, index)
 }
-// 排序
-const todosListRef = ref(null);
-onMounted(() => {
-    if (!isMobile) {
-        // Sortable.create(todosListRef.value, {
-        //     group: "shared",
-        //     animation: 150,
-        //     ghostClass: "ghost",
-        //     onEnd: ({ newIndex, oldIndex }) => {
-        //         const item = todoItems.value.splice(oldIndex, 1)[0];
-        //         todoItems.value.splice(newIndex, 0, item);
-        //         updateTodoSort(isLogin.value, todoItems.value)
-        //     },
-        // });
-    }
-})
-// 图片加载失败
-function onImageError(item) {
-    item.iconPath = "https://yuwb.cn/nav/pwa.png";
-}
-function go(item) {
-    window.open(item.linkPath);
-}
+
 </script>
 <style lang="less" scoped>
 .main::-webkit-scrollbar,
@@ -412,12 +605,12 @@ ul::-webkit-scrollbar-thumb {
         padding-left: 12px;
 
         .todo-input {
-            width: 240px;
+            width: 200px;
+            margin-right: 16px;
         }
 
-        ::v-deep .todo-time {
-            width: 240px;
-            margin-left: 16px;
+        :deep(.todo-time) {
+            width: 200px;
         }
     }
 
@@ -429,6 +622,7 @@ ul::-webkit-scrollbar-thumb {
         overflow: auto;
         padding: 12px;
 
+
         .title {
             padding: 0 56px 0;
             position: relative;
@@ -438,17 +632,6 @@ ul::-webkit-scrollbar-thumb {
             font-weight: 600;
             text-align: center;
             text-align: left;
-
-            .add {
-                display: block;
-                position: absolute;
-                right: 6px;
-                cursor: pointer;
-                top: -1px;
-                width: 32px;
-                height: 32px;
-                font-size: 24px;
-            }
 
             .edit {
                 cursor: pointer;
@@ -468,7 +651,6 @@ ul::-webkit-scrollbar-thumb {
             min-width: 380px;
             height: 100%;
             background: var(--bgColor);
-            // box-shadow: var(--newsShadow);
             border: var(--border);
             color: var(--fontColor);
             padding: 16px;
@@ -487,55 +669,56 @@ ul::-webkit-scrollbar-thumb {
                 margin: 6px 0 12px 0;
                 padding-right: 16px;
 
+
+
                 li {
                     cursor: pointer;
                     position: relative;
                     width: 100%;
-                    height:150px;
-                    line-height: 56px;
+                    // height: 150px;
                     border-radius: 12px;
-                    padding: 0 20px 0 12px;
+                    padding: 10px 20px 10px 12px;
                     background: var(--notesBg);
-                    box-shadow: var(--notesShadow);
+                    box-shadow: var(--notesShadowActive);
                     border: var(--border);
                     color: var(--fontColor);
                     margin: 16px 5px;
                     overflow: hidden;
                     text-overflow: ellipsis;
                     white-space: nowrap;
-                    padding-right: 30px;
+                    padding-right: 12px;
+                    text-align: left;
                 }
 
                 li.active {
-                    box-shadow: var(--notesShadowActive);
+                    box-shadow: var(--notesShadow);
                 }
 
                 li:hover,
                 li:active {
-                    box-shadow: var(--notesShadowActive);
+                    box-shadow: var(--notesShadow);
                 }
 
                 .checkbox {
                     margin-right: 12px;
                     display: inline-block;
-                    height: 28px;
-                    width: 38px;
-                    line-height: 28px;
+                    height: 32px;
+                    width: 32px;
                     border-radius: 10px;
                     position: absolute;
                     left: 10px;
-                    top: 14px;
+                    top: 10px;
                     background: var(--notesBg);
                     box-shadow: var(--notesShadow);
                     border: var(--border);
                     color: var(--fontColor);
-                    vertical-align: middle;
 
                     svg {
                         position: relative;
-                        top: 1px;
-                        left: 6px;
+                        top: 3px;
+                        left: 3px;
                         width: 24px;
+                        height: 24px;
                     }
                 }
 
@@ -543,24 +726,83 @@ ul::-webkit-scrollbar-thumb {
                     color: #999;
                 }
 
-                .todo-input {
-                    margin-left: 50px;
-                    outline: none;
-                    border: none;
-                    height: 28px;
-                    background: transparent;
-                    border: var(--border);
-                    color: var(--fontColor);
-                    padding: 0;
-                    font-size: 14px;
-                    width: 190px;
+                .todo-title {
+                    line-height: 32px;
+
+                    .todo-input {
+                        margin-left: 40px;
+                        margin-right: 12px;
+                        outline: none;
+                        border: none;
+                        height: 28px;
+                        background: transparent;
+                        border: var(--border);
+                        color: var(--fontColor);
+                        padding: 0;
+                        font-size: 14px;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                        width: calc(100% - 36px);
+                    }
+
+                    .todo-text {
+                        margin-left: 40px;
+                        font-size: 14px;
+                        text-decoration: line-through;
+                        text-align: left;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                        width: calc(100% - 36px);
+                        color: #999;
+                    }
                 }
 
-                .todo-text {
-                    margin-left: 50px;
-                    font-size: 14px;
-                    text-decoration: line-through;
-                    color: #999;
+                .todo-time {
+                    margin: 6px 0;
+                    line-height: 42px;
+                    color: var(--fontColorLabel);
+                    font-size: 12px;
+
+                    :deep(.el-input) {
+                        width: 120px;
+                        font-size: 12px;
+                    }
+
+                    .over-time {
+                        padding: 0 6px;
+
+                        .el-check-tag {
+                            position: relative;
+                            top: 1px;
+                            font-size: 12px;
+                            padding: 4px 15px;
+                        }
+
+                        svg {
+
+                            width: 20px;
+                            height: 20px;
+                            vertical-align: middle;
+                        }
+                    }
+                }
+
+                .todo-remark {
+                    margin: 6px 0;
+                    width: 100%;
+                    font-size: 12px;
+                    color: var(--fontColorLabel);
+
+                    span {
+                        vertical-align: top;
+                    }
+
+                    .el-textarea {
+                        width: calc(100% - 42px);
+                        font-size: 12px;
+                    }
                 }
 
                 .checkbox:hover,
@@ -572,23 +814,13 @@ ul::-webkit-scrollbar-thumb {
 
 
         .del-btn {
-            cursor: pointer;
-            display: block;
             position: absolute;
-            right: 8px;
-            top: 16px;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            background: var(--notesBg);
-            box-shadow: var(--shadow);
-            text-align: center;
+            right: 6px;
+            top: 12px;
 
             svg {
-                width: 16px;
-                height: 16px;
-                position: relative;
-                top: -13px;
+                width: 24px;
+                height: 24px;
             }
         }
 
@@ -597,6 +829,19 @@ ul::-webkit-scrollbar-thumb {
             box-shadow: var(--notesShadowActive);
         }
 
+    }
+}
+
+// 媒体查询
+@media screen and (max-width: 768px) {
+    .main {
+        .add-todo {
+            height: 110px;
+        }
+
+        .todo-list {
+            height: calc(100% - 120px);
+        }
     }
 }
 </style>

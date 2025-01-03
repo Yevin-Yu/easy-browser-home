@@ -79,7 +79,7 @@ export const useNotesStore = defineStore("notes", () => {
                 const noteItem: NoteItem = {
                     id: new Date().getTime(),
                     title: "笔记模块",
-                    data: "在这里可以记录你的笔记，支持Markdown语法"
+                    data: "在这里可以记录你的笔记"
                 };
                 addNote(isLogin, noteItem);
                 activeNotes.value = noteItem.id + '';

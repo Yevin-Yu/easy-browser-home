@@ -9,7 +9,8 @@
   <RouterView />
 </template>
 <script setup>
-import { ref } from "vue";
+import { ElNotification } from 'element-plus'
+import { ref, watchEffect, watch } from "vue";
 import { storeToRefs } from 'pinia'
 import { RouterView } from "vue-router";
 // 引入时间组件
@@ -36,4 +37,34 @@ const { toggleTheme, currentTheme } = useTheme();
 import { useUserStore } from '@/stores/useAuthStore'
 let { updateIsLogin, updateUserInfo } = useUserStore()
 let { isLogin, userInfo } = storeToRefs(useUserStore());
+
+// 获取待办 加载TodoList
+
+import { useTodoStore } from "@/stores/useTodoStore"
+let { loadTodos } = useTodoStore();
+let { todoItems } = storeToRefs(useTodoStore());
+watch(isLogin, () => {
+  loadTodos(isLogin.value)
+})
+
+// 时间格式化
+import { formatDate } from '@/hook/useFormatDate'
+// 提示
+watchEffect(() => {
+  // 获取待办中今天的未完成事项 和 已超时的事项
+  if (sessionStorage.getItem('isTodayNotificationTodo') == formatDate(new Date(), 'YYYY-MM-DD')) return
+  // 统计今日需关注和已超时的事项
+  let todayTodo = todoItems.value.filter(item => formatDate(item.time, 'YYYY-MM-DD') == formatDate(new Date(), 'YYYY-MM-DD') && item.checked == false)
+  let todayTodoOverdue = todoItems.value.filter(item => formatDate(item.time, 'YYYY-MM-DD') < formatDate(new Date(), 'YYYY-MM-DD') && item.checked == false)
+  if(!todayTodo.length && !todayTodoOverdue.length) return
+  // 显示通知
+  ElNotification({
+    title: '待办提示',
+    message: `今日有${todayTodo.length}个需关注，${todayTodoOverdue.length}个已超时。`,
+    position: 'top-right',
+    type: 'warning',
+  })
+  // 保存时间
+  sessionStorage.setItem('isTodayNotificationTodo', formatDate(new Date(), 'YYYY-MM-DD'))
+})
 </script>

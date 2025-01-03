@@ -8,6 +8,8 @@ interface TodoItem {
     title: string;
     checked: boolean | number;
     sort_order?: number;
+    time?: string;
+    remark?: string;
 }
 
 export const useTodoStore = defineStore("todo", () => {
