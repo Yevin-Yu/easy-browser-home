@@ -203,6 +203,7 @@ function onInput() {
 // 新增笔记
 function noteAdd() {
     const data = {
+        id: new Date().getTime(),
         title: "新建笔记",
         data: "新建笔记内容",
     };
@@ -219,7 +220,7 @@ const notesListRef = ref(null);
 onMounted(() => {
     nextTick(() => {
         // 移动端不排序
-        if (isMobile.value && !notesListRef.value) return
+        if (isMobile.value || !notesListRef.value) return
         Sortable.create(notesListRef.value, {
             group: "shared",
             animation: 150,
