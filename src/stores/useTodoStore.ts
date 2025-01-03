@@ -31,7 +31,7 @@ export const useTodoStore = defineStore("todo", () => {
                             // 接口获取用户待办为空时，默认批量上传本地todosList。
                             const todosList = JSON.parse(localStorage.getItem("todosList") || "[]");
                             todoItems.value = todosList;
-                            if (!todosList && !todosList.length) return;
+                            if (!todosList.length) return;
                             api.post("todo/batch", { todosList })
                                 .then((res) => {
                                     if (res.code === 200) {
@@ -83,21 +83,23 @@ export const useTodoStore = defineStore("todo", () => {
         }
     };
 
-    const delTodo = (isLogin: boolean, params: TodoItem, index: number) => {
+    const delTodo = (isLogin: boolean, params: TodoItem) => {
+        // 删除
+        todoItems.value = todoItems.value.filter((item) => item.id !== params.id);
+        localStorage.setItem("todosList", JSON.stringify(todoItems.value));
         if (isLogin) {
             api.post("todo/delete", { id: params.id })
                 .then((res) => {
                     if (res.code === 200) {
                         ElMessage.success("删除成功");
+                        // 重新加载 同步数据
+                        localStorage.setItem("todosList", JSON.stringify(todoItems.value));
                         loadTodos(isLogin);
                     }
                 })
                 .catch(() => {
                     ElMessage.error("系统异常，请稍后再试");
                 });
-        } else {
-            todoItems.value.splice(index, 1);
-            localStorage.setItem("todosList", JSON.stringify(todoItems.value));
         }
     };
 

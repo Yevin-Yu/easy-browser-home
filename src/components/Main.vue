@@ -147,7 +147,7 @@
                                 </el-input>
                             </div>
 
-                            <span class="del-btn" v-if="isEdit" @click="delTodoClick(item, index)">
+                            <span class="del-btn" v-if="isEdit" @click="delTodoClick(item)">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
                                     <g fill="none">
                                         <path fill="url(#fluentColorDismissCircle160)"
@@ -306,7 +306,7 @@
                                     v-model="item.remark">
                                 </el-input>
                             </div>
-                            <span class="del-btn" v-if="isEdit" @click="delTodoClick(item, index)">
+                            <span class="del-btn" v-if="isEdit" @click="delTodoClick(item)">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
                                     <g fill="none">
                                         <path fill="url(#fluentColorDismissCircle160)"
@@ -461,7 +461,7 @@
                                     v-model="item.remark">
                                 </el-input>
                             </div>
-                            <span class="del-btn" v-if="isEdit" @click="delTodoClick(item, index)">
+                            <span class="del-btn" v-if="isEdit" @click="delTodoClick(item)">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
                                     <g fill="none">
                                         <path fill="url(#fluentColorDismissCircle160)"
@@ -569,8 +569,8 @@ function changeTodoTitle(params, event) {
 }
 // 删除Todo
 let isEdit = ref(false);
-function delTodoClick(params, index) {
-    delTodo(isLogin.value, params, index)
+function delTodoClick(params) {
+    delTodo(isLogin.value, params)
 }
 
 </script>

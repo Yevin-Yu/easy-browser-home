@@ -146,6 +146,7 @@ export const useNavStore = defineStore("nav", () => {
                         if (res.data.length === 0) {
                             // 接口获取用户导航为空时，默认批量上传本地Nav。
                             const navMenu = JSON.parse(localStorage.getItem("navMenu") || "[]");
+                            if (!navMenu.length) return
                             navItems.value = navMenu;
                             api.post("nav/batch", { navMenu })
                                 .then((res) => {

@@ -92,7 +92,7 @@
                     <li @click="selectNote(item)" v-for="(item, index) in noteItems"
                         :class="{ 'active': item.id == activeNotes }" :key="item">
                         <span>{{ item.title }}</span>
-                        <span v-if="isDel" @click.stop="delNoteClick(item, index)" class="del-btn">
+                        <span v-if="isDel" @click.stop="delNoteClick(item)" class="del-btn">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
                                 <g fill="none">
                                     <path fill="url(#fluentColorDismissCircle160)"
@@ -117,7 +117,7 @@
                     </li>
                 </ul>
             </div>
-            <div class="right" v-if="!isMobile || (isMobile && isShowNotes)">
+            <div class="right" v-if="(!isMobile || (isMobile && isShowNotes)) && activeNotes">
                 <span class="back" @click="backList" v-if="isMobile">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                         <path fill="#2f88ff" fill-rule="evenodd" stroke="#000" stroke-linejoin="round" stroke-width="4"
@@ -136,7 +136,7 @@
 
 <script setup>
 import Sortable from "sortablejs";
-import { watch, onMounted, onBeforeUnmount, reactive, ref, computed, inject, nextTick } from "vue";
+import { watch, onMounted, onBeforeUnmount, reactive, ref, computed, inject, nextTick, effect, watchEffect } from "vue";
 import { storeToRefs } from "pinia";
 import { useRouter } from 'vue-router';
 const router = useRouter();
@@ -151,11 +151,10 @@ function closeDialog() {
 
 // 获取屏幕尺寸 低于500式 为移动端
 const isMobile = ref(false)
-const isShowNotes = ref(true)
+const isShowNotes = ref(false)
 const screenWidth = ref(document.documentElement.clientWidth)
 if (screenWidth.value < 768) {
     isMobile.value = true
-    isShowNotes.value = true
 }
 
 // 获取用户信息 是否登陆
@@ -167,6 +166,15 @@ let { loadNotes, editNote, delNote, addNote, updateNoteSort } = useNotesStore();
 let { noteItems, activeNotes, noteDetails } = storeToRefs(useNotesStore());
 watch(isLogin, () => {
     loadNotes(isLogin.value)
+})
+
+const isLoad = ref(false);
+watchEffect(() => {
+    if (isLoad.value) return
+    if (isMobile.value && activeNotes.value && noteItems.value.length) {
+        isShowNotes.value = true
+        isLoad.value = true
+    }
 })
 
 // app 返回列表
@@ -202,8 +210,8 @@ function noteAdd() {
 }
 // 删除
 let isDel = ref(false);
-function delNoteClick(params, index) {
-    delNote(isLogin.value, params, index);
+function delNoteClick(params) {
+    delNote(isLogin.value, params);
 }
 
 // 笔记排序

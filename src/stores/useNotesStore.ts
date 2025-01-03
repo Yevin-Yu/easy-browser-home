@@ -34,7 +34,11 @@ export const useNotesStore = defineStore("notes", () => {
                             // 接口获取用户笔记为空时，默认批量上传本地notesList。
                             const notesList = JSON.parse(localStorage.getItem("notesList") || "[]");
                             noteItems.value = notesList;
-                            if (!notesList && !notesList.length) return;
+                            if (!notesList.length) {
+                                activeNotes.value = '';
+                                noteDetails.value = {};
+                                return;
+                            }
                             api.post("note/batch", { notesList })
                                 .then((res) => {
                                     if (res.code === 200) {
@@ -49,9 +53,18 @@ export const useNotesStore = defineStore("notes", () => {
                             noteItems.value = res.data;
                             // 判断是否有激活的笔记
                             if (activeNotes.value) {
-                                noteDetails.value = noteItems.value.find((it) => it.id === parseInt(activeNotes.value)) || {};
+                                let note = noteItems.value.find((it) => it.id === parseInt(activeNotes.value));
+                                if (note) {
+                                    noteDetails.value = note;
+                                } else if (noteItems.value.length) {
+                                    activeNotes.value = noteItems.value[0].id + '';
+                                    noteDetails.value = noteItems.value[0];
+                                } else {
+                                    activeNotes.value = '';
+                                    noteDetails.value = {};
+                                }
                             } else {
-                                activeNotes.value = noteItems.value[0] + '';
+                                activeNotes.value = noteItems.value[0].id + '';
                                 noteDetails.value = noteItems.value[0];
                             }
                             localStorage.setItem("notesList", JSON.stringify(res.data));
@@ -111,7 +124,9 @@ export const useNotesStore = defineStore("notes", () => {
         }
     };
 
-    const delNote = (isLogin: boolean, params: NoteItem, index: number) => {
+    const delNote = (isLogin: boolean, params: NoteItem) => {
+        noteItems.value = noteItems.value.filter((item) => item.id !== params.id);
+        localStorage.setItem("notesList", JSON.stringify(noteItems.value));
         if (isLogin) {
             api.post("note/delete", { id: params.id })
                 .then((res) => {
@@ -123,9 +138,6 @@ export const useNotesStore = defineStore("notes", () => {
                 .catch(() => {
                     ElMessage.error("系统异常，请稍后再试");
                 });
-        } else {
-            noteItems.value.splice(index, 1);
-            localStorage.setItem("notesList", JSON.stringify(noteItems.value));
         }
     };
 
